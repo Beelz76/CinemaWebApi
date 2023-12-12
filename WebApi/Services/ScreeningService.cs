@@ -18,6 +18,8 @@ namespace WebApi.Services
             var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.Name == hallName);
             var screeningPrice = _cinemaDbContext.Set<ScreeningPrice>().SingleOrDefault(x => x.Price == price);
 
+            if (hall == null || movie == null || screeningPrice == null) { return false; }
+
             var screening = new Screening
             {
                 ScreeningUid = Guid.NewGuid(),

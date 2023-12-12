@@ -21,7 +21,7 @@ namespace WebApi.Controllers
         //[AllowAnonymous]
         public ActionResult<JwtToken> Register(UserRegisterCredentials credentials)
         {
-            /*var regex = new Regex("/^[a-zA-Z][a-zA-Z0-9_]+$/");
+            /*var regex = new Regex("^[a-zA-Z][a-zA-Z0-9_]*$");
 
             if (!regex.IsMatch(credentials.Login)) 
             {

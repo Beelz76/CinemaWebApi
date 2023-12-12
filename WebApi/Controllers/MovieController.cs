@@ -68,7 +68,24 @@ namespace WebApi.Controllers
         [HttpPut]
         public ActionResult UpdateMovie(Guid movieUid, MovieInfo movieInfo)
         {
-            throw new NotImplementedException();
+            if (movieInfo == null)
+            {
+                return BadRequest();
+            }
+
+            if (!_movieService.CheckMovieExists(movieUid))
+            {
+                return NotFound("Movie not found");
+            }
+
+            if (!_movieService.UpdateMovie(movieUid, movieInfo))
+            {
+                ModelState.AddModelError("", "Failed to update movie");
+
+                return BadRequest(ModelState);
+            }
+
+            return Ok("Movie updated");
         }
 
         [HttpDelete]

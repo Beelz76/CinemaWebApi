@@ -164,7 +164,88 @@ namespace WebApi.Services
 
         public bool UpdateMovie(Guid movieUid, Contracts.MovieInfo movieInfo)
         {
-            throw new NotImplementedException();
+            var movie = _cinemaDbContext.Set<Movie>()
+                .Include(x => x.Directors)
+                .Include(x => x.Countries)
+                .Include(x => x.Genres)
+                .SingleOrDefault(x => x.MovieUid == movieUid);
+
+            if (movie == null) { return false; }
+
+            movie.Title = movieInfo.Title;
+            movie.ReleaseYear = movieInfo.ReleaseYear;
+            movie.Duration = movieInfo.Duration;
+            movie.Description = movieInfo.Description;
+            movie.Image = movieInfo.Image;
+
+            movie.Directors.Clear();
+            movie.Countries.Clear();
+            movie.Genres.Clear();
+
+            var directors = new List<Director>();
+            foreach (var directorName in movieInfo.Directors)
+            {
+                var director = _cinemaDbContext.Set<Director>().SingleOrDefault(x => x.FullName == directorName);
+
+                if (director == null)
+                {
+                    director = new Director
+                    {
+                        DirectorUid = Guid.NewGuid(),
+                        FullName = directorName
+                    };
+
+                    _cinemaDbContext.Add(director);
+                }
+
+                directors.Add(director);
+            }
+
+            var countries = new List<Country>();
+            foreach (var countryName in movieInfo.Countries)
+            {
+                var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.Name == countryName);
+
+                if (country == null)
+                {
+                    country = new Country
+                    {
+                        CountryUid = Guid.NewGuid(),
+                        Name = countryName
+                    };
+
+                    _cinemaDbContext.Add(country);
+                }
+
+                countries.Add(country);
+            }
+
+            var genres = new List<Genre>();
+            foreach (var genreName in movieInfo.Genres)
+            {
+                var genre = _cinemaDbContext.Set<Genre>().SingleOrDefault(x => x.Name == genreName);
+
+                if (genre == null)
+                {
+                    genre = new Genre
+                    {
+                        GenreUid = Guid.NewGuid(),
+                        Name = genreName
+                    };
+
+                    _cinemaDbContext.Add(genre);
+                }
+
+                genres.Add(genre);
+            }
+
+            movie.Directors = directors;
+            movie.Genres = genres;
+            movie.Countries = countries;
+
+            _cinemaDbContext.Add(movie);
+
+            return _cinemaDbContext.SaveChanges() > 0;
         }
 
         public bool DeleteMovie(Guid movieUid)
@@ -176,6 +257,15 @@ namespace WebApi.Services
             _cinemaDbContext.Remove(movie);
 
             return _cinemaDbContext.SaveChanges() > 0;
+        }
+
+        public bool CheckMovieExists(Guid movieUid)
+        {
+            var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.MovieUid == movieUid);
+
+            if (movie == null) { return false; }
+
+            return true;
         }
     }
 }
