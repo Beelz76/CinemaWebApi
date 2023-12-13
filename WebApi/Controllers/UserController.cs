@@ -64,7 +64,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize (Roles = "Admin")]
         public ActionResult<List<User>> GetAllUsers()
         {
             var users = _userService.GetAllUsers();
@@ -78,7 +78,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public ActionResult<User> GetSingleUser(Guid userUid)
         {
             var user = _userService.GetSingleUser(userUid);
@@ -92,7 +92,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "User")]
         public ActionResult<UserInfo> GetUserInfo(Guid userUid)
         {
             var user = _userService.GetUserInfo(userUid);
@@ -106,7 +106,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize]
+        [Authorize(Roles = "Admin, User")]
         public ActionResult UpdateUser(Guid userUid, UserUpdate userUpdate)
         {
             if (userUpdate.Login == null || userUpdate.Password == null || 
@@ -157,14 +157,21 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public ActionResult UpdateUserAdminStatus(Guid userUid)
         {
-            throw new NotImplementedException();
+            if (!_userService.UpdateUserAdminStatus(userUid))
+            {
+                ModelState.AddModelError("", "Failed to update user status");
+
+                return BadRequest(ModelState);
+            }
+
+            return Ok("User status updated");
         }
 
         [HttpDelete]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteUser(Guid userUid)
         {
             if (!_userService.DeleteUser(userUid))

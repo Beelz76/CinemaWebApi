@@ -1,6 +1,7 @@
 ﻿using WebApi.Contracts;
 using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers
 {
@@ -16,6 +17,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public ActionResult<Guid> CreateGenre(string name)
         {
             if (name == null)

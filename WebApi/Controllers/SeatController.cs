@@ -1,6 +1,7 @@
 ﻿using WebApi.Contracts;
 using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers
 {
@@ -20,6 +21,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public ActionResult CreateSeat(string hallName, int row, int number)
         {
             if (hallName == null || row <= 0 || number <= 0)
@@ -43,6 +45,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<Seat>> GetAllSeats()
         {
             var seats = _seatService.GetAllSeats();
@@ -56,6 +59,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<HallSeat>> GetHallSeats(Guid hallUid)
         {
             if (!_hallService.IsHallExists(hallUid))
@@ -74,6 +78,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public ActionResult<List<ScreeningSeat>> GetScreeningSeats(Guid screeningUid)
         {
             if (!_screeningService.IsScreeningExists(screeningUid))
@@ -92,6 +97,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public ActionResult UpdateSeat(Guid seatUid, int row, int number)
         {
             if (row <= 0 || number <= 0)
@@ -110,6 +116,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteSeat(Guid seatUid)
         {
             if (!_seatService.DeleteSeat(seatUid))

@@ -1,11 +1,13 @@
 ﻿using WebApi.Contracts;
 using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class DirectorController : ControllerBase
     {
         private readonly DirectorService _directorService;

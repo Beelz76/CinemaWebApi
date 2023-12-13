@@ -100,7 +100,7 @@ namespace WebApi.Services
 
             user.FullName = userUpdate.FullName;
             user.Login = userUpdate.Login;
-            user.Password = userUpdate.Password;
+            user.Password = GetHash(userUpdate.Password);
             user.Email = userUpdate.Email;
 
             return _cinemaDbContext.SaveChanges() > 0;

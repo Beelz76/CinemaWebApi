@@ -1,6 +1,7 @@
 ﻿using WebApi.Contracts;
 using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers
 {
@@ -22,6 +23,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public ActionResult CreateScreening(ScreeningInfo screeningInfo)
         {
             if (screeningInfo.MovieTitle == null || screeningInfo.HallName == null ||
@@ -63,6 +65,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<Screening>> GetAllScreenings()
         {
             var screenings = _screeningService.GetAllScreenings();
@@ -76,6 +79,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public ActionResult<List<MovieScreening>> GetMovieScreenings(Guid movieUid)
         {
             if (!_movieService.IsMovieExists(movieUid))
@@ -94,6 +98,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<MovieScreening>> GetHallScreenings(string hallName)
         {
             if (!_hallService.CheckHallName(hallName))
@@ -112,6 +117,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public ActionResult UpdateScreening(Guid screeningUid, ScreeningInfo screeningInfo)
         {
             if (screeningInfo.MovieTitle == null || screeningInfo.HallName == null ||
@@ -157,6 +163,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteScreening(Guid screeningUid)
         {
             if (!_screeningService.DeleteScreening(screeningUid))
