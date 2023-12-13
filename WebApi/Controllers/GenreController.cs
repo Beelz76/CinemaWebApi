@@ -23,6 +23,13 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
+            if (!_genreService.CheckRegex(name))
+            {
+                ModelState.AddModelError("", "Invalid genre name format");
+
+                return BadRequest(ModelState);
+            }
+
             if (_genreService.CheckGenreName(name))
             {
                 ModelState.AddModelError("", "Genre already exists");
@@ -64,6 +71,13 @@ namespace WebApi.Controllers
             if (!_genreService.CheckGenreExists(genreUid))
             {
                 return NotFound("Genre not found");
+            }
+
+            if (!_genreService.CheckRegex(name))
+            {
+                ModelState.AddModelError("", "Invalid genre name format");
+
+                return BadRequest(ModelState);
             }
 
             if (_genreService.CheckGenreName(name))

@@ -1,6 +1,7 @@
 ﻿using WebApi.Contracts;
 using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace WebApi.Controllers
 {
@@ -21,6 +22,13 @@ namespace WebApi.Controllers
             if (name == null)
             {
                 return BadRequest();
+            }
+
+            if (!_hallService.CheckRegex(name))
+            {
+                ModelState.AddModelError("", "Invalid hall name format");
+
+                return BadRequest(ModelState);
             }
 
             if (_hallService.CheckHallName(name))
@@ -64,6 +72,13 @@ namespace WebApi.Controllers
             if (!_hallService.CheckHallExists(hallUid))
             {
                 return NotFound("Hall not found");
+            }
+
+            if (!_hallService.CheckRegex(name))
+            {
+                ModelState.AddModelError("", "Invalid hall name format");
+
+                return BadRequest(ModelState);
             }
 
             if (_hallService.CheckHallName(name))

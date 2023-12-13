@@ -18,9 +18,37 @@ namespace WebApi.Controllers
         [HttpPost]
         public ActionResult CreateMovie(MovieInfo movieInfo)
         {
-            if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || movieInfo.Duration <= 0)
+            if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || int.Parse(movieInfo.Duration) <= 0)
             {
                 return BadRequest();
+            }
+
+            if (!_movieService.CheckRegex(movieInfo.Title))
+            {
+                ModelState.AddModelError("", "Invalid movie title format");
+
+                return BadRequest(ModelState);
+            }
+
+            if (!_movieService.CheckRegexList(movieInfo.Directors))
+            {
+                ModelState.AddModelError("", "Invalid director name format");
+
+                return BadRequest(ModelState);
+            }
+
+            if (!_movieService.CheckRegexList(movieInfo.Countries))
+            {
+                ModelState.AddModelError("", "Invalid country name format");
+
+                return BadRequest(ModelState);
+            }
+
+            if (!_movieService.CheckRegexList(movieInfo.Genres))
+            {
+                ModelState.AddModelError("", "Invalid genre name format");
+
+                return BadRequest(ModelState);
             }
 
             if (_movieService.CheckMovieInfo(movieInfo))
@@ -29,7 +57,6 @@ namespace WebApi.Controllers
 
                 return BadRequest(ModelState);
             }
-
 
             if (!_movieService.CreateMovie(movieInfo))
             {
@@ -83,7 +110,7 @@ namespace WebApi.Controllers
         [HttpPut]
         public ActionResult UpdateMovie(Guid movieUid, MovieInfo movieInfo)
         {
-            if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || movieInfo.Duration <= 0)
+            if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || int.Parse(movieInfo.Duration) <= 0)
             {
                 return BadRequest();
             }
@@ -91,6 +118,34 @@ namespace WebApi.Controllers
             if (!_movieService.CheckMovieExists(movieUid))
             {
                 return NotFound("Movie not found");
+            }
+
+            if (!_movieService.CheckRegex(movieInfo.Title))
+            {
+                ModelState.AddModelError("", "Invalid movie title format");
+
+                return BadRequest(ModelState);
+            }
+
+            if (!_movieService.CheckRegexList(movieInfo.Directors))
+            {
+                ModelState.AddModelError("", "Invalid director name format");
+
+                return BadRequest(ModelState);
+            }
+
+            if (!_movieService.CheckRegexList(movieInfo.Countries))
+            {
+                ModelState.AddModelError("", "Invalid country name format");
+
+                return BadRequest(ModelState);
+            }
+
+            if (!_movieService.CheckRegexList(movieInfo.Genres))
+            {
+                ModelState.AddModelError("", "Invalid genre name format");
+
+                return BadRequest(ModelState);
             }
 
             if (_movieService.CheckMovieInfo(movieInfo))

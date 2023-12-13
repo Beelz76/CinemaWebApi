@@ -23,6 +23,13 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
+            if (!_directorService.CheckRegex(fullName))
+            {
+                ModelState.AddModelError("", "Invalid director name format");
+
+                return BadRequest(ModelState);
+            }
+
             if (!_directorService.CreateDirector(fullName))
             {
                 ModelState.AddModelError("", "Failed to create director");
@@ -57,6 +64,13 @@ namespace WebApi.Controllers
             if (!_directorService.CheckDirectorExists(directorUid))
             {
                 return NotFound("Director not found");
+            }
+
+            if (!_directorService.CheckRegex(fullName))
+            {
+                ModelState.AddModelError("", "Invalid director name format");
+
+                return BadRequest(ModelState);
             }
 
             if (!_directorService.UpdateDirector(directorUid, fullName))

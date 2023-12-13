@@ -1,5 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
+using System.Text.RegularExpressions;
 
 namespace WebApi.Services
 {
@@ -74,6 +75,18 @@ namespace WebApi.Services
             var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.CountryUid == countryUid);
 
             if (country == null) { return false; }
+
+            return true;
+        }
+
+        public bool CheckRegex(string name)
+        {
+            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$");
+
+            if (!regex.IsMatch(name))
+            {
+                return false;
+            }
 
             return true;
         }

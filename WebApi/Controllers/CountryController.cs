@@ -23,6 +23,13 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
+            if (!_countryService.CheckRegex(name))
+            {
+                ModelState.AddModelError("", "Invalid country name format");
+
+                return BadRequest(ModelState);
+            }
+
             if (_countryService.CheckCountryName(name))
             {
                 ModelState.AddModelError("", "Country already exists");
@@ -64,6 +71,13 @@ namespace WebApi.Controllers
             if (!_countryService.CheckCountryExists(countryUid))
             {
                 return NotFound("Country not found");
+            }
+
+            if (!_countryService.CheckRegex(name))
+            {
+                ModelState.AddModelError("", "Invalid country name format");
+
+                return BadRequest(ModelState);
             }
 
             if (_countryService.CheckCountryName(name))

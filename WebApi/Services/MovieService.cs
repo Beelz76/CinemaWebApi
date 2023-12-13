@@ -1,6 +1,7 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace WebApi.Services
 {
@@ -14,13 +15,13 @@ namespace WebApi.Services
         }
 
         public bool CreateMovie(Contracts.MovieInfo movieInfo)
-        {
+        {          
             var movie = new Movie
             {
                 MovieUid = Guid.NewGuid(),
                 Title = movieInfo.Title,
                 ReleaseYear = movieInfo.ReleaseYear,
-                Duration = movieInfo.Duration,
+                Duration = int.Parse(movieInfo.Duration),
                 Description = movieInfo.Description
             };
 
@@ -42,7 +43,7 @@ namespace WebApi.Services
                 .ToList();
 
             if (movies.Count == 0) { return null; }
-
+            
             return movies.Select(movie => new Contracts.Movie
             {
                 MovieUid = movie.MovieUid,
@@ -89,13 +90,11 @@ namespace WebApi.Services
                 .Include(x => x.Countries)
                 .ToList();
 
-            if (movies.Count == 0) { return null; }
-
             return movies.Select(movie => new Contracts.MovieInfo
             {
                 Title = movie.Title,
                 ReleaseYear = movie.ReleaseYear,
-                Duration = movie.Duration,
+                Duration = $"{movie.Duration / 60}ч {movie.Duration % 60}мин",
                 Description = movie.Description,
                 Image = movie.Image,
                 Directors = movie.Directors.Select(x => x.FullName).ToList(),
@@ -116,7 +115,7 @@ namespace WebApi.Services
 
             movie.Title = movieInfo.Title;
             movie.ReleaseYear = movieInfo.ReleaseYear;
-            movie.Duration = movieInfo.Duration;
+            movie.Duration = Int32.Parse(movieInfo.Duration);
             movie.Description = movieInfo.Description;
 
             movie.Directors.Clear();
@@ -227,10 +226,37 @@ namespace WebApi.Services
             var movie = _cinemaDbContext.Set<Movie>()
                 .SingleOrDefault(x => x.Title == movieInfo.Title && 
                                 x.ReleaseYear == movieInfo.ReleaseYear && 
-                                x.Duration == movieInfo.Duration && 
+                                x.Duration == Int32.Parse(movieInfo.Duration) && 
                                 x.Description == movieInfo.Description);
 
             if (movie == null) { return false; };
+
+            return true;
+        }
+
+        public bool CheckRegex(string name)
+        {
+            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$");
+
+            if (!regex.IsMatch(name))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool CheckRegexList(List<string> list)
+        {
+            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$");
+
+            foreach (var item in list)
+            {
+                if (!regex.IsMatch(item))
+                {
+                    return false;
+                }
+            }
 
             return true;
         }

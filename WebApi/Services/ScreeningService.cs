@@ -44,12 +44,13 @@ namespace WebApi.Services
             return _cinemaDbContext.SaveChanges() > 0;
         }
 
-        public List<Contracts.Screening>? GetScreenings()
+        public List<Contracts.Screening>? GetAllScreenings()
         {
             var screenings = _cinemaDbContext.Set<Screening>()
                 .Include(x => x.Hall)
                 .Include(x => x.ScreeningPrice)
                 .Include(x => x.Movie)
+                .OrderBy(x => x.ScreeningStart)
                 .ToList();
             
             if (screenings.Count == 0) { return null; }
@@ -58,7 +59,7 @@ namespace WebApi.Services
             {
                 ScreeingUid = screening.ScreeningUid,
                 MovieTitle = screening.Movie.Title,
-                MovieDuration = screening.Movie.Duration,
+                MovieDuration = $"{screening.Movie.Duration / 60}ч {screening.Movie.Duration % 60}мин",
                 ScreeningStart = screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
                 ScreeningEnd = screening.ScreeningEnd.ToString("dd.MM.yyyy HH:mm"),
                 HallName = screening.Hall.Name,
@@ -73,6 +74,7 @@ namespace WebApi.Services
                 .Include(x => x.ScreeningPrice)
                 .Include(x => x.Movie)
                 .Where(x => x.Movie.MovieUid == movieUid)
+                .OrderBy(x => x.ScreeningStart)
                 .ToList();
 
             if (screenings.Count == 0) { return null; }
@@ -88,11 +90,55 @@ namespace WebApi.Services
             }).ToList();
         }
 
-        public bool UpdateScreening(Guid screeningGuid, Contracts.ScreeningInfo screeningInfo)
+        public List<Contracts.MovieScreening>? GetHallScreenings(string hallName)
         {
+            var screenings = _cinemaDbContext.Set<Screening>()
+                .Include(x => x.Hall)
+                .Include(x => x.ScreeningPrice)
+                .Include(x => x.Movie)
+                .Where(x => x.Hall.Name == hallName)
+                .OrderBy(x => x.ScreeningStart)
+                .ToList();
 
+            if (screenings.Count == 0) { return null; }
 
-            throw new NotImplementedException();
+            return screenings.Select(screening => new Contracts.MovieScreening
+            {
+                MovieTitle = screening.Movie.Title,
+                MovieDuration = $"{screening.Movie.Duration / 60}ч {screening.Movie.Duration % 60}мин",
+                ScreeningStart = screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
+                ScreeningEnd = screening.ScreeningEnd.ToString("dd.MM.yyyy HH:mm"),
+                HallName = screening.Hall.Name,
+                Price = screening.ScreeningPrice.Price
+            }).ToList();
+        }
+
+        public bool UpdateScreening(Guid screeningUid, Contracts.ScreeningInfo screeningInfo)
+        {
+            var screening = _cinemaDbContext.Set<Screening>().SingleOrDefault(x => x.ScreeningUid == screeningUid);
+
+            if (screening == null) {  return false; }
+
+            var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.Title == screeningInfo.MovieTitle);
+            var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.Name == screeningInfo.HallName);
+            var screeningPrice = _cinemaDbContext.Set<ScreeningPrice>().SingleOrDefault(x => x.Price == screeningInfo.Price);
+
+            if (movie == null || hall == null || screeningPrice == null) { return false;}
+
+            DateTime screeningStartTime;
+
+            if (!DateTime.TryParseExact(screeningInfo.ScreeningStart, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out screeningStartTime))
+            {
+                return false;
+            }
+
+            screening.Movie = movie;
+            screening.Hall = hall;
+            screening.ScreeningStart = screeningStartTime;
+            screening.ScreeningEnd = screeningStartTime.AddMinutes(movie.Duration);
+            screening.ScreeningPrice = screeningPrice;
+
+            return _cinemaDbContext.SaveChanges() > 0;
         }
 
         public bool DeleteScreening(Guid screeningUid)

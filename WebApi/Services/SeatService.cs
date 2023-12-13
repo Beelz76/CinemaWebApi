@@ -36,7 +36,7 @@ namespace WebApi.Services
 
         public List<Contracts.Seat>? GetAllSeats()
         {
-            var seats = _cinemaDbContext.Set<Seat>().Include(x => x.Hall).ToList();
+            var seats = _cinemaDbContext.Set<Seat>().Include(x => x.Hall).OrderBy(x => x.Hall.Name).ToList();
 
             if (seats.Count == 0) { return null; }
 
@@ -52,6 +52,7 @@ namespace WebApi.Services
         public List<Contracts.HallSeat>? GetHallSeats(Guid hallUid)
         {
             var seats = _cinemaDbContext.Set<Seat>().Where(x => x.Hall.HallUid == hallUid).ToList();
+            //var seats = _cinemaDbContext.Set<Seat>().Where(x => x.Hall.HallUid == hallUid).OrderBy(x => x.Hall.HallUid).ThenBy(x => x.Row).ThenBy(x => x.Number).ToList();
 
             if (seats.Count == 0) { return null; }
 

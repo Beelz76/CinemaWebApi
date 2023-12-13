@@ -2,9 +2,9 @@
 {
     public class MovieScreening
     {
-        //public required string MovieTitle { get; init; }
+        public string MovieTitle { get; init; }
 
-        //public required int MovieDuration { get; init; }
+        public string MovieDuration { get; init; }
 
         public required string ScreeningStart { get; init; }
 

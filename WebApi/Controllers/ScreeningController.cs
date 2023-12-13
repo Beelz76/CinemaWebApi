@@ -30,17 +30,17 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
-            if (_movieService.CheckMovieTitle(screeningInfo.MovieTitle))
+            if (!_movieService.CheckMovieTitle(screeningInfo.MovieTitle))
             {
                 return NotFound("Movie not found");
             }
 
-            if (_hallService.CheckHallName(screeningInfo.HallName))
+            if (!_hallService.CheckHallName(screeningInfo.HallName))
             {
                 return NotFound("Hall not found");
             }
 
-            if (_screeningPriceService.CheckScreeningPrice(screeningInfo.Price))
+            if (!_screeningPriceService.CheckScreeningPrice(screeningInfo.Price))
             {
                 return NotFound("Price not found");
             }
@@ -63,9 +63,9 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Screening>> GetScreenings()
+        public ActionResult<List<Screening>> GetAllScreenings()
         {
-            var screenings = _screeningService.GetScreenings();
+            var screenings = _screeningService.GetAllScreenings();
 
             if (screenings == null)
             {
@@ -93,6 +93,24 @@ namespace WebApi.Controllers
             return Ok(screenings);
         }
 
+        [HttpGet]
+        public ActionResult<List<MovieScreening>> GetHallScreenings(string hallName)
+        {
+            if (!_hallService.CheckHallName(hallName))
+            {
+                return NotFound("Hall not found");
+            }
+
+            var screenings = _screeningService.GetHallScreenings(hallName);
+
+            if (screenings == null)
+            {
+                return NotFound("No screenings found");
+            }
+
+            return Ok(screenings);
+        }
+
         [HttpPut]
         public ActionResult UpdateScreening(Guid screeningUid, ScreeningInfo screeningInfo)
         {
@@ -107,17 +125,17 @@ namespace WebApi.Controllers
                 return NotFound("Screening not found");
             }
 
-            if (_movieService.CheckMovieTitle(screeningInfo.MovieTitle))
+            if (!_movieService.CheckMovieTitle(screeningInfo.MovieTitle))
             {
                 return NotFound("Movie not found");
             }
 
-            if (_hallService.CheckHallName(screeningInfo.HallName))
+            if (!_hallService.CheckHallName(screeningInfo.HallName))
             {
                 return NotFound("Hall not found");
             }
 
-            if (_screeningPriceService.CheckScreeningPrice(screeningInfo.Price))
+            if (!_screeningPriceService.CheckScreeningPrice(screeningInfo.Price))
             {
                 return NotFound("Price not found");
             }

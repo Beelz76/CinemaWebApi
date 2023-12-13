@@ -3,6 +3,7 @@ using DatabaseAccessLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace WebApi.Services
 {
@@ -174,6 +175,30 @@ namespace WebApi.Services
             user.IsAdmin = true;
 
             return _cinemaDbContext.SaveChanges() > 0;
+        }
+
+        public bool CheckRegex(string name)
+        {
+            var regex = new Regex(@"^[a-zA-Z][\w]{3,}$");
+
+            if (!regex.IsMatch(name))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool CheckEmailRegex(string email)
+        {
+            var regex = new Regex(@"^[\w-\.]+@([\w -]+\.)+[\w-]{2,4}$");
+
+            if (!regex.IsMatch(email))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

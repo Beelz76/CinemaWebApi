@@ -1,6 +1,7 @@
 ﻿using WebApi.Contracts;
 using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace WebApi.Controllers
 {
@@ -21,14 +22,12 @@ namespace WebApi.Controllers
         //[AllowAnonymous]
         public ActionResult<JwtToken> Register(UserRegisterCredentials credentials)
         {
-            /*var regex = new Regex("^[a-zA-Z][a-zA-Z0-9_]*$");
-
-            if (!regex.IsMatch(credentials.Login)) 
+            if (!_userService.CheckRegex(credentials.Login))
             {
-                ModelState.AddModelError("login", "Invalid login format");
+                ModelState.AddModelError("", "Invalid name format");
 
                 return BadRequest(ModelState);
-            }*/
+            }
 
             if (_userService.CheckLogin(credentials.Login))
             {
@@ -116,19 +115,33 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
-            if (_userService.CheckUserExists(userUid))
+            if (!_userService.CheckUserExists(userUid))
             {
                 return NotFound("User not found");
             }
 
             if (_userService.GetLogin(userUid) != userUpdate.Login)
             {
+                if (!_userService.CheckRegex(userUpdate.Login))
+                {
+                    ModelState.AddModelError("", "Invalid name format");
+
+                    return BadRequest(ModelState);
+                }
+
                 if (_userService.CheckLogin(userUpdate.Login))
                 {
                     ModelState.AddModelError("", "Login already exists");
 
                     return BadRequest(ModelState);
                 }
+            }
+
+            if (_userService.CheckEmailRegex(userUpdate.Email))
+            {
+                ModelState.AddModelError("", "Invalid email format");
+
+                return BadRequest(ModelState);
             }
 
             if (userUpdate.Password != userUpdate.ConfirmedPassword)
