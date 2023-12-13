@@ -119,14 +119,5 @@ namespace WebApi.Services
 
             return true;
         }
-
-        public bool CheckHallExists(string name)
-        {
-            var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.Name == name);
-
-            if (hall == null) { return false; }
-
-            return true;
-        }
     }
 }

@@ -9,21 +9,25 @@ namespace WebApi.Controllers
     public class SeatController : ControllerBase
     {
         private readonly SeatService _seatService;
+        private readonly HallService _hallService;
+        private readonly ScreeningService _screeningService;
 
-        public SeatController(SeatService seatService)
+        public SeatController(SeatService seatService, HallService hallService, ScreeningService screeningService)
         {
             _seatService = seatService;
+            _hallService = hallService;
+            _screeningService = screeningService;
         }
 
         [HttpPost]
         public ActionResult CreateSeat(string hallName, int row, int number)
         {
-            if (hallName == null || row == 0 || row.ToString() == null || number == 0 || number.ToString() == null)
+            if (hallName == null || row <= 0 || number <= 0)
             {
                 return BadRequest();
             }
 
-            if (!_seatService.CheckHallExists(hallName))
+            if (!_hallService.CheckHallName(hallName))
             {
                 return NotFound("Hall not found");
             }
@@ -54,6 +58,11 @@ namespace WebApi.Controllers
         [HttpGet]
         public ActionResult<List<HallSeat>> GetHallSeats(Guid hallUid)
         {
+            if (!_hallService.CheckHallExists(hallUid))
+            {
+                return NotFound("Hall not found");
+            }
+
             var seats = _seatService.GetHallSeats(hallUid);
 
             if (seats == null)
@@ -67,6 +76,11 @@ namespace WebApi.Controllers
         [HttpGet]
         public ActionResult<List<ScreeningSeat>> GetScreeningSeats(Guid screeningUid)
         {
+            if (!_screeningService.CheckScreeningExists(screeningUid))
+            {
+                return NotFound("Screening not found");
+            }
+
             var seats = _seatService.GetScreeningSeats(screeningUid);
 
             if (seats == null)
@@ -80,7 +94,7 @@ namespace WebApi.Controllers
         [HttpPut]
         public ActionResult UpdateSeat(Guid seatUid, int row, int number)
         {
-            if (row == 0 || row.ToString() == null || number == 0 || number.ToString() == null)
+            if (row <= 0 || number <= 0)
             {
                 return BadRequest();
             }

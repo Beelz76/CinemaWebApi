@@ -14,7 +14,7 @@
 
         public string? Email { get; set; }
 
-        public required bool IsAdmin { get; set; }
+        public required bool IsAdmin { get; set; } = false;
 
         public List<Ticket> Tickets { get; set; }
     }

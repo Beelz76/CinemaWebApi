@@ -21,70 +21,12 @@ namespace WebApi.Services
                 Title = movieInfo.Title,
                 ReleaseYear = movieInfo.ReleaseYear,
                 Duration = movieInfo.Duration,
-                Description = movieInfo.Description,
-                Image = movieInfo.Image,
-            };          
-            
-            var directors = new List<Director>();
-            foreach (var directorName in movieInfo.Directors)
-            {
-                var director = _cinemaDbContext.Set<Director>().SingleOrDefault(x => x.FullName == directorName);
+                Description = movieInfo.Description
+            };
 
-                if (director == null)
-                {
-                    director = new Director
-                    {
-                        DirectorUid = Guid.NewGuid(),
-                        FullName = directorName
-                    };
-
-                    _cinemaDbContext.Add(director);
-                }
-
-                directors.Add(director);
-            }
-
-            var countries = new List<Country>();
-            foreach (var countryName in movieInfo.Countries)
-            {
-                var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.Name == countryName);
-
-                if (country == null)
-                {
-                    country = new Country
-                    {
-                        CountryUid = Guid.NewGuid(),
-                        Name = countryName
-                    };
-
-                    _cinemaDbContext.Add(country);
-                }
-
-                countries.Add(country);
-            }
-
-            var genres = new List<Genre>();
-            foreach (var genreName in movieInfo.Genres)
-            {
-                var genre = _cinemaDbContext.Set<Genre>().SingleOrDefault(x => x.Name == genreName);
-
-                if (genre == null)
-                {
-                    genre = new Genre
-                    {
-                        GenreUid = Guid.NewGuid(),
-                        Name = genreName
-                    };
-
-                    _cinemaDbContext.Add(genre);
-                }
-
-                genres.Add(genre);
-            }
-
-            movie.Directors = directors;
-            movie.Genres = genres;
-            movie.Countries = countries;
+            AddDirectors(movieInfo.Directors, movie);
+            AddCountries(movieInfo.Countries, movie);
+            AddGenres(movieInfo.Genres, movie);
 
             _cinemaDbContext.Add(movie);
 
@@ -176,74 +118,14 @@ namespace WebApi.Services
             movie.ReleaseYear = movieInfo.ReleaseYear;
             movie.Duration = movieInfo.Duration;
             movie.Description = movieInfo.Description;
-            movie.Image = movieInfo.Image;
 
             movie.Directors.Clear();
             movie.Countries.Clear();
             movie.Genres.Clear();
 
-            var directors = new List<Director>();
-            foreach (var directorName in movieInfo.Directors)
-            {
-                var director = _cinemaDbContext.Set<Director>().SingleOrDefault(x => x.FullName == directorName);
-
-                if (director == null)
-                {
-                    director = new Director
-                    {
-                        DirectorUid = Guid.NewGuid(),
-                        FullName = directorName
-                    };
-
-                    _cinemaDbContext.Add(director);
-                }
-
-                directors.Add(director);
-            }
-
-            var countries = new List<Country>();
-            foreach (var countryName in movieInfo.Countries)
-            {
-                var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.Name == countryName);
-
-                if (country == null)
-                {
-                    country = new Country
-                    {
-                        CountryUid = Guid.NewGuid(),
-                        Name = countryName
-                    };
-
-                    _cinemaDbContext.Add(country);
-                }
-
-                countries.Add(country);
-            }
-
-            var genres = new List<Genre>();
-            foreach (var genreName in movieInfo.Genres)
-            {
-                var genre = _cinemaDbContext.Set<Genre>().SingleOrDefault(x => x.Name == genreName);
-
-                if (genre == null)
-                {
-                    genre = new Genre
-                    {
-                        GenreUid = Guid.NewGuid(),
-                        Name = genreName
-                    };
-
-                    _cinemaDbContext.Add(genre);
-                }
-
-                genres.Add(genre);
-            }
-
-            movie.Directors = directors;
-            movie.Genres = genres;
-            movie.Countries = countries;
-
-            _cinemaDbContext.Add(movie);
+            AddDirectors(movieInfo.Directors, movie);
+            AddCountries(movieInfo.Countries, movie);
+            AddGenres(movieInfo.Genres, movie);
 
             return _cinemaDbContext.SaveChanges() > 0;
         }
@@ -259,11 +141,96 @@ namespace WebApi.Services
             return _cinemaDbContext.SaveChanges() > 0;
         }
 
+        private void AddDirectors(List<string> directorNames, Movie movie)
+        {
+            foreach (var directorName in directorNames)
+            {
+                var director = _cinemaDbContext.Set<Director>().SingleOrDefault(x => x.FullName == directorName);
+
+                if (director == null)
+                {
+                    director = new Director
+                    {
+                        DirectorUid = Guid.NewGuid(),
+                        FullName = directorName
+                    };
+
+                    _cinemaDbContext.Add(director);
+                }
+
+                movie.Directors.Add(director);
+            }
+        }
+
+        private void AddCountries(List<string> countryNames, Movie movie)
+        {
+            foreach (var countryName in countryNames)
+            {
+                var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.Name == countryName);
+
+                if (country == null)
+                {
+                    country = new Country
+                    {
+                        CountryUid = Guid.NewGuid(),
+                        Name = countryName
+                    };
+
+                    _cinemaDbContext.Add(country);
+                }
+
+                movie.Countries.Add(country);
+            }
+        }
+
+        private void AddGenres(List<string> genreNames, Movie movie)
+        {
+            foreach (var genreName in genreNames)
+            {
+                var genre = _cinemaDbContext.Set<Genre>().SingleOrDefault(x => x.Name == genreName);
+
+                if (genre == null)
+                {
+                    genre = new Genre
+                    {
+                        GenreUid = Guid.NewGuid(),
+                        Name = genreName
+                    };
+
+                    _cinemaDbContext.Add(genre);
+                }
+
+                movie.Genres.Add(genre);
+            }
+        }
+
         public bool CheckMovieExists(Guid movieUid)
         {
             var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.MovieUid == movieUid);
 
             if (movie == null) { return false; }
+
+            return true;
+        }
+
+        public bool CheckMovieTitle(string movieTitle)
+        {
+            var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.Title == movieTitle);
+
+            if (movie == null) { return false; }
+
+            return true;
+        }
+
+        public bool CheckMovieInfo(Contracts.MovieInfo movieInfo)
+        {
+            var movie = _cinemaDbContext.Set<Movie>()
+                .SingleOrDefault(x => x.Title == movieInfo.Title && 
+                                x.ReleaseYear == movieInfo.ReleaseYear && 
+                                x.Duration == movieInfo.Duration && 
+                                x.Description == movieInfo.Description);
+
+            if (movie == null) { return false; };
 
             return true;
         }

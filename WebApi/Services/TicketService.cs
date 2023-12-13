@@ -1,6 +1,7 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace WebApi.Services
 {
@@ -45,15 +46,15 @@ namespace WebApi.Services
                 .ToList();
 
             if (tickets.Count == 0) { return null; }
-
+            
             return tickets.Select(ticket => new Contracts.Ticket
             {
                 TicketUid = ticket.TicketUid,
                 UserFullName = ticket.User.FullName,
                 MovieTitle = ticket.Screening.Movie.Title,
                 MovieDuration = ticket.Screening.Movie.Duration,
-                ScreeningStart = ticket.Screening.ScreeningStart,
-                ScreeningEnd = ticket.Screening.ScreeningEnd,
+                ScreeningStart = ticket.Screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
+                ScreeningEnd = ticket.Screening.ScreeningEnd.ToString("dd.MM.yyyy HH:mm"),
                 Price = ticket.Screening.ScreeningPrice.Price,
                 HallName = ticket.Screening.Hall.Name,
                 Row = ticket.Seat.Row,
@@ -78,8 +79,8 @@ namespace WebApi.Services
             {
                 MovieTitle = ticket.Screening.Movie.Title,
                 MovieDuration = ticket.Screening.Movie.Duration,
-                ScreeningStart = ticket.Screening.ScreeningStart,
-                ScreeningEnd = ticket.Screening.ScreeningEnd,
+                ScreeningStart = ticket.Screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
+                ScreeningEnd = ticket.Screening.ScreeningEnd.ToString("dd.MM.yyyy HH:mm"),
                 Price = ticket.Screening.ScreeningPrice.Price,
                 HallName = ticket.Screening.Hall.Name,
                 Row = ticket.Seat.Row,
@@ -106,8 +107,8 @@ namespace WebApi.Services
                 UserFullName = ticket.User.FullName,
                 MovieTitle = ticket.Screening.Movie.Title,
                 MovieDuration = ticket.Screening.Movie.Duration,
-                ScreeningStart = ticket.Screening.ScreeningStart,
-                ScreeningEnd = ticket.Screening.ScreeningEnd,
+                ScreeningStart = ticket.Screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
+                ScreeningEnd = ticket.Screening.ScreeningEnd.ToString("dd.MM.yyyy HH:mm"),
                 Price = ticket.Screening.ScreeningPrice.Price,
                 HallName = ticket.Screening.Hall.Name,
                 Row = ticket.Seat.Row,

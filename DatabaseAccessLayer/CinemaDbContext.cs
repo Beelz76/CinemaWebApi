@@ -21,16 +21,16 @@ namespace DatabaseAccessLayer
             builder.Entity<Director>().HasKey(x => x.DirectorId);
             builder.Entity<Director>().HasMany(x => x.Movies).WithMany(x => x.Directors)
                 .UsingEntity("MovieDirector",
-                l => l.HasOne(typeof(Movie)).WithMany().HasForeignKey("MovieId").HasPrincipalKey(nameof(Movie.MovieId)),
-                r => r.HasOne(typeof(Director)).WithMany().HasForeignKey("DirectorId").HasPrincipalKey(nameof(Director.DirectorId)),
-                j => j.HasKey("DirectorId", "MovieId"));
+                    l => l.HasOne(typeof(Movie)).WithMany().HasForeignKey("MovieId").HasPrincipalKey(nameof(Movie.MovieId)),
+                    r => r.HasOne(typeof(Director)).WithMany().HasForeignKey("DirectorId").HasPrincipalKey(nameof(Director.DirectorId)),
+                    j => j.HasKey("DirectorId", "MovieId"));
 
             builder.Entity<Country>().HasKey(x => x.CountryId);
             builder.Entity<Country>().HasMany(x => x.Movies).WithMany(x => x.Countries)
                 .UsingEntity("MovieCountry",
-                l => l.HasOne(typeof(Movie)).WithMany().HasForeignKey("MovieId").HasPrincipalKey(nameof(Movie.MovieId)),
-                r => r.HasOne(typeof(Country)).WithMany().HasForeignKey("CountryId").HasPrincipalKey(nameof(Country.CountryId)),
-                j => j.HasKey("CountryId", "MovieId"));
+                    l => l.HasOne(typeof(Movie)).WithMany().HasForeignKey("MovieId").HasPrincipalKey(nameof(Movie.MovieId)),
+                    r => r.HasOne(typeof(Country)).WithMany().HasForeignKey("CountryId").HasPrincipalKey(nameof(Country.CountryId)),
+                    j => j.HasKey("CountryId", "MovieId"));
 
             builder.Entity<Genre>().HasKey(x => x.GenreId);
             builder.Entity<Genre>().HasMany(x => x.Movies).WithMany(x => x.Genres)

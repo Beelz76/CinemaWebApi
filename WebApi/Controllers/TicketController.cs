@@ -9,10 +9,14 @@ namespace WebApi.Controllers
     public class TicketController : ControllerBase
     {
         private readonly TicketService _ticketService;
+        private readonly ScreeningService _screeningService;
+        private readonly UserService _userService;
 
-        public TicketController(TicketService ticketService)
+        public TicketController(TicketService ticketService, ScreeningService screeningService, UserService userService)
         {
             _ticketService = ticketService;
+            _screeningService = screeningService;
+            _userService = userService;
         }
 
         [HttpPost]
@@ -51,6 +55,11 @@ namespace WebApi.Controllers
         [HttpGet]
         public ActionResult<List<UserTicket>> GetUserTickets(Guid userUid)
         {
+            if (!_userService.CheckUserExists(userUid))
+            {
+                return NotFound("User not found");
+            }
+
             var tickets = _ticketService.GetUserTickets(userUid);
 
             if (tickets == null)
@@ -64,6 +73,11 @@ namespace WebApi.Controllers
         [HttpGet]
         public ActionResult<List<Ticket>> GetScreeningTickets(Guid screeningUid)
         {
+            if (!_screeningService.CheckScreeningExists(screeningUid))
+            {
+                return NotFound("Screning not found");
+            }
+
             var tickets = _ticketService.GetScreeningTickets(screeningUid);
 
             if (tickets == null)

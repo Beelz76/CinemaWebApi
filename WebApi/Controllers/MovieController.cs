@@ -18,12 +18,27 @@ namespace WebApi.Controllers
         [HttpPost]
         public ActionResult CreateMovie(MovieInfo movieInfo)
         {
-            if (_movieService.CreateMovie(movieInfo))
+            if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || movieInfo.Duration <= 0)
             {
-                return Ok("Success");
+                return BadRequest();
             }
 
-            return BadRequest();
+            if (_movieService.CheckMovieInfo(movieInfo))
+            {
+                ModelState.AddModelError("", "Movie already exists");
+
+                return BadRequest(ModelState);
+            }
+
+
+            if (!_movieService.CreateMovie(movieInfo))
+            {
+                ModelState.AddModelError("", "Failed to create movie");
+
+                return BadRequest(ModelState);
+            }
+
+            return Ok("Movie created");
         }
 
         [HttpGet]
@@ -68,7 +83,7 @@ namespace WebApi.Controllers
         [HttpPut]
         public ActionResult UpdateMovie(Guid movieUid, MovieInfo movieInfo)
         {
-            if (movieInfo == null)
+            if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || movieInfo.Duration <= 0)
             {
                 return BadRequest();
             }
@@ -76,6 +91,13 @@ namespace WebApi.Controllers
             if (!_movieService.CheckMovieExists(movieUid))
             {
                 return NotFound("Movie not found");
+            }
+
+            if (_movieService.CheckMovieInfo(movieInfo))
+            {
+                ModelState.AddModelError("", "Movie already exists");
+
+                return BadRequest(ModelState);
             }
 
             if (!_movieService.UpdateMovie(movieUid, movieInfo))
@@ -91,12 +113,19 @@ namespace WebApi.Controllers
         [HttpDelete]
         public ActionResult DeleteMovie(Guid movieUid)
         {
-            if (_movieService.DeleteMovie(movieUid))
+            if (!_movieService.CheckMovieExists(movieUid))
             {
-                return Ok("Movie deleted");
+                return NotFound("Movie not found");
             }
 
-            return NotFound();
+            if (!_movieService.DeleteMovie(movieUid))
+            {
+                ModelState.AddModelError("", "Failed to delete movie");
+
+                return BadRequest(ModelState);
+            }
+
+            return Ok("Movie deleted");
         }
     }
 }

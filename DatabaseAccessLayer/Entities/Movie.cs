@@ -16,11 +16,11 @@
 
         public byte[]? Image { get; set; }
 
-        public ICollection<Director> Directors { get; set; }
+        public ICollection<Director> Directors { get; set; } = new List<Director>();
 
-        public ICollection<Country> Countries { get; set; }
+        public ICollection<Country> Countries { get; set; } = new List<Country>();
         
-        public ICollection<Genre> Genres { get; set; }
+        public ICollection<Genre> Genres { get; set; } = new List<Genre>();
         
         public ICollection<Screening> Screenings { get; set; }
     }

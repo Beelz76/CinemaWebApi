@@ -156,6 +156,15 @@ namespace WebApi.Services
             return false;
         }
 
+        public bool CheckUserExists(Guid userUid)
+        {
+            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
+
+            if (user == null) { return false; }
+
+            return true;
+        }
+
         public bool UpdateUserAdminStatus(Guid userUid)
         {
             var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);

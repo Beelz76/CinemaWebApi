@@ -110,6 +110,17 @@ namespace WebApi.Controllers
         //[Authorize]
         public ActionResult UpdateUser(Guid userUid, UserUpdate userUpdate)
         {
+            if (userUpdate.Login == null || userUpdate.Password == null || 
+                userUpdate.FullName == null || userUpdate.ConfirmedPassword == null)
+            {
+                return BadRequest();
+            }
+
+            if (_userService.CheckUserExists(userUid))
+            {
+                return NotFound("User not found");
+            }
+
             if (_userService.GetLogin(userUid) != userUpdate.Login)
             {
                 if (_userService.CheckLogin(userUpdate.Login))

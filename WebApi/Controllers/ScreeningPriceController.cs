@@ -18,7 +18,7 @@ namespace WebApi.Controllers
         [HttpPost]
         public ActionResult CreateScreeningPrice(int price)
         {
-            if (price == 0 || price.ToString() == null)
+            if (price <= 0)
             {
                 return BadRequest();
             }
@@ -56,7 +56,7 @@ namespace WebApi.Controllers
         [HttpPut]
         public ActionResult UpdateScreeningPrice(Guid screeningPriceUid, int price)
         {
-            if (price == 0 || price.ToString() == null)
+            if (price <= 0)
             {
                 return BadRequest();
             }
