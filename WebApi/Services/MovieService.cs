@@ -1,5 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 
@@ -203,7 +204,7 @@ namespace WebApi.Services
             }
         }
 
-        public bool CheckMovieExists(Guid movieUid)
+        public bool IsMovieExists(Guid movieUid)
         {
             var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.MovieUid == movieUid);
 

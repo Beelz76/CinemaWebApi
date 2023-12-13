@@ -72,7 +72,7 @@ namespace WebApi.Services
             return true;
         }
 
-        public bool CheckHallExists(Guid hallUid)
+        public bool IsHallExists(Guid hallUid)
         {
             var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.HallUid == hallUid);
 

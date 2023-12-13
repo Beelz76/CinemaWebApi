@@ -112,7 +112,7 @@ namespace WebApi.Services
             return _cinemaDbContext.SaveChanges() > 0;
         }
 
-        public bool CheckSeatExists(Guid seatUid)
+        public bool IsSeatExists(Guid seatUid)
         {
             var seat = _cinemaDbContext.Set<Seat>().SingleOrDefault(x => x.SeatUid == seatUid);
 

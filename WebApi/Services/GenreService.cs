@@ -70,7 +70,7 @@ namespace WebApi.Services
             return true;
         }
 
-        public bool CheckGenreExists(Guid genreUid)
+        public bool IsGenreExists(Guid genreUid)
         {
             var genre = _cinemaDbContext.Set<Genre>().SingleOrDefault(x => x.GenreUid == genreUid);
 

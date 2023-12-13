@@ -1,7 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace WebApi.Services
 {
@@ -78,7 +77,7 @@ namespace WebApi.Services
             return tickets.Select(ticket => new Contracts.UserTicket
             {
                 MovieTitle = ticket.Screening.Movie.Title,
-                MovieDuration = ticket.Screening.Movie.Duration,
+                MovieDuration = $"{ticket.Screening.Movie.Duration / 60}ч {ticket.Screening.Movie.Duration % 60}мин",
                 ScreeningStart = ticket.Screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
                 ScreeningEnd = ticket.Screening.ScreeningEnd.ToString("dd.MM.yyyy HH:mm"),
                 Price = ticket.Screening.ScreeningPrice.Price,
@@ -127,7 +126,7 @@ namespace WebApi.Services
             return _cinemaDbContext.SaveChanges() > 0;
         }
 
-        public bool CheckTicketExists(Guid ticketUid)
+        public bool IsTicketExists(Guid ticketUid)
         {
             var ticket = _cinemaDbContext.Set<Ticket>().SingleOrDefault(x => x.TicketUid == ticketUid);
 
@@ -141,6 +140,22 @@ namespace WebApi.Services
             var ticket = _cinemaDbContext.Set<Ticket>().SingleOrDefault(x => x.Screening.ScreeningUid == screeningUid && x.Seat.SeatUid == seatUid);
 
             if (ticket == null) { return true; };
+
+            return false;
+        }
+
+        public bool CheckScreeningSeatExists(Guid screeningUid, Guid seatUid)
+        {
+            var screening = _cinemaDbContext.Set<Screening>().Include(x => x.Hall.Seats).SingleOrDefault(x => x.ScreeningUid == screeningUid);
+            var seat = _cinemaDbContext.Set<Seat>().SingleOrDefault(x => x.SeatUid == seatUid);
+
+            foreach (var item in screening.Hall.Seats)
+            {
+                if (item == seat) 
+                { 
+                    return true; 
+                }
+            }
 
             return false;
         }

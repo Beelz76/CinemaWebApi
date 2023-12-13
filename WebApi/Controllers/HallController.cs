@@ -69,11 +69,6 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
-            if (!_hallService.CheckHallExists(hallUid))
-            {
-                return NotFound("Hall not found");
-            }
-
             if (!_hallService.CheckRegex(name))
             {
                 ModelState.AddModelError("", "Invalid hall name format");
@@ -101,11 +96,6 @@ namespace WebApi.Controllers
         [HttpDelete]
         public ActionResult DeleteHall(Guid hallUid)
         {
-            if (!_hallService.CheckHallExists(hallUid))
-            {
-                return NotFound("Hall not found");
-            }
-
             if (!_hallService.DeleteHall(hallUid))
             {
                 ModelState.AddModelError("", "Failed to delete hall");

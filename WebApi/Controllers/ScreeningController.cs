@@ -78,7 +78,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public ActionResult<List<MovieScreening>> GetMovieScreenings(Guid movieUid)
         {
-            if (!_movieService.CheckMovieExists(movieUid))
+            if (!_movieService.IsMovieExists(movieUid))
             {
                 return NotFound("Movie not found");
             }
@@ -120,7 +120,7 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
-            if (!_screeningService.CheckScreeningExists(screeningUid))
+            if (!_screeningService.IsScreeningExists(screeningUid))
             {
                 return NotFound("Screening not found");
             }
@@ -159,11 +159,6 @@ namespace WebApi.Controllers
         [HttpDelete]
         public ActionResult DeleteScreening(Guid screeningUid)
         {
-            if (!_screeningService.CheckScreeningExists(screeningUid))
-            {
-                return NotFound("Screening not found");
-            }
-
             if (!_screeningService.DeleteScreening(screeningUid))
             {
                 ModelState.AddModelError("", "Failed to delete screening");

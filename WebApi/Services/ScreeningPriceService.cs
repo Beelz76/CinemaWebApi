@@ -69,7 +69,7 @@ namespace WebApi.Services
             return true;
         }
 
-        public bool CheckScreeningPriceExists(Guid screeningPriceUid)
+        public bool IsScreeningPriceExists(Guid screeningPriceUid)
         {
             var screeningPrice = _cinemaDbContext.Set<ScreeningPrice>().SingleOrDefault(x => x.ScreeningPriceUid == screeningPriceUid);
 

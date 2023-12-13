@@ -68,11 +68,6 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
-            if (!_genreService.CheckGenreExists(genreUid))
-            {
-                return NotFound("Genre not found");
-            }
-
             if (!_genreService.CheckRegex(name))
             {
                 ModelState.AddModelError("", "Invalid genre name format");
@@ -100,11 +95,6 @@ namespace WebApi.Controllers
         [HttpDelete]
         public ActionResult DeleteGenre(Guid genreUid)
         {
-            if (!_genreService.CheckGenreExists(genreUid))
-            {
-                return NotFound("Genre not found");
-            }
-
             if (!_genreService.DeleteGenre(genreUid))
             {
                 ModelState.AddModelError("", "Failed to delete genre");

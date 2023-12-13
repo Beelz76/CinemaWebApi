@@ -1,7 +1,7 @@
 ﻿using WebApi.Contracts;
 using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers
 {
@@ -19,7 +19,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        //[AllowAnonymous]
+        [AllowAnonymous]
         public ActionResult<JwtToken> Register(UserRegisterCredentials credentials)
         {
             if (!_userService.CheckRegex(credentials.Login))
@@ -40,12 +40,12 @@ namespace WebApi.Controllers
 
             return new JwtToken
             {
-                Token = _jwtService.GenerateToken(userUid, credentials.Login)
+                Token = _jwtService.GenerateToken(userUid, credentials.Login, false)
             };
         }
 
         [HttpPost]
-        //[AllowAnonymous]
+        [AllowAnonymous]
         public ActionResult<JwtToken> Login(UserLoginCredentials credentials)
         {
             var userUid = _userService.Login(credentials);
@@ -59,12 +59,12 @@ namespace WebApi.Controllers
 
             return new JwtToken
             {
-                Token = _jwtService.GenerateToken(userUid.Value, credentials.Login)
+                Token = _jwtService.GenerateToken(userUid.Value, credentials.Login, _userService.IsAdmin(userUid.Value))
             };
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public ActionResult<List<User>> GetAllUsers()
         {
             var users = _userService.GetAllUsers();
@@ -78,7 +78,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public ActionResult<User> GetSingleUser(Guid userUid)
         {
             var user = _userService.GetSingleUser(userUid);
@@ -92,7 +92,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public ActionResult<UserInfo> GetUserInfo(Guid userUid)
         {
             var user = _userService.GetUserInfo(userUid);
@@ -106,18 +106,13 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        //[Authorize]
+        [Authorize]
         public ActionResult UpdateUser(Guid userUid, UserUpdate userUpdate)
         {
             if (userUpdate.Login == null || userUpdate.Password == null || 
                 userUpdate.FullName == null || userUpdate.ConfirmedPassword == null)
             {
                 return BadRequest();
-            }
-
-            if (!_userService.CheckUserExists(userUid))
-            {
-                return NotFound("User not found");
             }
 
             if (_userService.GetLogin(userUid) != userUpdate.Login)
@@ -137,7 +132,7 @@ namespace WebApi.Controllers
                 }
             }
 
-            if (_userService.CheckEmailRegex(userUpdate.Email))
+            if (!_userService.CheckEmailRegex(userUpdate.Email))
             {
                 ModelState.AddModelError("", "Invalid email format");
 
@@ -161,13 +156,22 @@ namespace WebApi.Controllers
             return Ok("User updated");
         }
 
+        [HttpPut]
+        [Authorize]
+        public ActionResult UpdateUserAdminStatus(Guid userUid)
+        {
+            throw new NotImplementedException();
+        }
+
         [HttpDelete]
-        //[Authorize]
+        [Authorize]
         public ActionResult DeleteUser(Guid userUid)
         {
             if (!_userService.DeleteUser(userUid))
             {
-                return NotFound();
+                ModelState.AddModelError("", "Failed to delete user");
+
+                return BadRequest(ModelState);
             }
 
             return Ok("User deleted");

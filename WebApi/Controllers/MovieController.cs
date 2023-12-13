@@ -1,6 +1,7 @@
 ﻿using WebApi.Contracts;
 using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers
 {
@@ -69,6 +70,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public ActionResult<List<Movie>> GetAllMovies()
         {
             var movies = _movieService.GetAllMovies();
@@ -113,11 +115,6 @@ namespace WebApi.Controllers
             if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || int.Parse(movieInfo.Duration) <= 0)
             {
                 return BadRequest();
-            }
-
-            if (!_movieService.CheckMovieExists(movieUid))
-            {
-                return NotFound("Movie not found");
             }
 
             if (!_movieService.CheckRegex(movieInfo.Title))
@@ -168,11 +165,6 @@ namespace WebApi.Controllers
         [HttpDelete]
         public ActionResult DeleteMovie(Guid movieUid)
         {
-            if (!_movieService.CheckMovieExists(movieUid))
-            {
-                return NotFound("Movie not found");
-            }
-
             if (!_movieService.DeleteMovie(movieUid))
             {
                 ModelState.AddModelError("", "Failed to delete movie");

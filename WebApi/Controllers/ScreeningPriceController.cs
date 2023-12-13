@@ -61,11 +61,6 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
-            if (!_screeningPriceService.CheckScreeningPriceExists(screeningPriceUid))
-            {
-                return NotFound("Screening price not found");
-            }
-
             if (_screeningPriceService.CheckScreeningPrice(price))
             {
                 ModelState.AddModelError("", "Screening price already exists");
@@ -86,11 +81,6 @@ namespace WebApi.Controllers
         [HttpDelete]
         public ActionResult DeleteScreeningPrice(Guid screeningPriceUid)
         {
-            if (!_screeningPriceService.CheckScreeningPriceExists(screeningPriceUid))
-            {
-                return NotFound("Screening price not found");
-            }
-
             if (!_screeningPriceService.DeleteScreeningPrice(screeningPriceUid))
             {
                 ModelState.AddModelError("", "Failed to delete screening price");

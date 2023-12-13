@@ -134,7 +134,7 @@ namespace WebApi.Services
             return true;
         }
 
-        public string GetLogin(Guid userUid)
+        public string? GetLogin(Guid userUid)
         {
             var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
 
@@ -157,7 +157,7 @@ namespace WebApi.Services
             return false;
         }
 
-        public bool CheckUserExists(Guid userUid)
+        public bool IsUserExists(Guid? userUid)
         {
             var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
 

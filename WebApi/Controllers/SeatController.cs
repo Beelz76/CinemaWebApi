@@ -58,7 +58,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public ActionResult<List<HallSeat>> GetHallSeats(Guid hallUid)
         {
-            if (!_hallService.CheckHallExists(hallUid))
+            if (!_hallService.IsHallExists(hallUid))
             {
                 return NotFound("Hall not found");
             }
@@ -76,7 +76,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public ActionResult<List<ScreeningSeat>> GetScreeningSeats(Guid screeningUid)
         {
-            if (!_screeningService.CheckScreeningExists(screeningUid))
+            if (!_screeningService.IsScreeningExists(screeningUid))
             {
                 return NotFound("Screening not found");
             }
@@ -99,11 +99,6 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
-            if (!_seatService.CheckSeatExists(seatUid))
-            {
-                return NotFound("Seat not found");
-            }
-
             if (!_seatService.UpdateSeat(seatUid, row, number))
             {
                 ModelState.AddModelError("", "Failed to update seat");
@@ -117,11 +112,6 @@ namespace WebApi.Controllers
         [HttpDelete]
         public ActionResult DeleteSeat(Guid seatUid)
         {
-            if (!_seatService.CheckSeatExists(seatUid))
-            {
-                return NotFound("Seat not found");
-            }
-
             if (!_seatService.DeleteSeat(seatUid))
             {
                 ModelState.AddModelError("", "Failed to delete seat");

@@ -181,7 +181,7 @@ namespace WebApi.Services
             return true;
         }
 
-        public bool CheckScreeningExists(Guid screeningUid)
+        public bool IsScreeningExists(Guid screeningUid)
         {
             var screening = _cinemaDbContext.Set<Screening>().SingleOrDefault(x => x.ScreeningUid == screeningUid);
 

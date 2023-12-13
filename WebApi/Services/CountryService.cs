@@ -70,7 +70,7 @@ namespace WebApi.Services
             return true;
         }
 
-        public bool CheckCountryExists(Guid countryUid)
+        public bool IsCountryExists(Guid countryUid)
         {
             var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.CountryUid == countryUid);
 

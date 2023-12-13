@@ -22,12 +22,33 @@ namespace WebApi.Controllers
         [HttpPost]
         public ActionResult CreateTicket(Guid userUid, Guid screeningUid, Guid seatUid)
         {
+            if (!_userService.IsUserExists(userUid))
+            {
+                ModelState.AddModelError("", "User not found");
+
+                return BadRequest(ModelState);
+            }
+
+            if (!_screeningService.IsScreeningExists(screeningUid))
+            {
+                ModelState.AddModelError("", "Screening not found");
+
+                return BadRequest(ModelState);
+            }
+
+            if (!_ticketService.CheckScreeningSeatExists(screeningUid, seatUid))
+            {
+                ModelState.AddModelError("", "Seat not found");
+
+                return BadRequest(ModelState);
+            }
+
             if (!_ticketService.IsSeatTaken(screeningUid, seatUid))
             {
                 ModelState.AddModelError("", "Seat already taken");
 
                 return BadRequest(ModelState);
-            }
+            }          
 
             if (!_ticketService.CreateTicket(userUid, screeningUid, seatUid))
             {
@@ -55,7 +76,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public ActionResult<List<UserTicket>> GetUserTickets(Guid userUid)
         {
-            if (!_userService.CheckUserExists(userUid))
+            if (!_userService.IsUserExists(userUid))
             {
                 return NotFound("User not found");
             }
@@ -73,7 +94,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public ActionResult<List<Ticket>> GetScreeningTickets(Guid screeningUid)
         {
-            if (!_screeningService.CheckScreeningExists(screeningUid))
+            if (!_screeningService.IsScreeningExists(screeningUid))
             {
                 return NotFound("Screning not found");
             }
@@ -91,11 +112,6 @@ namespace WebApi.Controllers
         [HttpDelete]
         public ActionResult DeleteTicket(Guid ticketUid)
         {
-            if (!_ticketService.CheckTicketExists(ticketUid))
-            {
-                return NotFound("Ticket not found");
-            }
-
             if (!_ticketService.DeleteTicket(ticketUid))
             {
                 ModelState.AddModelError("", "Failed to delete ticket");

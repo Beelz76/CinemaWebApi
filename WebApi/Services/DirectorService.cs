@@ -61,7 +61,7 @@ namespace WebApi.Services
             return _cinemaDbContext.SaveChanges() > 0;
         }
 
-        public bool CheckDirectorExists(Guid directorUid)
+        public bool IsDirectorExists(Guid directorUid)
         {
             var director = _cinemaDbContext.Set<Director>().SingleOrDefault(x => x.DirectorUid == directorUid);
 

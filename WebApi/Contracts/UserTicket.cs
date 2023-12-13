@@ -4,7 +4,7 @@
     {
         public required string MovieTitle { get; init; }
 
-        public required int MovieDuration { get; init; }
+        public required string MovieDuration { get; init; }
 
         public required string ScreeningStart { get; init; }
 

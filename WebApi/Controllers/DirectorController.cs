@@ -61,11 +61,6 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
-            if (!_directorService.CheckDirectorExists(directorUid))
-            {
-                return NotFound("Director not found");
-            }
-
             if (!_directorService.CheckRegex(fullName))
             {
                 ModelState.AddModelError("", "Invalid director name format");
@@ -86,11 +81,6 @@ namespace WebApi.Controllers
         [HttpDelete]
         public ActionResult DeleteDirector(Guid directorUid)
         {
-            if (!_directorService.CheckDirectorExists(directorUid))
-            {
-                return NotFound("Director not found");
-            }
-
             if (!_directorService.DeleteDirector(directorUid))
             {
                 ModelState.AddModelError("", "Failed to delete director");

@@ -68,11 +68,6 @@ namespace WebApi.Controllers
                 return BadRequest();
             }
 
-            if (!_countryService.CheckCountryExists(countryUid))
-            {
-                return NotFound("Country not found");
-            }
-
             if (!_countryService.CheckRegex(name))
             {
                 ModelState.AddModelError("", "Invalid country name format");
@@ -100,11 +95,6 @@ namespace WebApi.Controllers
         [HttpDelete]
         public ActionResult DeleteCountry(Guid countryUid)
         {
-            if (!_countryService.CheckCountryExists(countryUid))
-            {
-                return NotFound("Country not found");
-            }
-
             if (!_countryService.DeleteCountry(countryUid))
             {
                 ModelState.AddModelError("", "Failed to delete country");
