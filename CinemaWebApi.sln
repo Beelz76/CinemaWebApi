@@ -5,9 +5,9 @@ VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseAccessLayer", "DatabaseAccessLayer\DatabaseAccessLayer.csproj", "{82AE4F42-A78C-4B89-9508-D7E7DBA8408E}"
 EndProject
-Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "CinemaDb", "CinemaDb\CinemaDb.sqlproj", "{89E1274C-35B7-4CB4-930C-ACEDF71EF43B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{29B24370-C5EA-4C4C-B595-4DB5B1250E09}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "CinemaDb", "CinemaDb\CinemaDb.sqlproj", "{C0D8B406-372E-426D-83BB-E655116F7D37}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,16 +19,16 @@ Global
 		{82AE4F42-A78C-4B89-9508-D7E7DBA8408E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82AE4F42-A78C-4B89-9508-D7E7DBA8408E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82AE4F42-A78C-4B89-9508-D7E7DBA8408E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{89E1274C-35B7-4CB4-930C-ACEDF71EF43B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{89E1274C-35B7-4CB4-930C-ACEDF71EF43B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{89E1274C-35B7-4CB4-930C-ACEDF71EF43B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{89E1274C-35B7-4CB4-930C-ACEDF71EF43B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{89E1274C-35B7-4CB4-930C-ACEDF71EF43B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{89E1274C-35B7-4CB4-930C-ACEDF71EF43B}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{29B24370-C5EA-4C4C-B595-4DB5B1250E09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{29B24370-C5EA-4C4C-B595-4DB5B1250E09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29B24370-C5EA-4C4C-B595-4DB5B1250E09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29B24370-C5EA-4C4C-B595-4DB5B1250E09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0D8B406-372E-426D-83BB-E655116F7D37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0D8B406-372E-426D-83BB-E655116F7D37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0D8B406-372E-426D-83BB-E655116F7D37}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{C0D8B406-372E-426D-83BB-E655116F7D37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0D8B406-372E-426D-83BB-E655116F7D37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0D8B406-372E-426D-83BB-E655116F7D37}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -21,7 +21,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin, User")]
+        //[Authorize(Roles = "Admin, User")]
         public ActionResult CreateTicket(Guid userUid, Guid screeningUid, Guid seatUid)
         {
             if (!_userService.IsUserExists(userUid))
@@ -63,7 +63,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult<List<Ticket>> GetAllTickets()
         {
             var tickets = _ticketService.GetAllTickets();
@@ -77,7 +77,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin, User")]
+        //[Authorize(Roles = "Admin, User")]
         public ActionResult<List<UserTicket>> GetUserTickets(Guid userUid)
         {
             if (!_userService.IsUserExists(userUid))
@@ -96,7 +96,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult<List<Ticket>> GetScreeningTickets(Guid screeningUid)
         {
             if (!_screeningService.IsScreeningExists(screeningUid))
@@ -115,7 +115,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult DeleteTicket(Guid ticketUid)
         {
             if (!_ticketService.DeleteTicket(ticketUid))
