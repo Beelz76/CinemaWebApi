@@ -7,13 +7,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="../js/user.js"></script>
     <title>Registration</title>
 </head>
 <body>
+    <br>
     <div class="container">
         <div class="row">
             <div class="col-md-6 offset-md-3">
-                <h1 class="text-center">Регистрация</h1>        
+                <h1 class="text-center">Регистрация</h1>
+                <br>
                 <div class="form-group">
                     <label for="fullName">Полное имя:</label>
                     <input type="text" class="form-control" id="fullName" name="fullName" required>
@@ -27,10 +30,9 @@
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
                 <button type="button" class="btn btn-primary" onclick="register()">Зарегистрироваться</button>
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='../html/login.html'">Войти</button>     
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='../html/login.html'">Войти</button>
             </div>
         </div>
     </div>
-    <script src="../js/user.js"></script>
 </body>
 </html>

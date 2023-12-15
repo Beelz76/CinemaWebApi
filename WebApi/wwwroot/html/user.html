@@ -60,29 +60,32 @@
     </nav>
     <br>
     <div class="container">
-        <h1 class="text-center">Country Manager</h1>
+        <h1 class="text-center">User Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="countryName" placeholder="Введите название страны">
+            <input type="text" class="form-control" id="countryName" placeholder="Введите uid пользователя">
         </div>
-        <button type="button" class="btn btn-primary" onclick="getCountries()">Все страны</button>
-        <button type="button" class="btn btn-secondary" onclick="createCountry()">Добавить страну</button>
+        <button type="button" class="btn btn-primary" onclick="getAllUsers()">Все пользователи</button>
+        <button type="button" class="btn btn-primary" onclick="getSingleUser()">Пользователь</button>
+        <button type="button" class="btn btn-secondary" onclick="updateUserAdminStatus()">Сделать админом</button>
         <button type="button" class="btn btn-secondary" onclick="updateCountry()">Изменить страну</button>
-        <button type="button" class="btn btn-danger" onclick="deleteCountry()">Удалить страну(ы)</button>
+        <button type="button" class="btn btn-danger" onclick="deleteUser()">Удалить пользователя</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Country</th>
+                    <th>Full Name</th>
+                    <th>Login</th>
+                    <th>Email</th>
                     <th>Selected</th>
                 </tr>
             </thead>
-            <tbody id="countryTable">
+            <tbody id="userTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/country.js"></script>
+    <script src="../js/user.js"></script>
 </body>
 </html>

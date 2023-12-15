@@ -99,7 +99,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "User")]
+        //[Authorize(Roles = "Admin, User")]
         public ActionResult<UserInfo> GetUserInfo(Guid userUid)
         {
             var user = _userService.GetUserInfo(userUid);

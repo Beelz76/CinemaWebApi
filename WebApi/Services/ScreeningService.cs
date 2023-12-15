@@ -90,7 +90,7 @@ namespace WebApi.Services
             }).ToList();
         }
 
-        public List<Contracts.MovieScreening>? GetHallScreenings(string hallName)
+        public List<Contracts.Screening>? GetHallScreenings(string hallName)
         {
             var screenings = _cinemaDbContext.Set<Screening>()
                 .Include(x => x.Hall)
@@ -102,8 +102,9 @@ namespace WebApi.Services
 
             if (screenings.Count == 0) { return null; }
 
-            return screenings.Select(screening => new Contracts.MovieScreening
+            return screenings.Select(screening => new Contracts.Screening
             {
+                ScreeingUid = screening.ScreeningUid,
                 MovieTitle = screening.Movie.Title,
                 MovieDuration = $"{screening.Movie.Duration / 60}ч {screening.Movie.Duration % 60}мин",
                 ScreeningStart = screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),

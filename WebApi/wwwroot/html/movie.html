@@ -63,26 +63,41 @@
         <h1 class="text-center">Country Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="countryName" placeholder="Введите название страны">
+            <input type="text" class="form-control" id="movieTitle" placeholder="Введите название/uid фильма">
+            <input type="text" class="form-control" id="movieReleaseYear" placeholder="Введите год выпуска">
+            <input type="text" class="form-control" id="movieDuration" placeholder="Введите продолжительность (мин)">
+            <input type="text" class="form-control" id="movieDescription" placeholder="Введите описание фильма">
+            <input type="text" class="form-control" id="movieDirectors" placeholder="Введите режиссеров фильма">
+            <input type="text" class="form-control" id="movieCountries" placeholder="Введите страны фильма">
+            <input type="text" class="form-control" id="movieGenres" placeholder="Введите жанры фильма">
+
+
         </div>
-        <button type="button" class="btn btn-primary" onclick="getCountries()">Все страны</button>
-        <button type="button" class="btn btn-secondary" onclick="createCountry()">Добавить страну</button>
-        <button type="button" class="btn btn-secondary" onclick="updateCountry()">Изменить страну</button>
-        <button type="button" class="btn btn-danger" onclick="deleteCountry()">Удалить страну(ы)</button>
+        <button type="button" class="btn btn-primary" onclick="getAllMovies()">Все фильмы</button>
+        <button type="button" class="btn btn-primary" onclick="getSingleMovie()">Фильм</button>
+        <button type="button" class="btn btn-secondary" onclick="createMovie()">Добавить фильм</button>
+        <button type="button" class="btn btn-secondary" onclick="updateMovie()">Изменить фильм</button>
+        <button type="button" class="btn btn-danger" onclick="deleteMovie()">Удалить фильм</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Country</th>
+                    <th>Title</th>
+                    <th>ReleaseYear</th>
+                    <th>Duration</th>
+                    <th>Description</th>
+                    <th>Directors</th>
+                    <th>Countries</th>
+                    <th>Genres</th>
                     <th>Selected</th>
                 </tr>
             </thead>
-            <tbody id="countryTable">
+            <tbody id="movieTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/country.js"></script>
+    <script src="../js/movie.js"></script>
 </body>
 </html>

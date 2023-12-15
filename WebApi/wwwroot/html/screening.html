@@ -60,29 +60,39 @@
     </nav>
     <br>
     <div class="container">
-        <h1 class="text-center">Country Manager</h1>
+        <h1 class="text-center">Screening Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="countryName" placeholder="Введите название страны">
+            <input type="text" class="form-control" id="movieTitle" placeholder="Введите название фильма">
+            <input type="text" class="form-control" id="hallName" placeholder="Введите название зала">
+            <input type="text" class="form-control" id="screeningStart" placeholder="Введите начало сеанса">
+            <input type="text" class="form-control" id="screeningEnd" placeholder="Введите конец сеанса">
+            <input type="text" class="form-control" id="screeningPrice" placeholder="Введите цену">
         </div>
-        <button type="button" class="btn btn-primary" onclick="getCountries()">Все страны</button>
-        <button type="button" class="btn btn-secondary" onclick="createCountry()">Добавить страну</button>
-        <button type="button" class="btn btn-secondary" onclick="updateCountry()">Изменить страну</button>
-        <button type="button" class="btn btn-danger" onclick="deleteCountry()">Удалить страну(ы)</button>
+        <button type="button" class="btn btn-primary" onclick="getAllScreenings()">Все Сеансы</button>
+        <button type="button" class="btn btn-primary" onclick="getHallScreenings()">Сеансы в зале</button>
+        <button type="button" class="btn btn-secondary" onclick="createScreening()">Добавить сеанс</button>
+        <button type="button" class="btn btn-secondary" onclick="updateScreening()">Изменить сеанс</button>
+        <button type="button" class="btn btn-danger" onclick="deleteScreening()">Удалить сеанс</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Country</th>
+                    <th>Movie</th>
+                    <th>Duration</th>
+                    <th>Start time</th>
+                    <th>End Time</th>
+                    <th>Hall</th>
+                    <th>Price</th>
                     <th>Selected</th>
                 </tr>
             </thead>
-            <tbody id="countryTable">
+            <tbody id="screeningTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/country.js"></script>
+    <script src="../js/screening.js"></script>
 </body>
 </html>

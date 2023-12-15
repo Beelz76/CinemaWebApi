@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>   
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>  
     <title>Admin Panel</title>
 </head>
 <body>
@@ -21,7 +21,7 @@
                         Профиль
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="userInfo.html">Изменить данные</a>
+                        <a class="dropdown-item" href="#">Изменить данные</a>
                         <a class="dropdown-item" href="login.html">Выйти</a>
                     </div>
                 </li>
@@ -60,29 +60,48 @@
     </nav>
     <br>
     <div class="container">
-        <h1 class="text-center">Country Manager</h1>
-        <br>
-        <div class="form-group">
-            <input type="text" class="form-control" id="countryName" placeholder="Введите название страны">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <h1 class="text-center">Данные пользователя</h1>
+                <br>
+                <div class="form-group">
+                    <label for="fullName">Полное имя*:</label>
+                    <input type="text" class="form-control" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="login">Email:</label>
+                    <input type="text" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login">Логин*:</label>
+                    <input type="text" class="form-control" id="login" name="login" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль*:</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Подтвердите пароль*:</label>
+                    <input type="password" class="form-control" id="confirmedPassword" name="confirmedPassword" required>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="updateUser()">Сохранить</button>
+                <button type="button" class="btn btn-secondary" onclick="">Отмена</button>
+            </div>
         </div>
-        <button type="button" class="btn btn-primary" onclick="getCountries()">Все страны</button>
-        <button type="button" class="btn btn-secondary" onclick="createCountry()">Добавить страну</button>
-        <button type="button" class="btn btn-secondary" onclick="updateCountry()">Изменить страну</button>
-        <button type="button" class="btn btn-danger" onclick="deleteCountry()">Удалить страну(ы)</button>
-        <br><br>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>UID</th>
-                    <th>Country</th>
-                    <th>Selected</th>
-                </tr>
-            </thead>
-            <tbody id="countryTable">
-            </tbody>
-        </table>
     </div>
 
-    <script src="../js/country.js"></script>
+    <script src="../js/user.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            const token = localStorage.getItem('userToken');
+
+            if (!token) {
+                alert('Отказано. Пожалуйста авторизуйтесь');
+                window.location.href = 'login.html';
+                return;
+            }
+        });
+        window.addEventListener('load', getUserInfo);
+    </script>
 </body>
 </html>

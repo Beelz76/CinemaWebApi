@@ -70,7 +70,7 @@ namespace WebApi.Services
             if (screening == null) { return null; }
 
             var seats = _cinemaDbContext.Set<Seat>().Where(x => x.Hall.HallUid == screening.Hall.HallUid)
-                .Select(x => new Contracts.SeatInfo
+                .Select(x => new Contracts.ScreeningSeat
                 {
                     Row = x.Row,
                     Number = x.Number,

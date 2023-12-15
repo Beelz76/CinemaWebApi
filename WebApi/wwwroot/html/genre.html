@@ -60,29 +60,29 @@
     </nav>
     <br>
     <div class="container">
-        <h1 class="text-center">Country Manager</h1>
+        <h1 class="text-center">Genre Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="countryName" placeholder="Введите название страны">
+            <input type="text" class="form-control" id="genreName" placeholder="Введите название жанра">
         </div>
-        <button type="button" class="btn btn-primary" onclick="getCountries()">Все страны</button>
-        <button type="button" class="btn btn-secondary" onclick="createCountry()">Добавить страну</button>
-        <button type="button" class="btn btn-secondary" onclick="updateCountry()">Изменить страну</button>
-        <button type="button" class="btn btn-danger" onclick="deleteCountry()">Удалить страну(ы)</button>
+        <button type="button" class="btn btn-primary" onclick="getGenres()">Все жанры</button>
+        <button type="button" class="btn btn-secondary" onclick="createGenre()">Добавить жанр</button>
+        <button type="button" class="btn btn-secondary" onclick="updateGenre()">Изменить жанр</button>
+        <button type="button" class="btn btn-danger" onclick="deleteGenre()">Удалить жанр</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Country</th>
+                    <th>Genre</th>
                     <th>Selected</th>
                 </tr>
             </thead>
-            <tbody id="countryTable">
+            <tbody id="genreTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/country.js"></script>
+    <script src="../js/genre.js"></script>
 </body>
 </html>

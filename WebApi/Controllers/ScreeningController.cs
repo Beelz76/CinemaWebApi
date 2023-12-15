@@ -99,7 +99,7 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<List<MovieScreening>> GetHallScreenings(string hallName)
+        public ActionResult<List<Screening>> GetHallScreenings(string hallName)
         {
             if (!_hallService.CheckHallName(hallName))
             {

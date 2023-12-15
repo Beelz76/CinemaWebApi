@@ -60,29 +60,33 @@
     </nav>
     <br>
     <div class="container">
-        <h1 class="text-center">Country Manager</h1>
+        <h1 class="text-center">Seat Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="countryName" placeholder="Введите название страны">
+            <input type="text" class="form-control" id="hallName" placeholder="Введите название зала">
+            <input type="text" class="form-control" id="seatRow" placeholder="Введите ряд">
+            <input type="text" class="form-control" id="seatNumber" placeholder="Введите номер">
         </div>
-        <button type="button" class="btn btn-primary" onclick="getCountries()">Все страны</button>
-        <button type="button" class="btn btn-secondary" onclick="createCountry()">Добавить страну</button>
-        <button type="button" class="btn btn-secondary" onclick="updateCountry()">Изменить страну</button>
-        <button type="button" class="btn btn-danger" onclick="deleteCountry()">Удалить страну(ы)</button>
+        <button type="button" class="btn btn-primary" onclick="getAllSeats()">Все места</button>
+        <button type="button" class="btn btn-primary" onclick="getHallSeats()">Места</button>
+        <button type="button" class="btn btn-secondary" onclick="createSeat()">Добавить место</button>
+        <button type="button" class="btn btn-secondary" onclick="updateSeaty()">Изменить иесто</button>
+        <button type="button" class="btn btn-danger" onclick="deleteSeat()">Удалить место</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Country</th>
+                    <th>Row</th>
+                    <th>Number</th>
                     <th>Selected</th>
                 </tr>
             </thead>
-            <tbody id="countryTable">
+            <tbody id="seatTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/country.js"></script>
+    <script src="../js/seat.js"></script>
 </body>
 </html>

@@ -46,7 +46,7 @@ namespace WebApi.Controllers
                 return BadRequest(ModelState);
             }
 
-            return Ok("Genre created");
+            return Ok("Country created");
         }
 
         [HttpGet]
@@ -103,7 +103,7 @@ namespace WebApi.Controllers
 
                 return BadRequest(ModelState);
             }
-
+             
             return Ok("Country deleted");
         }
     }

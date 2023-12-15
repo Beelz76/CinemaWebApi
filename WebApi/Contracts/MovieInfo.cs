@@ -10,8 +10,6 @@
 
         public required string? Description { get; init; }
 
-        public required byte[]? Image { get; init; }
-
         public required List<string> Directors { get; init; }
 
         public required List<string> Countries { get; init; }

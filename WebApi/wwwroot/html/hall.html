@@ -60,29 +60,30 @@
     </nav>
     <br>
     <div class="container">
-        <h1 class="text-center">Country Manager</h1>
+        <h1 class="text-center">Hall Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="countryName" placeholder="Введите название страны">
+            <input type="text" class="form-control" id="hallName" placeholder="Введите название зала">
         </div>
-        <button type="button" class="btn btn-primary" onclick="getCountries()">Все страны</button>
-        <button type="button" class="btn btn-secondary" onclick="createCountry()">Добавить страну</button>
-        <button type="button" class="btn btn-secondary" onclick="updateCountry()">Изменить страну</button>
-        <button type="button" class="btn btn-danger" onclick="deleteCountry()">Удалить страну(ы)</button>
+        <button type="button" class="btn btn-primary" onclick="getHalls()">Все залы</button>
+        <button type="button" class="btn btn-secondary" onclick="createHall()">Добавить зал</button>
+        <button type="button" class="btn btn-secondary" onclick="updateHall()">Изменить зал</button>
+        <button type="button" class="btn btn-danger" onclick="deleteHall()">Удалить зал</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Country</th>
+                    <th>Hall</th>
+                    <th>Capacity</th>
                     <th>Selected</th>
                 </tr>
             </thead>
-            <tbody id="countryTable">
+            <tbody id="hallTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/country.js"></script>
+    <script src="../js/hall.js"></script>
 </body>
 </html>

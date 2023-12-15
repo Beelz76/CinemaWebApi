@@ -106,6 +106,17 @@ namespace WebApi.Services
             return _cinemaDbContext.SaveChanges() > 0;
         }
 
+        public bool UpdateUserAdminStatus(Guid userUid)
+        {
+            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
+
+            if (user == null) { return false; };
+
+            user.IsAdmin = true;
+
+            return _cinemaDbContext.SaveChanges() > 0;
+        }
+
         public bool DeleteUser(Guid userUid)
         {
             var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
@@ -164,17 +175,6 @@ namespace WebApi.Services
             if (user == null) { return false; }
 
             return true;
-        }
-
-        public bool UpdateUserAdminStatus(Guid userUid)
-        {
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
-
-            if (user == null) { return false; };
-
-            user.IsAdmin = true;
-
-            return _cinemaDbContext.SaveChanges() > 0;
         }
 
         public bool CheckRegex(string name)

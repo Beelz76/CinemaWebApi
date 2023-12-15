@@ -52,7 +52,6 @@ namespace WebApi.Services
                 ReleaseYear = movie.ReleaseYear,
                 Duration = movie.Duration,
                 Description = movie.Description,
-                Image = movie.Image,
                 Directors = movie.Directors.Select(x => x.FullName).ToList(),
                 Countries = movie.Countries.Select(x => x.Name).ToList(),
                 Genres = movie.Genres.Select(x => x.Name).ToList()
@@ -76,7 +75,6 @@ namespace WebApi.Services
                 ReleaseYear = movie.ReleaseYear,
                 Duration = movie.Duration,
                 Description = movie.Description,
-                Image = movie.Image,
                 Directors = movie.Directors.Select(x => x.FullName).ToList(),
                 Countries = movie.Countries.Select(x => x.Name).ToList(),
                 Genres = movie.Genres.Select(x => x.Name).ToList()
@@ -97,7 +95,6 @@ namespace WebApi.Services
                 ReleaseYear = movie.ReleaseYear,
                 Duration = $"{movie.Duration / 60}ч {movie.Duration % 60}мин",
                 Description = movie.Description,
-                Image = movie.Image,
                 Directors = movie.Directors.Select(x => x.FullName).ToList(),
                 Countries = movie.Countries.Select(x => x.Name).ToList(),
                 Genres = movie.Genres.Select(x => x.Name).ToList()
