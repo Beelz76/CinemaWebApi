@@ -26,9 +26,9 @@
                 const userRole = decodedToken.role;
 
                 if (userRole === 'Admin') {
-                    window.location.href = 'admin.html';
+                    window.location.href = 'admin/user.html';
                 } else if (userRole === 'User') {
-                    window.location.href = 'country.html';
+                    window.location.href = 'user/userMovie.html';
                 } else {
                     alert('Произошла ошибка при авторизации');
                 }
@@ -71,7 +71,7 @@ async function register() {
 
         if (response.ok) {
             alert('Успешная регистрация');
-            window.location.href = 'country.html';
+            window.location.href = 'user/userMovie.html';
         } else {
             throw new Error('Ошибка регистрации');
         }
@@ -116,6 +116,7 @@ async function updateUser() {
 
         if (response.ok) {
             const data = await response.text();
+
             console.log(data);
             alert('Данные обновлены');
             location.reload(true);
@@ -129,6 +130,9 @@ async function updateUser() {
 }
 
 async function getUserInfo() {
+    document.getElementById('password').value = '';
+    document.getElementById('confirmedPassword').value = '';
+
     var decodedToken = JSON.parse(atob(localStorage.getItem('userToken').split('.')[1]));
     const uid = decodedToken.nameid;
 
@@ -143,11 +147,174 @@ async function getUserInfo() {
 
         if (response.ok) {
             const data = await response.json();
+
             document.getElementById('fullName').value = data.fullName;
             document.getElementById('login').value = data.login;
             document.getElementById('email').value = data.email;
         } else {
             throw new Error('Что-то пошло не так');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Ошибка');
+    }
+}
+
+async function getAllUsers() {
+    try {
+        const response = await fetch('https://localhost:7172/api/User/GetAllUsers', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            const userTable = document.getElementById('userTable');
+            userTable.innerHTML = '';
+
+            data.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td>${user.userUid}</td>
+                <td>${user.fullName}</td>
+                <td>${user.login}</td>
+                <td>${user.email}</td>
+                <td>${user.isAdmin}</td>
+                <td style="text-align: center;"><input type="checkbox" value="${user.userUid}"></td>`;
+                userTable.appendChild(row);
+            });
+        } else {
+            throw new Error('Что-то пошло не так');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Ошибка');
+    }
+}
+
+async function getSingleUser() {
+    const uid = document.getElementById('userUid').value;
+
+    if (!uid) {
+        alert("Введите uid пользователя");
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://localhost:7172/api/User/GetSingleUser?userUid=${uid}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            const userTable = document.getElementById('userTable');
+            userTable.innerHTML = '';
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${data.userUid}</td>
+            <td>${data.fullName}</td>
+            <td>${data.login}</td>
+            <td>${data.email}</td>
+            <td>${data.isAdmin}</td>
+            <td style="text-align: center;"><input type="checkbox" value="${data.userUid}"></td>`;
+            userTable.appendChild(row);
+        } else {
+            throw new Error('Что-то пошло не так');
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert('Ошибка');
+    }
+}
+
+async function deleteUser() {
+    const selectedCheckboxes = document.querySelectorAll('#userTable input[type="checkbox"]:checked');
+
+    if (selectedCheckboxes.length === 0) {
+        alert('Выберите хотя бы одного пользователя');
+        return;
+    }
+
+    let uids = [];
+    for (let i = 0; i < selectedCheckboxes.length; i++) {
+        if (selectedCheckboxes[i].checked) {
+            uids.push(selectedCheckboxes[i].value);
+        }
+    }
+
+    uids.forEach(async (uid) => {
+        try {
+            const response = await fetch(`https://localhost:7172/api/User/DeleteUser?userUid=${uid}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('userToken')}`
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.text();
+
+                if (data) {
+                    //alert(data);
+                    getAllUsers();
+                } else {
+                    alert('Не получилось удалить пользователя');
+                }
+            } else {
+                throw new Error('Что-то пошло не так');
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Ошибка');
+        }
+    });
+}
+
+async function updateUserAdminStatus() {
+    const selectedCheckboxes = document.querySelectorAll('#userTable input[type="checkbox"]:checked');
+
+    if (selectedCheckboxes.length !== 1) {
+        alert('Выберите одного пользователя');
+        return;
+    }
+
+    var choice = confirm('Вы хотите назначить пользователя администратором?');
+
+    if (!choice) {
+        return;
+    }
+
+    const uid = selectedCheckboxes[0].value;
+
+    try {
+        const response = await fetch(`https://localhost:7172/api/User/UpdateUserAdminStatus?userUid=${uid}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.text();
+
+            console.log(data);
+            alert('Данный пользователь назначен администратором');
+            getAllUsers();
+        } else {
+            throw new Error('Не удалось обновить роль');
         }
     } catch (error) {
         console.error(error);

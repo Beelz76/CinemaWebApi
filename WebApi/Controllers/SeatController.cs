@@ -60,14 +60,14 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<List<HallSeat>> GetHallSeats(Guid hallUid)
+        public ActionResult<List<HallSeat>> GetHallSeats(string hallName)
         {
-            if (!_hallService.IsHallExists(hallUid))
+            if (!_hallService.CheckHallName(hallName))
             {
                 return NotFound("Hall not found");
             }
 
-            var seats = _seatService.GetHallSeats(hallUid);
+            var seats = _seatService.GetHallSeats(hallName);
 
             if (seats == null)
             {

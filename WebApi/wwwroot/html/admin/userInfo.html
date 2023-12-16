@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>  
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Admin Panel</title>
 </head>
 <body>
@@ -21,8 +21,8 @@
                         Профиль
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Изменить данные</a>
-                        <a class="dropdown-item" href="login.html">Выйти</a>
+                        <a class="dropdown-item" href="userInfo.html">Изменить данные</a>
+                        <a class="dropdown-item" href="../login.html">Выйти</a>
                     </div>
                 </li>
                 <li class="nav-item">
@@ -85,19 +85,19 @@
                     <input type="password" class="form-control" id="confirmedPassword" name="confirmedPassword" required>
                 </div>
                 <button type="button" class="btn btn-primary" onclick="updateUser()">Сохранить</button>
-                <button type="button" class="btn btn-secondary" onclick="">Отмена</button>
+                <button type="button" class="btn btn-secondary" onclick="getUserInfo()">Отмена</button>
             </div>
         </div>
     </div>
 
-    <script src="../js/user.js"></script>
+    <script src="../../js/user.js"></script>
     <script>
         window.addEventListener('load', function () {
             const token = localStorage.getItem('userToken');
 
             if (!token) {
                 alert('Отказано. Пожалуйста авторизуйтесь');
-                window.location.href = 'login.html';
+                window.location.href = '../login.html';
                 return;
             }
         });

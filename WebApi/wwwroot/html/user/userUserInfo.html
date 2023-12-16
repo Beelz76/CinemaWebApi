@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Admin Panel</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown active">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Профиль
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="userUserInfo.html">Изменить данные</a>
+                        <a class="dropdown-item" href="../login.html">Выйти</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="userTicket.html">Мои билеты</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="userMovie.html">Фильмы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="userScreening.html">Сеансы</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="userSeat.html">Места</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <br>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <h1 class="text-center">Данные пользователя</h1>
+                <br>
+                <div class="form-group">
+                    <label for="fullName">Полное имя*:</label>
+                    <input type="text" class="form-control" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="login">Email:</label>
+                    <input type="text" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login">Логин*:</label>
+                    <input type="text" class="form-control" id="login" name="login" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль*:</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Подтвердите пароль*:</label>
+                    <input type="password" class="form-control" id="confirmedPassword" name="confirmedPassword" required>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="updateUser()">Сохранить</button>
+                <button type="button" class="btn btn-secondary" onclick="getUserInfo()">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/user.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            const token = localStorage.getItem('userToken');
+
+            if (!token) {
+                alert('Отказано. Пожалуйста авторизуйтесь');
+                window.location.href = '../login.html';
+                return;
+            }
+        });
+
+        window.addEventListener('load', getUserInfo);
+    </script>
+</body>
+</html>

@@ -6,7 +6,7 @@
     <Name>CinemaDb</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{c0d8b406-372e-426d-83bb-e655116f7d37}</ProjectGuid>
+    <ProjectGuid>{72578ca8-257a-418a-b29e-601f12217030}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.Sql160DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>

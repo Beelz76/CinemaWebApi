@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>   
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Admin Panel</title>
 </head>
 <body>
@@ -22,9 +22,8 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="userInfo.html">Изменить данные</a>
-                        <a class="dropdown-item" href="login.html">Выйти</a>
+                        <a class="dropdown-item" href="../login.html">Выйти</a>
                     </div>
-                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="user.html">Пользователи</a>
                 </li>
@@ -59,45 +58,57 @@
         </div>
     </nav>
     <br>
-    <div class="container">
-        <h1 class="text-center">Country Manager</h1>
+    <div class="container" style="max-width:1500px">
+        <h1 class="text-center">Ticket Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="movieTitle" placeholder="Введите название/uid фильма">
-            <input type="text" class="form-control" id="movieReleaseYear" placeholder="Введите год выпуска">
-            <input type="text" class="form-control" id="movieDuration" placeholder="Введите продолжительность (мин)">
-            <input type="text" class="form-control" id="movieDescription" placeholder="Введите описание фильма">
-            <input type="text" class="form-control" id="movieDirectors" placeholder="Введите режиссеров фильма">
-            <input type="text" class="form-control" id="movieCountries" placeholder="Введите страны фильма">
-            <input type="text" class="form-control" id="movieGenres" placeholder="Введите жанры фильма">
-
-
+            <input type="text" class="form-control" id="screeningUid" placeholder="Введите uid сеанса">
         </div>
-        <button type="button" class="btn btn-primary" onclick="getAllMovies()">Все фильмы</button>
-        <button type="button" class="btn btn-primary" onclick="getSingleMovie()">Фильм</button>
-        <button type="button" class="btn btn-secondary" onclick="createMovie()">Добавить фильм</button>
-        <button type="button" class="btn btn-secondary" onclick="updateMovie()">Изменить фильм</button>
-        <button type="button" class="btn btn-danger" onclick="deleteMovie()">Удалить фильм</button>
+        <button type="button" class="btn btn-primary" onclick="getAllTickets()">Все билеты</button>
+        <button type="button" class="btn btn-secondary" onclick="getScreeningTickets()">Все билеты на сеанс</button>
+        <button type="button" class="btn btn-danger" onclick="deleteTicket()">Удалить билет</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Title</th>
-                    <th>ReleaseYear</th>
+                    <th>Row</th>
+                    <th>User</th>
+                    <th>Movie</th>
                     <th>Duration</th>
-                    <th>Description</th>
-                    <th>Directors</th>
-                    <th>Countries</th>
-                    <th>Genres</th>
-                    <th>Selected</th>
+                    <th>Start time</th>
+                    <th>End time</th>
+                    <th>Price</th>
+                    <th>Hall</th>
+                    <th>Row</th>
+                    <th>Number</th>
+                    <th style="text-align: center;">Selected</th>
                 </tr>
             </thead>
-            <tbody id="movieTable">
+            <tbody id="ticketTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/movie.js"></script>
+    <script src="../../js/ticket.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            const token = localStorage.getItem('userToken');
+
+            if (!token) {
+                alert('Отказано. Пожалуйста авторизуйтесь');
+                window.location.href = '../login.html';
+                return;
+            }
+
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const userRole = decodedToken.role;
+
+            if (userRole !== 'Admin') {
+                alert('Отказано. Только Администратор имеет доступ');
+                window.location.href = 'javascript:history. back()';
+            }
+        });
+    </script>
 </body>
 </html>

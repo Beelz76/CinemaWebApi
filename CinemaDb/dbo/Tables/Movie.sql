@@ -4,7 +4,6 @@
     [Title]       NVARCHAR (256)   NOT NULL,
     [ReleaseYear] INT              NOT NULL,
     [Duration]    INT              NOT NULL,
-    [Description] NVARCHAR (512)   NULL,
     PRIMARY KEY CLUSTERED ([MovieId] ASC),
     UNIQUE NONCLUSTERED ([MovieUid] ASC)
 );

@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>   
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Admin Panel</title>
 </head>
 <body>
@@ -22,7 +22,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="userInfo.html">Изменить данные</a>
-                        <a class="dropdown-item" href="login.html">Выйти</a>
+                        <a class="dropdown-item" href="../login.html">Выйти</a>
                     </div>
                 </li>
                 <li class="nav-item">
@@ -60,30 +60,48 @@
     </nav>
     <br>
     <div class="container">
-        <h1 class="text-center">Hall Manager</h1>
+        <h1 class="text-center">Genre Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="hallName" placeholder="Введите название зала">
+            <input type="text" class="form-control" id="genreName" placeholder="Введите название жанра">
         </div>
-        <button type="button" class="btn btn-primary" onclick="getHalls()">Все залы</button>
-        <button type="button" class="btn btn-secondary" onclick="createHall()">Добавить зал</button>
-        <button type="button" class="btn btn-secondary" onclick="updateHall()">Изменить зал</button>
-        <button type="button" class="btn btn-danger" onclick="deleteHall()">Удалить зал</button>
+        <button type="button" class="btn btn-primary" onclick="getGenres()">Все жанры</button>
+        <button type="button" class="btn btn-secondary" onclick="createGenre()">Добавить жанр</button>
+        <button type="button" class="btn btn-secondary" onclick="updateGenre()">Изменить жанр</button>
+        <button type="button" class="btn btn-danger" onclick="deleteGenre()">Удалить жанр</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Hall</th>
-                    <th>Capacity</th>
-                    <th>Selected</th>
+                    <th>Genre</th>
+                    <th style="text-align: center;">Selected</th>
                 </tr>
             </thead>
-            <tbody id="hallTable">
+            <tbody id="genreTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/hall.js"></script>
+    <script src="../../js/genre.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            const token = localStorage.getItem('userToken');
+
+            if (!token) {
+                alert('Отказано. Пожалуйста авторизуйтесь');
+                window.location.href = '../login.html';
+                return;
+            }
+
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const userRole = decodedToken.role;
+
+            if (userRole !== 'Admin') {
+                alert('Отказано. Только Администратор имеет доступ');
+                window.location.href = 'javascript:history. back()';
+            }
+        });
+    </script>
 </body>
 </html>

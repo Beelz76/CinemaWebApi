@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>   
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Admin Panel</title>
 </head>
 <body>
@@ -22,7 +22,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="userInfo.html">Изменить данные</a>
-                        <a class="dropdown-item" href="login.html">Выйти</a>
+                        <a class="dropdown-item" href="../login.html">Выйти</a>
                     </div>
                 </li>
                 <li class="nav-item">
@@ -60,29 +60,48 @@
     </nav>
     <br>
     <div class="container">
-        <h1 class="text-center">Screening price Manager</h1>
+        <h1 class="text-center">Country Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="screeningPrice" placeholder="Введите цену">
+            <input type="text" class="form-control" id="countryName" placeholder="Введите название страны">
         </div>
-        <button type="button" class="btn btn-primary" onclick="getScreeningPrices()">Все цены</button>
-        <button type="button" class="btn btn-secondary" onclick="createScreeningPrice()">Добавить цену</button>
-        <button type="button" class="btn btn-secondary" onclick="updateScreeningPrice()">Изменить цену</button>
-        <button type="button" class="btn btn-danger" onclick="deleteScreeningPrice()">Удалить цену</button>
+        <button type="button" class="btn btn-primary" onclick="getCountries()">Все страны</button>
+        <button type="button" class="btn btn-secondary" onclick="createCountry()">Добавить страну</button>
+        <button type="button" class="btn btn-secondary" onclick="updateCountry()">Изменить страну</button>
+        <button type="button" class="btn btn-danger" onclick="deleteCountry()">Удалить страну</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Price</th>
-                    <th>Selected</th>
+                    <th>Country</th>
+                    <th style="text-align: center;">Selected</th>
                 </tr>
             </thead>
-            <tbody id="screeningPriceTable">
+            <tbody id="countryTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/screeningPrice.js"></script>
+    <script src="../../js/country.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            const token = localStorage.getItem('userToken');
+
+            if (!token) {
+                alert('Отказано. Пожалуйста авторизуйтесь');
+                window.location.href = '../login.html';
+                return;
+            }
+
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const userRole = decodedToken.role;
+
+            if (userRole !== 'Admin') {
+                alert('Отказано. Только Администратор имеет доступ');
+                window.location.href = 'javascript:history. back()';
+            }
+        });
+    </script>
 </body>
 </html>

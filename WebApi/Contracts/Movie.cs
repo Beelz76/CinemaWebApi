@@ -10,8 +10,6 @@
 
         public required int Duration { get; init; }
 
-        public required string? Description { get; init; }
-
         public required List<string> Directors { get; init; }
 
         public required List<string> Countries { get; init; }

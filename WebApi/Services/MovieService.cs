@@ -23,7 +23,6 @@ namespace WebApi.Services
                 Title = movieInfo.Title,
                 ReleaseYear = movieInfo.ReleaseYear,
                 Duration = int.Parse(movieInfo.Duration),
-                Description = movieInfo.Description
             };
 
             AddDirectors(movieInfo.Directors, movie);
@@ -51,7 +50,6 @@ namespace WebApi.Services
                 Title = movie.Title,
                 ReleaseYear = movie.ReleaseYear,
                 Duration = movie.Duration,
-                Description = movie.Description,
                 Directors = movie.Directors.Select(x => x.FullName).ToList(),
                 Countries = movie.Countries.Select(x => x.Name).ToList(),
                 Genres = movie.Genres.Select(x => x.Name).ToList()
@@ -74,7 +72,6 @@ namespace WebApi.Services
                 Title = movie.Title,
                 ReleaseYear = movie.ReleaseYear,
                 Duration = movie.Duration,
-                Description = movie.Description,
                 Directors = movie.Directors.Select(x => x.FullName).ToList(),
                 Countries = movie.Countries.Select(x => x.Name).ToList(),
                 Genres = movie.Genres.Select(x => x.Name).ToList()
@@ -91,10 +88,10 @@ namespace WebApi.Services
 
             return movies.Select(movie => new Contracts.MovieInfo
             {
+                movieUid = movie.MovieUid,
                 Title = movie.Title,
                 ReleaseYear = movie.ReleaseYear,
                 Duration = $"{movie.Duration / 60}ч {movie.Duration % 60}мин",
-                Description = movie.Description,
                 Directors = movie.Directors.Select(x => x.FullName).ToList(),
                 Countries = movie.Countries.Select(x => x.Name).ToList(),
                 Genres = movie.Genres.Select(x => x.Name).ToList()
@@ -114,7 +111,6 @@ namespace WebApi.Services
             movie.Title = movieInfo.Title;
             movie.ReleaseYear = movieInfo.ReleaseYear;
             movie.Duration = Int32.Parse(movieInfo.Duration);
-            movie.Description = movieInfo.Description;
 
             movie.Directors.Clear();
             movie.Countries.Clear();
@@ -222,10 +218,9 @@ namespace WebApi.Services
         public bool CheckMovieInfo(Contracts.MovieInfo movieInfo)
         {
             var movie = _cinemaDbContext.Set<Movie>()
-                .SingleOrDefault(x => x.Title == movieInfo.Title && 
-                                x.ReleaseYear == movieInfo.ReleaseYear && 
-                                x.Duration == Int32.Parse(movieInfo.Duration) && 
-                                x.Description == movieInfo.Description);
+                .SingleOrDefault(x => x.Title == movieInfo.Title &&
+                                x.ReleaseYear == movieInfo.ReleaseYear &&
+                                x.Duration == Int32.Parse(movieInfo.Duration));
 
             if (movie == null) { return false; };
 

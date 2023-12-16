@@ -12,8 +12,6 @@
 
         public required int Duration { get; set; }
 
-        public string? Description { get; set; }
-
         public ICollection<Director> Directors { get; set; } = new List<Director>();
 
         public ICollection<Country> Countries { get; set; } = new List<Country>();

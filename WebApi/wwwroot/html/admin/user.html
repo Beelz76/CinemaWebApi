@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>   
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Admin Panel</title>
 </head>
 <body>
@@ -22,7 +22,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="userInfo.html">Изменить данные</a>
-                        <a class="dropdown-item" href="login.html">Выйти</a>
+                        <a class="dropdown-item" href="../login.html">Выйти</a>
                     </div>
                 </li>
                 <li class="nav-item">
@@ -63,11 +63,11 @@
         <h1 class="text-center">User Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="countryName" placeholder="Введите uid пользователя">
+            <input type="text" class="form-control" id="userUid" placeholder="Введите uid пользователя">
         </div>
         <button type="button" class="btn btn-primary" onclick="getAllUsers()">Все пользователи</button>
-        <button type="button" class="btn btn-primary" onclick="getSingleUser()">Пользователь</button>
-        <button type="button" class="btn btn-secondary" onclick="updateUserAdminStatus()">Сделать админом</button>
+        <button type="button" class="btn btn-primary" onclick="getSingleUser()">Пользователь по uid</button>
+        <button type="button" class="btn btn-secondary" onclick="updateUserAdminStatus()">Сделать администратором</button>
         <button type="button" class="btn btn-secondary" onclick="updateCountry()">Изменить страну</button>
         <button type="button" class="btn btn-danger" onclick="deleteUser()">Удалить пользователя</button>
         <br><br>
@@ -78,7 +78,8 @@
                     <th>Full Name</th>
                     <th>Login</th>
                     <th>Email</th>
-                    <th>Selected</th>
+                    <th>IsAdmin</th>
+                    <th style="text-align: center;">Selected</th>
                 </tr>
             </thead>
             <tbody id="userTable">
@@ -86,6 +87,26 @@
         </table>
     </div>
 
-    <script src="../js/user.js"></script>
+    <script src="../../js/user.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            const token = localStorage.getItem('userToken');
+
+            if (!token) {
+                alert('Отказано. Пожалуйста авторизуйтесь');
+                window.location.href = '../login.html';
+                return;
+            }
+
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const userRole = decodedToken.role;
+
+            if (userRole !== 'Admin') {
+                alert('Отказано. Только Администратор имеет доступ');
+                window.location.href = 'javascript:history. back()';
+            }
+        });
+    </script>
+
 </body>
 </html>

@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>   
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Admin Panel</title>
 </head>
 <body>
@@ -22,7 +22,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="userInfo.html">Изменить данные</a>
-                        <a class="dropdown-item" href="login.html">Выйти</a>
+                        <a class="dropdown-item" href="../login.html">Выйти</a>
                     </div>
                 </li>
                 <li class="nav-item">
@@ -60,39 +60,49 @@
     </nav>
     <br>
     <div class="container">
-        <h1 class="text-center">Screening Manager</h1>
+        <h1 class="text-center">Hall Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="movieTitle" placeholder="Введите название фильма">
             <input type="text" class="form-control" id="hallName" placeholder="Введите название зала">
-            <input type="text" class="form-control" id="screeningStart" placeholder="Введите начало сеанса">
-            <input type="text" class="form-control" id="screeningEnd" placeholder="Введите конец сеанса">
-            <input type="text" class="form-control" id="screeningPrice" placeholder="Введите цену">
         </div>
-        <button type="button" class="btn btn-primary" onclick="getAllScreenings()">Все Сеансы</button>
-        <button type="button" class="btn btn-primary" onclick="getHallScreenings()">Сеансы в зале</button>
-        <button type="button" class="btn btn-secondary" onclick="createScreening()">Добавить сеанс</button>
-        <button type="button" class="btn btn-secondary" onclick="updateScreening()">Изменить сеанс</button>
-        <button type="button" class="btn btn-danger" onclick="deleteScreening()">Удалить сеанс</button>
+        <button type="button" class="btn btn-primary" onclick="getHalls()">Все залы</button>
+        <button type="button" class="btn btn-secondary" onclick="createHall()">Добавить зал</button>
+        <button type="button" class="btn btn-secondary" onclick="updateHall()">Изменить зал</button>
+        <button type="button" class="btn btn-danger" onclick="deleteHall()">Удалить зал</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Movie</th>
-                    <th>Duration</th>
-                    <th>Start time</th>
-                    <th>End Time</th>
                     <th>Hall</th>
-                    <th>Price</th>
-                    <th>Selected</th>
+                    <th>Capacity</th>
+                    <th style="text-align: center;">Selected</th>
                 </tr>
             </thead>
-            <tbody id="screeningTable">
+            <tbody id="hallTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/screening.js"></script>
+    <script src="../../js/hall.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            const token = localStorage.getItem('userToken');
+
+            if (!token) {
+                alert('Отказано. Пожалуйста авторизуйтесь');
+                window.location.href = '../login.html';
+                return;
+            }
+
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const userRole = decodedToken.role;
+
+            if (userRole !== 'Admin') {
+                alert('Отказано. Только Администратор имеет доступ');
+                window.location.href = 'javascript:history. back()';
+            }
+        });
+    </script>
 </body>
 </html>

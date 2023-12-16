@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>   
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Admin Panel</title>
 </head>
 <body>
@@ -22,7 +22,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="userInfo.html">Изменить данные</a>
-                        <a class="dropdown-item" href="login.html">Выйти</a>
+                        <a class="dropdown-item" href="../login.html">Выйти</a>
                     </div>
                 </li>
                 <li class="nav-item">
@@ -60,29 +60,53 @@
     </nav>
     <br>
     <div class="container">
-        <h1 class="text-center">Genre Manager</h1>
+        <h1 class="text-center">Seat Manager</h1>
         <br>
         <div class="form-group">
-            <input type="text" class="form-control" id="genreName" placeholder="Введите название жанра">
+            <input type="text" class="form-control" id="hallName" placeholder="Введите название зала"><br />
+            <input type="text" class="form-control" id="seatRow" placeholder="Введите ряд"><br />
+            <input type="text" class="form-control" id="seatNumber" placeholder="Введите номер">
         </div>
-        <button type="button" class="btn btn-primary" onclick="getGenres()">Все жанры</button>
-        <button type="button" class="btn btn-secondary" onclick="createGenre()">Добавить жанр</button>
-        <button type="button" class="btn btn-secondary" onclick="updateGenre()">Изменить жанр</button>
-        <button type="button" class="btn btn-danger" onclick="deleteGenre()">Удалить жанр</button>
+        <button type="button" class="btn btn-primary" onclick="getAllSeats()">Все места</button>
+        <button type="button" class="btn btn-primary" onclick="getHallSeats()">Места по залу</button>
+        <button type="button" class="btn btn-secondary" onclick="createSeat()">Добавить место</button>
+        <button type="button" class="btn btn-secondary" onclick="updateSeaty()">Изменить иесто</button>
+        <button type="button" class="btn btn-danger" onclick="deleteSeat()">Удалить место</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>UID</th>
-                    <th>Genre</th>
-                    <th>Selected</th>
+                    <th>Hall name</th>
+                    <th>Row</th>
+                    <th>Number</th>
+                    <th style="text-align: center;">Selected</th>
                 </tr>
             </thead>
-            <tbody id="genreTable">
+            <tbody id="seatTable">
             </tbody>
         </table>
     </div>
 
-    <script src="../js/genre.js"></script>
+    <script src="../../js/seat.js"></script>
+    <script>
+        window.addEventListener('load', function () {
+            const token = localStorage.getItem('userToken');
+
+            if (!token) {
+                alert('Отказано. Пожалуйста авторизуйтесь');
+                window.location.href = '../login.html';
+                return;
+            }
+
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const userRole = decodedToken.role;
+
+            if (userRole !== 'Admin') {
+                alert('Отказано. Только Администратор имеет доступ');
+                window.location.href = 'javascript:history. back()';
+            }
+        });
+    </script>
 </body>
 </html>

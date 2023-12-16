@@ -8,31 +8,35 @@
             },
         });
 
-        const data = await response.json();
-        const countryTable = document.getElementById('countryTable');
-        countryTable.innerHTML = '';
+        if (response.ok) {
+            const data = await response.json();
 
-        data.forEach(country => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
+            const countryTable = document.getElementById('countryTable');
+            countryTable.innerHTML = '';
+
+            data.forEach(country => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
                 <td>${country.countryUid}</td>
                 <td>${country.name}</td>
-                <td><input type="checkbox" value="${country.countryUid}"></td>
+                <td style="text-align: center;"><input type="checkbox" value="${country.countryUid}"></td>
             `;
-            countryTable.appendChild(row);
-        });
+                countryTable.appendChild(row);
+            });
+        } else {
+            throw new Error('Что-то пошло не так');
+        }
     } catch (error) {
         console.error(error);
         alert('Ошибка');
     }
 }
 
-
-function createCountry() {
+async function createCountry() {
     const countryName = document.getElementById('countryName').value;
 
     if (!countryName) {
-        alert('Введите название страны');
+        alert('Please enter the country name');
         return;
     }
 
@@ -40,31 +44,35 @@ function createCountry() {
         name: countryName
     }
 
-    fetch('https://localhost:7172/api/Country/CreateCountry', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('userToken')}`
-        },
-        body: JSON.stringify(data)
-    })
-        .then(response => response.text())
-        .then(data => {
-            console.log(data);
-            getCountries();
-        })
-        .catch(error => {
-            console.error(error);
-            alert('Ошибка');
+    try {
+        const response = await fetch('https://localhost:7172/api/Country/CreateCountry', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('userToken')}`
+            },
+            body: JSON.stringify(data)
         });
+
+        if (response.ok) {
+            const responseData = await response.text();
+            console.log(responseData);
+            getCountries();
+        } else {
+
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Error');
+    }
 }
 
-function updateCountry() {
+async function updateCountry() {
     const countryName = document.getElementById('countryName').value;
     const selectedCheckboxes = document.querySelectorAll('#countryTable input[type="checkbox"]:checked');
 
     if (selectedCheckboxes.length !== 1) {
-        alert('Выберите только одну страну');
+        alert('Выберите одну страну');
         return;
     }
 
@@ -73,29 +81,35 @@ function updateCountry() {
         return;
     }
 
-    const countryUid = selectedCheckboxes[0].value;
+    const uid = selectedCheckboxes[0].value;
 
     const data = {
         name: countryName
     }
 
-    fetch(`https://localhost:7172/api/Country/UpdateCountry?countryUid=${countryUid}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('userToken')}`
-        },
-        body: JSON.stringify(data)
-    })
-        .then(response => response.text())
-        .then(data => {
-            console.log(data);
-            getCountries();
-        })
-        .catch(error => {
-            console.error(error);
-            alert('Ошибка');
+    try {
+        const response = await fetch(`https://localhost:7172/api/Country/UpdateCountry?countryUid=${uid}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+            },
+            body: JSON.stringify(data)
         });
+
+        if (response.ok) {
+            const data = await response.text();
+
+            console.log(data);
+            alert('Страна изменена');
+            getCountries();
+        } else {
+            throw new Error('Не удалось изменить страну');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Ошибка');
+    }
 }
 
 async function deleteCountry() {
@@ -123,13 +137,17 @@ async function deleteCountry() {
                 },
             });
 
-            const data = await response.text();
+            if (response.ok) {
+                const data = await response.text();
 
-            if (data) {
-                //alert(data);
-                getCountries();
+                if (data) {
+                    //alert(data);
+                    getCountries();
+                } else {
+                    alert('Не получилось удалить страну');
+                }
             } else {
-                alert('Не получилось удалить страну(ы)');
+                throw new Error('Что-то пошло не так');
             }
         } catch (error) {
             console.error(error);

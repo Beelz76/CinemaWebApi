@@ -71,7 +71,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize (Roles = "Admin")]
+        //[Authorize (Roles = "Admin")]
         public ActionResult<List<User>> GetAllUsers()
         {
             var users = _userService.GetAllUsers();
