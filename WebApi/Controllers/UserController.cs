@@ -20,7 +20,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult Register(UserRegisterCredentials credentials)
+        public ActionResult<JwtToken> Register(UserRegisterCredentials credentials)
         {
             if (!_userService.CheckRegex(credentials.Login))
             {
@@ -38,17 +38,17 @@ namespace WebApi.Controllers
 
             var userUid = _userService.Register(credentials);
 
-            /*return new JwtToken
+            return new JwtToken
             {
                 Token = _jwtService.GenerateToken(userUid, credentials.Login, false)
-            };*/
+            };
 
-            if (_jwtService.GenerateToken(userUid, credentials.Login, false) == null)
+            /*if (_jwtService.GenerateToken(userUid, credentials.Login, false) == null)
             {
                 return BadRequest(ModelState);
             }
 
-            return Ok("Successful registration");
+            return Ok("Successful registration");*/
         }
 
         [HttpPost]
@@ -71,7 +71,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize (Roles = "Admin")]
+        [Authorize (Roles = "Admin")]
         public ActionResult<List<User>> GetAllUsers()
         {
             var users = _userService.GetAllUsers();
@@ -85,7 +85,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<User> GetSingleUser(Guid userUid)
         {
             var user = _userService.GetSingleUser(userUid);
@@ -99,7 +99,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin, User")]
+        [Authorize(Roles = "Admin, User")]
         public ActionResult<UserInfo> GetUserInfo(Guid userUid)
         {
             var user = _userService.GetUserInfo(userUid);
@@ -113,7 +113,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        //[Authorize(Roles = "Admin, User")]
+        [Authorize(Roles = "Admin, User")]
         public ActionResult UpdateUser(Guid userUid, UserUpdate userUpdate)
         {
             if (userUpdate.Login == null || userUpdate.Password == null || 
@@ -164,7 +164,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult UpdateUserAdminStatus(Guid userUid)
         {
             if (!_userService.UpdateUserAdminStatus(userUid))
@@ -178,7 +178,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteUser(Guid userUid)
         {
             if (!_userService.DeleteUser(userUid))

@@ -23,7 +23,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult CreateScreening(ScreeningInfo screeningInfo)
         {
             if (screeningInfo.MovieTitle == null || screeningInfo.HallName == null ||
@@ -65,7 +65,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<Screening>> GetAllScreenings()
         {
             var screenings = _screeningService.GetAllScreenings();
@@ -79,7 +79,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin, User")]
+        [Authorize(Roles = "Admin, User")]
         public ActionResult<List<MovieScreening>> GetMovieScreenings(Guid movieUid)
         {
             if (!_movieService.IsMovieExists(movieUid))
@@ -98,7 +98,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<Screening>> GetHallScreenings(string hallName)
         {
             if (!_hallService.CheckHallName(hallName))
@@ -117,7 +117,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult UpdateScreening(Guid screeningUid, ScreeningInfo screeningInfo)
         {
             if (screeningInfo.MovieTitle == null || screeningInfo.HallName == null ||
@@ -146,7 +146,7 @@ namespace WebApi.Controllers
                 return NotFound("Price not found");
             }
 
-            if (!_screeningService.CheckScreeningCreating(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart))
+            if (!_screeningService.CheckScreeningCreating(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart, screeningUid))
             {
                 ModelState.AddModelError("", "Failed to create screening at this time");
                 return BadRequest(ModelState);
@@ -163,7 +163,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteScreening(Guid screeningUid)
         {
             if (!_screeningService.DeleteScreening(screeningUid))

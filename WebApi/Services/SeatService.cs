@@ -36,7 +36,12 @@ namespace WebApi.Services
 
         public List<Contracts.Seat>? GetAllSeats()
         {
-            var seats = _cinemaDbContext.Set<Seat>().Include(x => x.Hall).OrderBy(x => x.Hall.Name).ThenBy(x => x.Row).ThenBy(x => x.Number).ToList();
+            var seats = _cinemaDbContext.Set<Seat>()
+                .Include(x => x.Hall)
+                .OrderBy(x => x.Hall.Name)
+                .ThenBy(x => x.Row)
+                .ThenBy(x => x.Number)
+                .ToList();
 
             if (seats.Count == 0) { return null; }
 
@@ -51,8 +56,12 @@ namespace WebApi.Services
 
         public List<Contracts.HallSeat>? GetHallSeats(string hallName)
         {
-            //var seats = _cinemaDbContext.Set<Seat>().Where(x => x.Hall.Name == hallName).ToList();
-            var seats = _cinemaDbContext.Set<Seat>().Where(x => x.Hall.Name == hallName).OrderBy(x => x.Hall.HallUid).ThenBy(x => x.Row).ThenBy(x => x.Number).ToList();
+            var seats = _cinemaDbContext.Set<Seat>()
+                .Where(x => x.Hall.Name == hallName)
+                .OrderBy(x => x.Hall.HallUid)
+                .ThenBy(x => x.Row)
+                .ThenBy(x => x.Number)
+                .ToList();
 
             if (seats.Count == 0) { return null; }
 
@@ -70,18 +79,24 @@ namespace WebApi.Services
 
             if (screening == null) { return null; }
 
-            var seats = _cinemaDbContext.Set<Seat>().Where(x => x.Hall.HallUid == screening.Hall.HallUid)
+            var seats = _cinemaDbContext.Set<Seat>()
+                .Where(x => x.Hall.HallUid == screening.Hall.HallUid)
                 .Select(x => new Contracts.ScreeningSeat
                 {
+                    SeatUid = x.SeatUid,
                     Row = x.Row,
                     Number = x.Number,
                     Status = x.Tickets.Any(x => x.Screening.ScreeningUid == screeningUid) ? "Занято" : "Свободно"
-                }).ToList();
+                })
+                .OrderBy(x => x.Row)
+                .ThenBy(x => x.Number)
+                .ToList();
 
             if (seats.Count == 0) { return null; }
 
             return seats.Select(seat => new Contracts.ScreeningSeat
             {
+                SeatUid = seat.SeatUid,
                 Row = seat.Row,
                 Number = seat.Number,
                 Status = seat.Status,
@@ -116,6 +131,17 @@ namespace WebApi.Services
         public bool IsSeatExists(Guid seatUid)
         {
             var seat = _cinemaDbContext.Set<Seat>().SingleOrDefault(x => x.SeatUid == seatUid);
+
+            if (seat == null) { return false; }
+
+            return true;
+        }
+
+        public bool CheckSeat(string hallName, int row, int number)
+        {
+            var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.Name == hallName);
+
+            var seat = _cinemaDbContext.Set<Seat>().SingleOrDefault(x => x.Hall == hall & x.Row == row & x.Number == number);
 
             if (seat == null) { return false; }
 

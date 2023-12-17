@@ -2,9 +2,7 @@
 {
     public class MovieScreening
     {
-        public string MovieTitle { get; init; }
-
-        public string MovieDuration { get; init; }
+        public required Guid ScreeningUid { get; init; }
 
         public required string ScreeningStart { get; init; }
 

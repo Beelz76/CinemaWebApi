@@ -28,11 +28,12 @@
                 movieTable.appendChild(row);
             });
         } else {
+            console.log(await response.text())
+            location.reload(true);
             throw new Error('Что-то пошло не так');
         }
     } catch (error) {
         console.error(error);
-        alert('Ошибка');
     }
 }
 
@@ -71,6 +72,7 @@ async function getSingleMovie() {
             <td style="text-align: center;"><input type="checkbox" value="${data.movieUid}"></td>`;
             movieTable.appendChild(row);
         } else {
+            console.log(await response.text())
             throw new Error('Что-то пошло не так');
         }
     } catch (error) {
@@ -108,7 +110,109 @@ async function getMoviesInfo() {
                 movieTable.appendChild(row);
             });
         } else {
+            console.log(await response.text())
             throw new Error('Что-то пошло не так');
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function createMovie() {
+    const movieTitle = document.getElementById('movieTitle').value;
+    const movieReleaseYear = document.getElementById('movieReleaseYear').value;
+    const movieDuration = document.getElementById('movieDuration').value;
+    const movieDirectors = document.getElementById("movieDirectors").value;
+    const movieCountries = document.getElementById("movieCountries").value;
+    const movieGenres = document.getElementById("movieGenres").value;
+
+    if (!movieTitle || !movieReleaseYear || !movieDuration) {
+        alert('Заполните необходимые поля');
+        return;
+    }
+
+    const movieInfo = {
+        title: movieTitle,
+        releaseYear: parseInt(movieReleaseYear),
+        duration: movieDuration,
+        directors: movieDirectors.split(", "),
+        countries: movieCountries.split(", "),
+        genres: movieGenres.split(", "),
+    };
+
+    try {
+        const response = await fetch(`https://localhost:7172/api/Movie/CreateMovie`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('userToken')}`
+            },
+            body: JSON.stringify(movieInfo)
+        });
+
+        const data = await response.text();
+
+        if (response.ok) {
+            console.log(data);;
+            getAllMovies();
+        } else {
+            console.log(data);
+            throw new Error('Что-то пошло не так');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Ошибка');
+    }
+}
+
+async function updateMovie() {
+    const movieTitle = document.getElementById('movieTitle').value;
+    const movieReleaseYear = document.getElementById('movieReleaseYear').value;
+    const movieDuration = document.getElementById('movieDuration').value;
+    const movieDirectors = document.getElementById("movieDirectors").value;
+    const movieCountries = document.getElementById("movieCountries").value;
+    const movieGenres = document.getElementById("movieGenres").value;
+    const selectedCheckboxes = document.querySelectorAll('#movieTable input[type="checkbox"]:checked');
+
+    if (selectedCheckboxes.length !== 1) {
+        alert('Выберите один фильм');
+        return;
+    }
+
+    if (!movieTitle || !movieReleaseYear || !movieDuration) {
+        alert('Заполните необходимые поля');
+        return;
+    }
+
+    const movieInfo = {
+        title: movieTitle,
+        releaseYear: parseInt(movieReleaseYear),
+        duration: movieDuration,
+        directors: movieDirectors.split(", "),
+        countries: movieCountries.split(", "),
+        genres: movieGenres.split(", "),
+    };
+
+    const uid = selectedCheckboxes[0].value;
+
+    try {
+        const response = await fetch(`https://localhost:7172/api/Movie/UpdateMovie?movieUid=${uid}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+            },
+            body: JSON.stringify(movieInfo)
+        });
+
+        const data = await response.text();
+
+        if (response.ok) {
+            console.log(data);
+            getAllMovies();
+        } else {
+            console.log(data);
+            throw new Error('Не удалось изменить фильм');
         }
     } catch (error) {
         console.error(error);
@@ -141,16 +245,14 @@ async function deleteMovie() {
                 },
             });
 
-            if (response.ok) {
-                const data = await response.text();
+            const data = await response.text();
 
-                if (data) {
-                    //alert(data);
-                    getAllMovies();
-                } else {
-                    alert('Не получилось удалить фильм');
-                }
+            if (response.ok) {
+                console.log(data);
+                getAllMovies();
+               
             } else {
+                console.log(data);
                 throw new Error('Что-то пошло не так');
             }
         } catch (error) {

@@ -2,6 +2,8 @@
 {
     public class UserTicket
     {
+        public required Guid TicketUid { get; init; }    
+
         public required string MovieTitle { get; init; }
 
         public required string MovieDuration { get; init; }

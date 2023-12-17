@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Главная</title>
 </head>
@@ -43,7 +42,7 @@
     <br>
     <div class="container">
         <h1 class="text-center">Сеансы на фильм</h1>
-        <button type="button" class="btn btn-primary float-right" onclick="">Выбрать место</button>
+        <button type="button" class="btn btn-primary float-right" onclick="selectScreening()">Выбрать место</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
@@ -52,7 +51,7 @@
                     <th>End time</th>
                     <th>Hall name</th>
                     <th>Price</th>
-                    <th style="text-align: center;">Selected</th>
+                    <th>Selected</th>
                 </tr>
             </thead>
             <tbody id="screeningTable">
@@ -73,6 +72,21 @@
         });
 
         window.addEventListener('load', getMovieScreenings);
+
+        function selectScreening() {
+            const selectedCheckboxes = document.querySelectorAll('#screeningTable input[type="checkbox"]:checked');
+
+            if (selectedCheckboxes.length !== 1) {
+                alert('Выберите один сеанс');
+                return;
+            }
+
+            uid = selectedCheckboxes[0].value;
+
+            localStorage.setItem('selectedScreening', uid);
+
+            window.location.href = 'userSeat.html';
+        }
     </script>
 </body>
 </html>

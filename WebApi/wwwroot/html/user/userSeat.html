@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Главная</title>
 </head>
@@ -43,7 +42,7 @@
     <br>
     <div class="container">
         <h1 class="text-center">Места в этом зале</h1>
-        <button type="button" class="btn btn-primary float-right" onclick="">Купить билет</button>
+        <button type="button" class="btn btn-primary float-right" onclick="createTicket()">Купить билет</button>
         <br><br>
         <table class="table table-bordered">
             <thead>
@@ -51,7 +50,7 @@
                     <th>Row</th>
                     <th>Number</th>
                     <th>Status</th>
-                    <th style="text-align: center;">Selected</th>
+                    <th>Selected</th>
                 </tr>
             </thead>
             <tbody id="seatTable">
@@ -60,6 +59,7 @@
     </div>
 
     <script src="../../js/seat.js"></script>
+    <script src="../../js/ticket.js"></script>
     <script>
         window.addEventListener('load', function () {
             const token = localStorage.getItem('userToken');

@@ -21,7 +21,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult CreateSeat(string hallName, int row, int number)
         {
             if (hallName == null || row <= 0 || number <= 0)
@@ -32,6 +32,13 @@ namespace WebApi.Controllers
             if (!_hallService.CheckHallName(hallName))
             {
                 return NotFound("Hall not found");
+            }
+
+            if (_seatService.CheckSeat(hallName, row, number))
+            {
+                ModelState.AddModelError("", "Seat already exists");
+
+                return BadRequest(ModelState);
             }
 
             if (!_seatService.CreateSeat(hallName, row, number))
@@ -45,7 +52,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<Seat>> GetAllSeats()
         {
             var seats = _seatService.GetAllSeats();
@@ -59,7 +66,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult<List<HallSeat>> GetHallSeats(string hallName)
         {
             if (!_hallService.CheckHallName(hallName))
@@ -78,7 +85,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin, User")]
+        [Authorize(Roles = "Admin, User")]
         public ActionResult<List<ScreeningSeat>> GetScreeningSeats(Guid screeningUid)
         {
             if (!_screeningService.IsScreeningExists(screeningUid))
@@ -97,7 +104,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult UpdateSeat(Guid seatUid, int row, int number)
         {
             if (row <= 0 || number <= 0)
@@ -116,7 +123,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult DeleteSeat(Guid seatUid)
         {
             if (!_seatService.DeleteSeat(seatUid))

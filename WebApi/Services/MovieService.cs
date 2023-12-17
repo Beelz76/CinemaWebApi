@@ -110,7 +110,7 @@ namespace WebApi.Services
 
             movie.Title = movieInfo.Title;
             movie.ReleaseYear = movieInfo.ReleaseYear;
-            movie.Duration = Int32.Parse(movieInfo.Duration);
+            movie.Duration = int.Parse(movieInfo.Duration);
 
             movie.Directors.Clear();
             movie.Countries.Clear();
@@ -220,7 +220,19 @@ namespace WebApi.Services
             var movie = _cinemaDbContext.Set<Movie>()
                 .SingleOrDefault(x => x.Title == movieInfo.Title &&
                                 x.ReleaseYear == movieInfo.ReleaseYear &&
-                                x.Duration == Int32.Parse(movieInfo.Duration));
+                                x.Duration == int.Parse(movieInfo.Duration));
+
+            if (movie == null) { return false; };
+
+            return true;
+        }
+
+        public bool CheckMovieInfo(Guid movieUid, Contracts.MovieInfo movieInfo)
+        {
+            var movie = _cinemaDbContext.Set<Movie>()
+                .SingleOrDefault(x => x.MovieUid != movieUid && x.Title == movieInfo.Title &&
+                                x.ReleaseYear == movieInfo.ReleaseYear &&
+                                x.Duration == int.Parse(movieInfo.Duration));
 
             if (movie == null) { return false; };
 

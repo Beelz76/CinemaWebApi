@@ -7,6 +7,7 @@ namespace WebApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class GenreController : ControllerBase
     {
         private readonly GenreService _genreService;
@@ -17,7 +18,6 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
         public ActionResult<Guid> CreateGenre(string name)
         {
             if (name == null)

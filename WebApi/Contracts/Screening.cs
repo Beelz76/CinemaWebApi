@@ -2,7 +2,7 @@
 {
     public class Screening
     {
-        public required Guid ScreeingUid { get; init; }
+        public required Guid ScreeningUid { get; init; }
 
         public required string MovieTitle { get; init; }
 

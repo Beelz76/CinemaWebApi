@@ -8,6 +8,7 @@ namespace WebApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class HallController : ControllerBase
     {
         private readonly HallService _hallService;
@@ -18,7 +19,6 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
         public ActionResult CreateHall(string name)
         {
             if (name == null)

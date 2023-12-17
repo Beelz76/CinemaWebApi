@@ -18,24 +18,21 @@
 
         if (response.ok) {
             const data = await response.json();
+            localStorage.setItem('userToken', data.token);
 
-            if (data.token) {
-                localStorage.setItem('userToken', data.token);
+            var decodedToken = JSON.parse(atob(data.token.split('.')[1]));
+            const userRole = decodedToken.role;
 
-                var decodedToken = JSON.parse(atob(data.token.split('.')[1]));
-                const userRole = decodedToken.role;
-
-                if (userRole === 'Admin') {
-                    window.location.href = 'admin/user.html';
-                } else if (userRole === 'User') {
-                    window.location.href = 'user/userMovie.html';
-                } else {
-                    alert('Произошла ошибка при авторизации');
-                }
+            if (userRole === 'Admin') {
+                window.location.href = 'admin/user.html';
+            } else if (userRole === 'User') {
+                window.location.href = 'user/userMovie.html';
             } else {
-                throw new Error('Неправильный логин или пароль');
-            }
+                console.log(await response.text());
+                alert('Произошла ошибка при авторизации');
+            }            
         } else {
+            console.log(await response.text());
             throw new Error('Неправильный логин или пароль');
         }
     } catch (error) {
@@ -50,7 +47,7 @@ async function register() {
     const password = document.getElementById('password').value;
 
     if (!fullName || !login || !password) {
-        alert('Please fill in all fields');
+        alert('Заполните необходимые поля');
         return;
     }
 
@@ -70,9 +67,13 @@ async function register() {
         });
 
         if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('userToken', data.token);
+
             alert('Успешная регистрация');
             window.location.href = 'user/userMovie.html';
         } else {
+            console.log(await response.text());
             throw new Error('Ошибка регистрации');
         }
     } catch (error) {
@@ -114,13 +115,14 @@ async function updateUser() {
             body: JSON.stringify(userUpdate)
         });
 
-        if (response.ok) {
-            const data = await response.text();
+        const data = await response.text();
 
+        if (response.ok) {          
             console.log(data);
             alert('Данные обновлены');
             location.reload(true);
         } else {
+            console.log(data);
             throw new Error('Не удалось обновить данные');
         }
     } catch (error) {
@@ -152,6 +154,7 @@ async function getUserInfo() {
             document.getElementById('login').value = data.login;
             document.getElementById('email').value = data.email;
         } else {
+            console.log(await response.text());
             throw new Error('Что-то пошло не так');
         }
     } catch (error) {
@@ -177,22 +180,30 @@ async function getAllUsers() {
             userTable.innerHTML = '';
 
             data.forEach(user => {
+                let email;
+
+                if (!user.email) {
+                    email = '';
+                } else {
+                    email = user.email;
+                }
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${user.userUid}</td>
                 <td>${user.fullName}</td>
                 <td>${user.login}</td>
-                <td>${user.email}</td>
+                <td>${email}</td>
                 <td>${user.isAdmin}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${user.userUid}"></td>`;
                 userTable.appendChild(row);
             });
         } else {
+            console.log(await response.text());
             throw new Error('Что-то пошло не так');
         }
     } catch (error) {
         console.error(error);
-        alert('Ошибка');
     }
 }
 
@@ -219,16 +230,24 @@ async function getSingleUser() {
             const userTable = document.getElementById('userTable');
             userTable.innerHTML = '';
 
+            let email;
+            if (!data.email) {
+                email = '';
+            } else {
+                email = data.email;
+            }
+
             const row = document.createElement('tr');
             row.innerHTML = `
             <td>${data.userUid}</td>
             <td>${data.fullName}</td>
             <td>${data.login}</td>
-            <td>${data.email}</td>
+            <td>${email}</td>
             <td>${data.isAdmin}</td>
             <td style="text-align: center;"><input type="checkbox" value="${data.userUid}"></td>`;
             userTable.appendChild(row);
         } else {
+            console.log(await response.text());
             throw new Error('Что-то пошло не так');
         }
 
@@ -263,16 +282,13 @@ async function deleteUser() {
                 },
             });
 
-            if (response.ok) {
-                const data = await response.text();
+            const data = await response.text();
 
-                if (data) {
-                    //alert(data);
-                    getAllUsers();
-                } else {
-                    alert('Не получилось удалить пользователя');
-                }
+            if (response.ok) {
+                console.log(data);
+                getAllUsers();             
             } else {
+                console.log(data);
                 throw new Error('Что-то пошло не так');
             }
         } catch (error) {
@@ -307,13 +323,14 @@ async function updateUserAdminStatus() {
             },
         });
 
-        if (response.ok) {
-            const data = await response.text();
+        const data = await response.text();
 
+        if (response.ok) {
             console.log(data);
             alert('Данный пользователь назначен администратором');
             getAllUsers();
         } else {
+            console.log(data);
             throw new Error('Не удалось обновить роль');
         }
     } catch (error) {

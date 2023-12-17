@@ -59,7 +59,6 @@ namespace WebApi.Services
             }).ToList();
         }
 
-        [HttpGet]
         public Contracts.User? GetSingleUser(Guid userUid)
         {
             var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);

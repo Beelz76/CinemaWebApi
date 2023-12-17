@@ -27,7 +27,7 @@ namespace WebApi.Services
 
         public List<Contracts.ScreeningPrice>? GetScreeningPrices()
         {
-            var screeningPrices = _cinemaDbContext.Set<ScreeningPrice>().ToList();
+            var screeningPrices = _cinemaDbContext.Set<ScreeningPrice>().OrderBy(x => x.Price).ToList();
 
             if (screeningPrices.Count == 0 ) { return null; }
 

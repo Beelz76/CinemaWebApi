@@ -24,7 +24,80 @@
                 hallTable.appendChild(row);
             });
         } else {
+            console.log(await response.text())
+            location.reload(true);
             throw new Error('Что-то пошло не так');
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function createHall() {
+    const hallName = document.getElementById('hallName').value;
+
+    if (!hallName) {
+        alert('Введите название зала');
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://localhost:7172/api/Hall/CreateHall?name=${hallName}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('userToken')}`
+            },
+        });
+
+        const data = await response.text();
+
+        if (response.ok) {
+            console.log(data);;
+            getHalls();
+        } else {
+            console.log(data);
+            throw new Error('Что-то пошло не так');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('Ошибка');
+    }
+}
+
+async function updateHall() {
+    const hallName = document.getElementById('hallName').value;
+    const selectedCheckboxes = document.querySelectorAll('#hallTable input[type="checkbox"]:checked');
+
+    if (selectedCheckboxes.length !== 1) {
+        alert('Выберите один зал');
+        return;
+    }
+
+    if (!hallName) {
+        alert('Введите название зала');
+        return;
+    }
+
+    const uid = selectedCheckboxes[0].value;
+
+    try {
+        const response = await fetch(`https://localhost:7172/api/Hall/UpdateHall?hallUid=${uid}&name=${hallName}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+            },
+        });
+
+        const data = await response.text();
+
+        if (response.ok) {
+            console.log(data);
+            getHalls();
+        } else {
+            console.log(data);
+            throw new Error('Не удалось изменить зал');
         }
     } catch (error) {
         console.error(error);
@@ -57,16 +130,14 @@ async function deleteHall() {
                 },
             });
 
-            if (response.ok) {
-                const data = await response.text();
+            const data = await response.text();
 
-                if (data) {
-                    //alert(data);
-                    getHalls();
-                } else {
-                    alert('Не получилось удалить зал');
-                }
+            if (response.ok) {
+                console.log(data);
+                getHalls();
+                 
             } else {
+                console.log(data);
                 throw new Error('Что-то пошло не так');
             }
         } catch (error) {

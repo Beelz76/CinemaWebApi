@@ -57,7 +57,7 @@ namespace WebApi.Services
 
             return screenings.Select(screening => new Contracts.Screening
             {
-                ScreeingUid = screening.ScreeningUid,
+                ScreeningUid = screening.ScreeningUid,
                 MovieTitle = screening.Movie.Title,
                 MovieDuration = $"{screening.Movie.Duration / 60}ч {screening.Movie.Duration % 60}мин",
                 ScreeningStart = screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
@@ -81,8 +81,7 @@ namespace WebApi.Services
 
             return screenings.Select(screening => new Contracts.MovieScreening
             {
-                //MovieTitle = screening.Movie.Title,
-                //MovieDuration = screening.Movie.Duration,
+                ScreeningUid = screening.ScreeningUid,
                 ScreeningStart = screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
                 ScreeningEnd = screening.ScreeningEnd.ToString("dd.MM.yyyy HH:mm"),
                 HallName = screening.Hall.Name,
@@ -104,7 +103,7 @@ namespace WebApi.Services
 
             return screenings.Select(screening => new Contracts.Screening
             {
-                ScreeingUid = screening.ScreeningUid,
+                ScreeningUid = screening.ScreeningUid,
                 MovieTitle = screening.Movie.Title,
                 MovieDuration = $"{screening.Movie.Duration / 60}ч {screening.Movie.Duration % 60}мин",
                 ScreeningStart = screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
@@ -170,7 +169,37 @@ namespace WebApi.Services
             var screeningEndTime = screeningStartTime.AddMinutes(movie.Duration);
 
             var conflictingScreenings = _cinemaDbContext.Set<Screening>()
+                .Where(x => x.Hall == hall &&
+                            ((x.ScreeningStart <= screeningStartTime && screeningStartTime <= x.ScreeningEnd) ||
+                            (x.ScreeningStart <= screeningEndTime && screeningEndTime <= x.ScreeningEnd))).ToList();
+
+            if (conflictingScreenings.Any())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool CheckScreeningCreating(string movieTitle, string hallName, string screeningStart, Guid screeningUid)
+        {
+            var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.Title == movieTitle);
+            var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.Name == hallName);
+
+            if (movie == null || hall == null) { return false; };
+
+            DateTime screeningStartTime;
+
+            if (!DateTime.TryParseExact(screeningStart, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out screeningStartTime))
+            {
+                return false;
+            }
+
+            var screeningEndTime = screeningStartTime.AddMinutes(movie.Duration);
+
+            var conflictingScreenings = _cinemaDbContext.Set<Screening>()
                 .Where(x => x.Hall == hall && 
+                            x.ScreeningUid != screeningUid &&
                             ((x.ScreeningStart <= screeningStartTime && screeningStartTime <= x.ScreeningEnd) ||
                             (x.ScreeningStart <= screeningEndTime && screeningEndTime <= x.ScreeningEnd))).ToList();
 

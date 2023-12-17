@@ -76,6 +76,7 @@ namespace WebApi.Services
 
             return tickets.Select(ticket => new Contracts.UserTicket
             {
+                TicketUid = ticket.TicketUid,
                 MovieTitle = ticket.Screening.Movie.Title,
                 MovieDuration = $"{ticket.Screening.Movie.Duration / 60}ч {ticket.Screening.Movie.Duration % 60}мин",
                 ScreeningStart = ticket.Screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
