@@ -3,10 +3,11 @@ using DatabaseAccessLayer.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using WebApi.Interface;
 
 namespace WebApi.Services
 {
-    public class MovieService
+    public class MovieService : IMovieService
     {
         private readonly CinemaDbContext _cinemaDbContext;
 
@@ -241,7 +242,7 @@ namespace WebApi.Services
 
         public bool CheckRegex(string name)
         {
-            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$");
+            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9. -]{1,}$");
 
             if (!regex.IsMatch(name))
             {

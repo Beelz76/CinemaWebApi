@@ -2,10 +2,11 @@
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using WebApi.Interface;
 
 namespace WebApi.Services
 {
-    public class ScreeningService
+    public class ScreeningService : IScreeningService
     {
         private readonly CinemaDbContext _cinemaDbContext;
 
@@ -49,7 +50,7 @@ namespace WebApi.Services
             var screenings = _cinemaDbContext.Set<Screening>()
                 .Include(x => x.Hall)
                 .Include(x => x.ScreeningPrice)
-                .Include(x => x.Movie)
+                .Include(x => x.Movie)               
                 .OrderBy(x => x.ScreeningStart)
                 .ToList();
             
@@ -75,6 +76,7 @@ namespace WebApi.Services
                 .Include(x => x.Movie)
                 .Where(x => x.Movie.MovieUid == movieUid)
                 .OrderBy(x => x.ScreeningStart)
+                .ThenBy(x => x.Hall.Name)
                 .ToList();
 
             if (screenings.Count == 0) { return null; }
@@ -152,7 +154,7 @@ namespace WebApi.Services
             return _cinemaDbContext.SaveChanges() > 0;
         }
 
-        public bool CheckScreeningCreating(string movieTitle, string hallName, string screeningStart)
+        public bool CheckScreeningInfo(string movieTitle, string hallName, string screeningStart)
         {
             var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.Title == movieTitle);
             var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.Name == hallName);
@@ -181,7 +183,7 @@ namespace WebApi.Services
             return true;
         }
 
-        public bool CheckScreeningCreating(string movieTitle, string hallName, string screeningStart, Guid screeningUid)
+        public bool CheckScreeningInfo(string movieTitle, string hallName, string screeningStart, Guid screeningUid)
         {
             var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.Title == movieTitle);
             var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.Name == hallName);

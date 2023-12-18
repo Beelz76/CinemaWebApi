@@ -1,7 +1,7 @@
 ﻿using WebApi.Contracts;
-using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using WebApi.Interface;
 
 namespace WebApi.Controllers
 {
@@ -9,15 +9,15 @@ namespace WebApi.Controllers
     [ApiController]
     public class MovieController : ControllerBase
     {
-        private readonly MovieService _movieService;
+        private readonly IMovieService _movieService;
 
-        public MovieController(MovieService movieService)
+        public MovieController(IMovieService movieService)
         {
             _movieService = movieService;
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult CreateMovie(MovieInfo movieInfo)
         {
             if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || int.Parse(movieInfo.Duration) <= 0)
@@ -71,7 +71,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult<List<Movie>> GetAllMovies()
         {
             var movies = _movieService.GetAllMovies();
@@ -85,7 +85,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult<Movie> GetSingleMovie(Guid movieUid)
         {
             var movie = _movieService.GetSingleMovie(movieUid);
@@ -99,7 +99,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin, User")]
+        //[Authorize(Roles = "Admin, User")]
         public ActionResult<List<MovieInfo>> GetMoviesInfo()
         {
             var movies = _movieService.GetMoviesInfo();
@@ -113,7 +113,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult UpdateMovie(Guid movieUid, MovieInfo movieInfo)
         {
             if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || int.Parse(movieInfo.Duration) <= 0)
@@ -167,7 +167,7 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public ActionResult DeleteMovie(Guid movieUid)
         {
             if (!_movieService.DeleteMovie(movieUid))

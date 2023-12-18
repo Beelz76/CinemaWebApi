@@ -1,10 +1,11 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using System.Text.RegularExpressions;
+using WebApi.Interface;
 
 namespace WebApi.Services
 {
-    public class DirectorService
+    public class DirectorService : IDirectorService
     {
         private readonly CinemaDbContext _cinemaDbContext;
 

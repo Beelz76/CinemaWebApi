@@ -1,22 +1,22 @@
 ﻿using WebApi.Contracts;
-using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using WebApi.Interface;
 
 namespace WebApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class CountryController : ControllerBase
     {
-        private readonly CountryService _countryService;
+        private readonly ICountryService _countryService;
 
-        public CountryController(CountryService countryService)
+        public CountryController(ICountryService countryService)
         {
             _countryService = countryService;
         }
-
+    
         [HttpPost]
         public ActionResult CreateCountry(string name)
         {

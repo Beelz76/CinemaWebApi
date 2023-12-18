@@ -1,10 +1,11 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Interface;
 
 namespace WebApi.Services
 {
-    public class SeatService
+    public class SeatService : ISeatService
     {
         private readonly CinemaDbContext _cinemaDbContext;
 

@@ -1,13 +1,13 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using WebApi.Interface;
 
 namespace WebApi.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly CinemaDbContext _cinemaDbContext;
 
@@ -176,11 +176,11 @@ namespace WebApi.Services
             return true;
         }
 
-        public bool CheckRegex(string name)
+        public bool CheckLoginRegex(string login)
         {
-            var regex = new Regex(@"^[a-zA-Z][\w]{3,}$");
+            var regex = new Regex(@"^[a-zA-Z0-9][\w]{3,}$");
 
-            if (!regex.IsMatch(name))
+            if (!regex.IsMatch(login))
             {
                 return false;
             }

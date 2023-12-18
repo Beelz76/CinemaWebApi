@@ -1,18 +1,18 @@
 ﻿using WebApi.Contracts;
-using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using WebApi.Interface;
 
 namespace WebApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class ScreeningPriceController : ControllerBase
     {
-        private readonly ScreeningPriceService _screeningPriceService;
+        private readonly IScreeningPriceService _screeningPriceService;
 
-        public ScreeningPriceController(ScreeningPriceService screeningPriceService)
+        public ScreeningPriceController(IScreeningPriceService screeningPriceService)
         {
             _screeningPriceService = screeningPriceService;
         }

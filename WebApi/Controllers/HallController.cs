@@ -1,8 +1,7 @@
 ﻿using WebApi.Contracts;
-using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
+using WebApi.Interface;
 
 namespace WebApi.Controllers
 {
@@ -11,9 +10,9 @@ namespace WebApi.Controllers
     [Authorize(Roles = "Admin")]
     public class HallController : ControllerBase
     {
-        private readonly HallService _hallService;
+        private readonly IHallService _hallService;
 
-        public HallController(HallService hallService)
+        public HallController(IHallService hallService)
         {
             _hallService = hallService;
         }

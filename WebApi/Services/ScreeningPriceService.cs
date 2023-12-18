@@ -1,9 +1,10 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
+using WebApi.Interface;
 
 namespace WebApi.Services
 {
-    public class ScreeningPriceService
+    public class ScreeningPriceService : IScreeningPriceService
     {
         private readonly CinemaDbContext _cinemaDbContext;
 

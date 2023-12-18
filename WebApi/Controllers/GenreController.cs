@@ -1,18 +1,18 @@
 ﻿using WebApi.Contracts;
-using WebApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using WebApi.Interface;
 
 namespace WebApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class GenreController : ControllerBase
     {
-        private readonly GenreService _genreService;
+        private readonly IGenreService _genreService;
 
-        public GenreController(GenreService genreService)
+        public GenreController(IGenreService genreService)
         {
             _genreService = genreService;
         }

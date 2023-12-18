@@ -1,10 +1,11 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using System.Text.RegularExpressions;
+using WebApi.Interface;
 
 namespace WebApi.Services
 {
-    public class HallService
+    public class HallService : IHallService
     {
         private readonly CinemaDbContext _cinemaDbContext;
 
