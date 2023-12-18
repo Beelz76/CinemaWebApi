@@ -241,7 +241,7 @@ namespace WebApi.Services
 
         public bool CheckRegex(string name)
         {
-            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$");
+            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9. -]{1,}$");
 
             if (!regex.IsMatch(name))
             {

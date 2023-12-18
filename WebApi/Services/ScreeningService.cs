@@ -49,7 +49,7 @@ namespace WebApi.Services
             var screenings = _cinemaDbContext.Set<Screening>()
                 .Include(x => x.Hall)
                 .Include(x => x.ScreeningPrice)
-                .Include(x => x.Movie)
+                .Include(x => x.Movie)               
                 .OrderBy(x => x.ScreeningStart)
                 .ToList();
             
@@ -75,6 +75,7 @@ namespace WebApi.Services
                 .Include(x => x.Movie)
                 .Where(x => x.Movie.MovieUid == movieUid)
                 .OrderBy(x => x.ScreeningStart)
+                .ThenBy(x => x.Hall.Name)
                 .ToList();
 
             if (screenings.Count == 0) { return null; }

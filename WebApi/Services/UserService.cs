@@ -176,11 +176,11 @@ namespace WebApi.Services
             return true;
         }
 
-        public bool CheckRegex(string name)
+        public bool CheckRegex(string login)
         {
-            var regex = new Regex(@"^[a-zA-Z][\w]{3,}$");
+            var regex = new Regex(@"^[a-zA-Z0-9][\w]{3,}$");
 
-            if (!regex.IsMatch(name))
+            if (!regex.IsMatch(login))
             {
                 return false;
             }

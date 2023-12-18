@@ -42,13 +42,6 @@ namespace WebApi.Controllers
             {
                 Token = _jwtService.GenerateToken(userUid, credentials.Login, false)
             };
-
-            /*if (_jwtService.GenerateToken(userUid, credentials.Login, false) == null)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok("Successful registration");*/
         }
 
         [HttpPost]

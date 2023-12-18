@@ -100,7 +100,16 @@
                 window.location.href = '../login.html';
                 return;
             }
+
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const userRole = decodedToken.role;
+
+            if (userRole !== 'Admin') {
+                alert('Отказано. Только Администратор имеет доступ');
+                window.location.href = 'javascript:history. back()';
+            }
         });
+
         window.addEventListener('load', getUserInfo);
     </script>
 </body>
