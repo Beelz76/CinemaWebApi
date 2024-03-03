@@ -176,7 +176,7 @@ namespace WebApi.Services
             return true;
         }
 
-        public bool CheckLoginRegex(string login)
+        public bool CheckRegex(string name)
         {
             var regex = new Regex(@"^[a-zA-Z0-9][\w]{3,}$");
 
