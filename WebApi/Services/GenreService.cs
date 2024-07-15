@@ -1,5 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using WebApi.Interface;
 
@@ -14,7 +15,7 @@ namespace WebApi.Services
             _cinemaDbContext = cinemaDbContext;
         }
 
-        public bool CreateGenre(string name)
+        public async Task<bool> CreateGenreAsync(string name)
         {
             var genre = new Genre
             {
@@ -22,16 +23,15 @@ namespace WebApi.Services
                 Name = name
             };
 
-            _cinemaDbContext.Add(genre);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            await _cinemaDbContext.AddAsync(genre);
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public List<Contracts.Genre>? GetGenres()
+        public async Task<List<Contracts.Genre>> GetGenresAsync()
         {
-            var genres = _cinemaDbContext.Set<Genre>().ToList();
+            var genres = await _cinemaDbContext.Set<Genre>().ToListAsync();
 
-            if (genres.Count == 0) { return null; }
+            if (genres.Count == 0) { return new List<Contracts.Genre>(); }
 
             return genres.Select(genre => new Contracts.Genre
             {
@@ -40,56 +40,35 @@ namespace WebApi.Services
             }).ToList();
         }
 
-        public bool UpdateGenre(Guid genreUid, string name)
+        public async Task<bool> UpdateGenreAsync(Guid genreUid, string name)
         {
-            var genre = _cinemaDbContext.Set<Genre>().SingleOrDefault(x => x.GenreUid == genreUid);
+            var genre = await _cinemaDbContext.Set<Genre>().FirstOrDefaultAsync(x => x.GenreUid == genreUid);
 
             if (genre == null) { return false; }
 
             genre.Name = name;
 
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool DeleteGenre(Guid genreUid)
+        public async Task<bool> DeleteGenreAsync(Guid genreUid)
         {
-            var genre = _cinemaDbContext.Set<Genre>().SingleOrDefault(x => x.GenreUid == genreUid);
+            var genre = await _cinemaDbContext.Set<Genre>().FirstOrDefaultAsync(x => x.GenreUid == genreUid);
 
             if (genre == null) { return false; }
 
             _cinemaDbContext.Remove(genre);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool CheckGenreName(string name)
+        public async Task<bool> GenreExistsAsync(string name)
         {
-            var genre = _cinemaDbContext.Set<Genre>().SingleOrDefault(x => x.Name == name);
-
-            if (genre == null) { return false; }
-
-            return true;
+            return await _cinemaDbContext.Set<Genre>().AnyAsync(x => x.Name == name);
         }
 
-        public bool IsGenreExists(Guid genreUid)
+        public bool IsValidGenreName(string name)
         {
-            var genre = _cinemaDbContext.Set<Genre>().SingleOrDefault(x => x.GenreUid == genreUid);
-
-            if (genre == null) { return false; }
-
-            return true;
-        }
-
-        public bool CheckRegex(string name)
-        {
-            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$");
-
-            if (!regex.IsMatch(name))
-            {
-                return false;
-            }
-
-            return true;
+            return new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$").IsMatch(name);
         }
     }
 }

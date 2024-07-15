@@ -1,5 +1,4 @@
-﻿using WebApi.Contracts;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Interface;
 
@@ -18,43 +17,32 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Guid> CreateGenre(string name)
+        public async Task<IActionResult> CreateGenre(string name)
         {
-            if (name == null)
+            if (!_genreService.IsValidGenreName(name))
             {
-                return BadRequest();
+                return BadRequest("Invalid genre name format");
             }
 
-            if (!_genreService.CheckRegex(name))
+            if (await _genreService.GenreExistsAsync(name))
             {
-                ModelState.AddModelError("", "Invalid genre name format");
-
-                return BadRequest(ModelState);
+                return Conflict("Genre already exists");
             }
 
-            if (_genreService.CheckGenreName(name))
+            if (!await _genreService.CreateGenreAsync(name))
             {
-                ModelState.AddModelError("", "Genre already exists");
-
-                return BadRequest(ModelState);
-            }
-
-            if (!_genreService.CreateGenre(name))
-            {
-                ModelState.AddModelError("", "Failed to create genre");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create genre");
             }
 
             return Ok("Genre created");
         }
 
         [HttpGet]
-        public ActionResult<List<Genre>> GetGenres()
+        public async Task<IActionResult> GetGenres()
         {
-            var genres = _genreService.GetGenres();
+            var genres = await _genreService.GetGenresAsync();
 
-            if (genres == null)
+            if (genres.Count == 0)
             {
                 return NotFound("No genres found");
             }
@@ -63,45 +51,32 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        public ActionResult UpdateGenre(Guid genreUid, string name)
+        public async Task<IActionResult> UpdateGenre(Guid genreUid, string name)
         {
-            if (name == null)
+            if (!_genreService.IsValidGenreName(name))
             {
-                return BadRequest();
+                return BadRequest("Invalid genre name format");
             }
 
-            if (!_genreService.CheckRegex(name))
+            if (await _genreService.GenreExistsAsync(name))
             {
-                ModelState.AddModelError("", "Invalid genre name format");
-
-                return BadRequest(ModelState);
+                return Conflict("Genre already exists");
             }
 
-            if (_genreService.CheckGenreName(name))
+            if (!await _genreService.UpdateGenreAsync(genreUid, name))
             {
-                ModelState.AddModelError("", "Genre already exists");
-
-                return BadRequest(ModelState);
-            }
-
-            if (!_genreService.UpdateGenre(genreUid, name))
-            {
-                ModelState.AddModelError("", "Failed to update genre");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to update genre");
             }
 
             return Ok("Genre updated");
         }
 
         [HttpDelete]
-        public ActionResult DeleteGenre(Guid genreUid)
+        public async Task<IActionResult> DeleteGenre(Guid genreUid)
         {
-            if (!_genreService.DeleteGenre(genreUid))
+            if (!await _genreService.DeleteGenreAsync(genreUid))
             {
-                ModelState.AddModelError("", "Failed to delete genre");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to delete genre");
             }
 
             return Ok("Genre deleted");

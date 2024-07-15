@@ -2,12 +2,11 @@
 {
     public interface IGenreService
     {
-        bool CreateGenre(string name);
-        List<Contracts.Genre>? GetGenres();
-        bool UpdateGenre(Guid genreUid, string name);
-        bool DeleteGenre(Guid genreUid);
-        bool IsGenreExists(Guid genreUid);
-        bool CheckGenreName(string name);
-        bool CheckRegex(string name);
+        Task<bool> CreateGenreAsync(string name);
+        Task<List<Contracts.Genre>> GetGenresAsync();
+        Task<bool> UpdateGenreAsync(Guid genreUid, string name);
+        Task<bool> DeleteGenreAsync(Guid genreUid);
+        Task<bool> GenreExistsAsync(string name);
+        bool IsValidGenreName(string name);
     }
 }
