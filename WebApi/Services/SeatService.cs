@@ -58,7 +58,7 @@ namespace WebApi.Services
         public List<Contracts.HallSeat>? GetHallSeats(string hallName)
         {
             var seats = _cinemaDbContext.Set<Seat>()
-                .Where(x => x.Hall.Name == hallName)
+                .Where(x => x.Hall.Name.ToLower() == hallName.ToLower())
                 .OrderBy(x => x.Hall.HallUid)
                 .ThenBy(x => x.Row)
                 .ThenBy(x => x.Number)

@@ -8,7 +8,7 @@ using WebApi.Interface;
 
 namespace WebApi.Services
 {
-    public class JwtService : ISwtService
+    public class JwtService : IJwtService
     {
         private readonly IOptions<JwtAuthenticationOptions> _options;
 

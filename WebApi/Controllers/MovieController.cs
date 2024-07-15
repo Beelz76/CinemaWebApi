@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Interface;
+using WebApi.Services;
 
 namespace WebApi.Controllers
 {
@@ -178,6 +179,23 @@ namespace WebApi.Controllers
             }
 
             return Ok("Movie deleted");
+        }
+
+
+
+
+        //////////////////
+        [HttpGet("{title}")]
+        public async Task<ActionResult<string>> GetMovieInfoByTitle(string title)
+        {
+            var movieString = await _movieService.GetMovieInfoByTitle(title);
+
+            if (movieString == null)
+            {
+                return NotFound("Movie not found");
+            }
+
+            return Ok(movieString);
         }
     }
 }

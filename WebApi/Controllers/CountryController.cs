@@ -1,5 +1,4 @@
-﻿using WebApi.Contracts;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Interface;
 
@@ -18,43 +17,32 @@ namespace WebApi.Controllers
         }
     
         [HttpPost]
-        public ActionResult CreateCountry(string name)
+        public async Task<IActionResult> CreateCountry(string name)
         {
-            if (name == null)
+            if (!_countryService.IsValidCountryName(name))
             {
-                return BadRequest();
+                return BadRequest("Invalid country name format");
             }
 
-            if (!_countryService.CheckRegex(name))
+            if (await _countryService.CountryExistsAsync(name))
             {
-                ModelState.AddModelError("", "Invalid country name format");
-
-                return BadRequest(ModelState);
+                return Conflict("Country already exists");
             }
 
-            if (_countryService.CheckCountryName(name))
+            if (!await _countryService.CreateCountryAsync(name))
             {
-                ModelState.AddModelError("", "Country already exists");
-
-                return BadRequest(ModelState);
-            }
-
-            if (!_countryService.CreateCountry(name))
-            {
-                ModelState.AddModelError("", "Failed to create country");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create country");
             }
 
             return Ok("Country created");
         }
 
         [HttpGet]
-        public ActionResult<List<Country>> GetCountries()
+        public async Task<IActionResult> GetCountries()
         {
-            var countries = _countryService.GetCountries();
+            var countries = await _countryService.GetCountriesAsync();
 
-            if (countries == null)
+            if (countries.Count == 0)
             {
                 return NotFound("No countries found");
             }
@@ -63,45 +51,32 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        public ActionResult UpdateCountry(Guid countryUid, string name)
+        public async Task<IActionResult> UpdateCountry(Guid countryUid, string name)
         {
-            if (name == null)
+            if (!_countryService.IsValidCountryName(name))
             {
-                return BadRequest();
+                return BadRequest("Invalid country name format");
             }
 
-            if (!_countryService.CheckRegex(name))
+            if (await _countryService.CountryExistsAsync(name))
             {
-                ModelState.AddModelError("", "Invalid country name format");
-
-                return BadRequest(ModelState);
+                return Conflict("Country already exists");
             }
 
-            if (_countryService.CheckCountryName(name))
+            if (!await _countryService.UpdateCountryAsync(countryUid, name))
             {
-                ModelState.AddModelError("", "Country already exists");
-
-                return BadRequest(ModelState);
-            }
-
-            if (!_countryService.UpdateCountry(countryUid, name))
-            {
-                ModelState.AddModelError("", "Failed to update country");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to update country");
             }
 
             return Ok("Country updated");
         }
 
         [HttpDelete]
-        public ActionResult DeleteCountry(Guid countryUid)
+        public async Task<IActionResult> DeleteCountry(Guid countryUid)
         {
-            if (!_countryService.DeleteCountry(countryUid))
+            if (!await _countryService.DeleteCountryAsync(countryUid))
             {
-                ModelState.AddModelError("", "Failed to delete country");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to delete country");
             }
              
             return Ok("Country deleted");

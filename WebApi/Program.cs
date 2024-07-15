@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using WebApi.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,17 +43,21 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddDbContext<CinemaDbContext>(x => x.UseSqlServer(builder.Services.BuildServiceProvider().GetRequiredService<IOptions<ConnectionStringsOptions>>().Value.CinemaDbConnectionString));
 
-builder.Services.AddTransient<UserService>();
-builder.Services.AddTransient<MovieService>();
-builder.Services.AddTransient<ScreeningService>();
-builder.Services.AddTransient<ScreeningPriceService>();
-builder.Services.AddTransient<SeatService>();
-builder.Services.AddTransient<HallService>();
-builder.Services.AddTransient<TicketService>();
-builder.Services.AddTransient<CountryService>();
-builder.Services.AddTransient<DirectorService>();
-builder.Services.AddTransient<GenreService>();
-builder.Services.AddTransient<JwtService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<IScreeningService, ScreeningService>();
+builder.Services.AddScoped<IScreeningPriceService, ScreeningPriceService>();
+builder.Services.AddScoped<ISeatService, SeatService>();
+builder.Services.AddScoped<IHallService, HallService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<ICountryService, CountryService>();
+builder.Services.AddScoped<IDirectorService, DirectorService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+
+builder.Services.AddHttpClient();
+
 
 builder.Services
     .AddAuthentication(options =>

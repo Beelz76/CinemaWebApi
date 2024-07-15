@@ -1,5 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using WebApi.Interface;
 
@@ -14,7 +15,7 @@ namespace WebApi.Services
             _cinemaDbContext = cinemaDbContext;
         }
 
-        public bool CreateCountry(string name)
+        public async Task<bool> CreateCountryAsync(string name)
         {
             var country = new Country
             {
@@ -22,16 +23,15 @@ namespace WebApi.Services
                 Name = name
             };
 
-            _cinemaDbContext.Add(country);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            await _cinemaDbContext.AddAsync(country);
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public List<Contracts.Country>? GetCountries()
+        public async Task<List<Contracts.Country>> GetCountriesAsync()
         {
-            var countries = _cinemaDbContext.Set<Country>().ToList();
+            var countries = await _cinemaDbContext.Set<Country>().ToListAsync();
 
-            if (countries.Count == 0) { return null; }
+            if (countries.Count == 0) { return new List<Contracts.Country>(); }
 
             return countries.Select(country => new Contracts.Country
             {
@@ -40,56 +40,36 @@ namespace WebApi.Services
             }).ToList();
         }
 
-        public bool UpdateCountry(Guid countryUid, string name)
+        public async Task<bool> UpdateCountryAsync(Guid countryUid, string name)
         {
-            var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.CountryUid == countryUid);
+            var country = await _cinemaDbContext.Set<Country>().FirstOrDefaultAsync(x => x.CountryUid == countryUid);
 
             if (country == null) { return false; }
 
             country.Name = name;
 
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool DeleteCountry(Guid countryUid)
+        public async Task<bool> DeleteCountryAsync(Guid countryUid)
         {
-            var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.CountryUid == countryUid);
+            var country = await _cinemaDbContext.Set<Country>().FirstOrDefaultAsync(x => x.CountryUid == countryUid);
 
             if (country == null) { return false; }
 
             _cinemaDbContext.Remove(country);
 
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool CheckCountryName(string name)
+        public async Task<bool> CountryExistsAsync(string name)
         {
-            var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.Name == name);
-
-            if (country == null) { return false; }
-
-            return true;
+            return await _cinemaDbContext.Set<Country>().AnyAsync(x => x.Name == name);
         }
 
-        public bool IsCountryExists(Guid countryUid)
+        public bool IsValidCountryName(string name)
         {
-            var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.CountryUid == countryUid);
-
-            if (country == null) { return false; }
-
-            return true;
-        }
-
-        public bool CheckRegex(string name)
-        {
-            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$");
-
-            if (!regex.IsMatch(name))
-            {
-                return false;
-            }
-
-            return true;
+            return new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$").IsMatch(name);     
         }
     }
 }

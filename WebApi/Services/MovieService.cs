@@ -1,7 +1,7 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using WebApi.Interface;
 
@@ -11,9 +11,12 @@ namespace WebApi.Services
     {
         private readonly CinemaDbContext _cinemaDbContext;
 
-        public MovieService(CinemaDbContext cinemaDbContext)
+        private readonly HttpClient _httpClient;
+
+        public MovieService(CinemaDbContext cinemaDbContext, HttpClient httpClient)
         {
             _cinemaDbContext = cinemaDbContext;
+            _httpClient = httpClient;
         }
 
         public bool CreateMovie(Contracts.MovieInfo movieInfo)
@@ -265,6 +268,33 @@ namespace WebApi.Services
             }
 
             return true;
+        }
+
+
+
+        //////////////////
+        public async Task<string?> GetMovieInfoByTitle(string title)
+        {
+            string url = $"http://www.omdbapi.com/?apikey=a6f864c1&t={Uri.EscapeDataString(title)}";
+
+            HttpResponseMessage response = await _httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                Contracts.MovieInfoo movieInfoo = JsonConvert.DeserializeObject<Contracts.MovieInfoo>(jsonResponse);
+
+                string movieString = $"Title: {movieInfoo.Title}\n" +
+                                 $"Year: {movieInfoo.Year}\n" +
+                                 $"Genre: {movieInfoo.Genre}\n" +
+                                 $"Director: {movieInfoo.Director}\n" +
+                                 $"Plot: {movieInfoo.Plot}";
+
+                return movieString;
+            }
+
+            return null;
         }
     }
 }

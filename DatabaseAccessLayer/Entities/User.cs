@@ -16,6 +16,6 @@
 
         public required bool IsAdmin { get; set; } = false;
 
-        public List<Ticket> Tickets { get; set; }
+        public ICollection<Ticket> Tickets { get; set; }
     }
 }

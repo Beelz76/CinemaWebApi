@@ -1,4 +1,6 @@
-﻿namespace WebApi.Interface
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace WebApi.Interface
 {
     public interface IMovieService
     {
@@ -14,5 +16,9 @@
         bool CheckMovieInfo(Guid movieUid, Contracts.MovieInfo movieInfo);
         bool CheckRegex(string name);
         bool CheckRegexList(List<string> list);
+
+
+        //////////////////
+        Task<string?> GetMovieInfoByTitle(string title);
     }
 }

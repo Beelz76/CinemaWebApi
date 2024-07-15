@@ -2,12 +2,11 @@
 {
     public interface ICountryService
     {
-        bool CreateCountry(string name);
-        List<Contracts.Country>? GetCountries();
-        bool UpdateCountry(Guid countryUid, string name);
-        bool DeleteCountry(Guid countryUid);
-        bool CheckCountryName(string name);
-        bool IsCountryExists(Guid countryUid);
-        bool CheckRegex(string name);
+        Task<bool> CreateCountryAsync(string name);
+        Task<List<Contracts.Country>> GetCountriesAsync();
+        Task<bool> UpdateCountryAsync(Guid countryUid, string name);
+        Task<bool> DeleteCountryAsync(Guid countryUid);
+        Task<bool> CountryExistsAsync(string name);
+        bool IsValidCountryName(string name);
     }
 }

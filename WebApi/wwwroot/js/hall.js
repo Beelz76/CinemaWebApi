@@ -22,10 +22,10 @@
 			data.forEach((hall) => {
 				const row = document.createElement("tr");
 				row.innerHTML = `
-                <td>${hall.hallUid}</td>
-                <td>${hall.name}</td>
-                <td>${hall.capacity}</td>
-                <td style="text-align: center;"><input type="checkbox" value="${hall.hallUid}"></td>`;
+				<td>${hall.hallUid}</td>
+				<td>${hall.name}</td>
+				<td>${hall.capacity}</td>
+				<td style="text-align: center;"><input type="checkbox" value="${hall.hallUid}"></td>`;
 				hallTable.appendChild(row);
 			});
 		} else {
