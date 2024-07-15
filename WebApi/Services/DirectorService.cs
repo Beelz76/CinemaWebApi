@@ -1,5 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using WebApi.Interface;
 
@@ -14,7 +15,7 @@ namespace WebApi.Services
             _cinemaDbContext = cinemaDbContext;
         }
 
-        public bool CreateDirector(string fullName)
+        public async Task<bool> CreateDirectorAsync(string fullName)
         {
             var director = new Director
             {
@@ -22,16 +23,15 @@ namespace WebApi.Services
                 FullName = fullName
             };
 
-            _cinemaDbContext.Add(director);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            await _cinemaDbContext.AddAsync(director);
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public List<Contracts.Director>? GetDirectors()
+        public async Task<List<Contracts.Director>> GetDirectorsAsync()
         {
-            var directors = _cinemaDbContext.Set<Director>().ToList();
+            var directors = await _cinemaDbContext.Set<Director>().ToListAsync();
 
-            if (directors.Count == 0) { return null; }
+            if (directors.Count == 0) { return new List<Contracts.Director>(); }
 
             return directors.Select(director => new Contracts.Director
             {
@@ -40,47 +40,35 @@ namespace WebApi.Services
             }).ToList();
         }
 
-        public bool UpdateDirector(Guid directorUid, string fullName)
+        public async Task<bool> UpdateDirectorAsync(Guid directorUid, string fullName)
         {
-            var director = _cinemaDbContext.Set<Director>().SingleOrDefault(x => x.DirectorUid == directorUid);
+            var director = await _cinemaDbContext.Set<Director>().FirstOrDefaultAsync(x => x.DirectorUid == directorUid);
 
             if (director == null) { return false; }
 
             director.FullName = fullName;
 
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool DeleteDirector(Guid directorUid)
+        public async Task<bool> DeleteDirectorAsync(Guid directorUid)
         {
-            var director = _cinemaDbContext.Set<Director>().SingleOrDefault(x => x.DirectorUid == directorUid);
+            var director = await _cinemaDbContext.Set<Director>().FirstOrDefaultAsync(x => x.DirectorUid == directorUid);
 
             if (director == null) { return false; }
 
             _cinemaDbContext.Remove(director);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool IsDirectorExists(Guid directorUid)
+        public async Task<bool> DirectorExistsAsync(string fullName)
         {
-            var director = _cinemaDbContext.Set<Director>().SingleOrDefault(x => x.DirectorUid == directorUid);
-
-            if (director == null) { return false; }
-
-            return true;
+            return await _cinemaDbContext.Set<Director>().AnyAsync(x => x.FullName == fullName);
         }
 
-        public bool CheckRegex(string name)
+        public bool IsValidDirectorName(string name)
         {
-            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$");
-
-            if (!regex.IsMatch(name))
-            {
-                return false;
-            }
-
-            return true;
+            return new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$").IsMatch(name);
         }
     }
 }

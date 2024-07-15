@@ -2,11 +2,11 @@
 {
     public interface IDirectorService
     {
-        bool CreateDirector(string fullName);
-        List<Contracts.Director>? GetDirectors();
-        bool UpdateDirector(Guid directorUid, string fullName);
-        bool DeleteDirector(Guid directorUid);
-        bool IsDirectorExists(Guid directorUid);
-        bool CheckRegex(string name);
+        Task<bool> CreateDirectorAsync(string fullName);
+        Task<List<Contracts.Director>> GetDirectorsAsync();
+        Task<bool> UpdateDirectorAsync(Guid directorUid, string fullName);
+        Task<bool> DeleteDirectorAsync(Guid directorUid);
+        Task<bool> DirectorExistsAsync(string fullName);
+        bool IsValidDirectorName(string name);
     }
 }

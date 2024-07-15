@@ -58,7 +58,6 @@ namespace WebApi.Services
             if (country == null) { return false; }
 
             _cinemaDbContext.Remove(country);
-
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 

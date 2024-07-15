@@ -1,5 +1,4 @@
-﻿using WebApi.Contracts;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Interface;
 
@@ -18,36 +17,27 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateDirector(string fullName)
+        public async Task<IActionResult> CreateDirector(string fullName)
         {
-            if (fullName == null)
+            if (!_directorService.IsValidDirectorName(fullName))
             {
-                return BadRequest();
+                return BadRequest("Invalid director name format");
             }
 
-            if (!_directorService.CheckRegex(fullName))
+            if (!await _directorService.CreateDirectorAsync(fullName))
             {
-                ModelState.AddModelError("", "Invalid director name format");
-
-                return BadRequest(ModelState);
-            }
-
-            if (!_directorService.CreateDirector(fullName))
-            {
-                ModelState.AddModelError("", "Failed to create director");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create director");
             }
 
             return Ok("Director created");
         }
 
         [HttpGet]
-        public ActionResult<List<Director>> GetDirectors()
+        public async Task<IActionResult> GetDirectors()
         {
-            var directors = _directorService.GetDirectors();
+            var directors = await _directorService.GetDirectorsAsync();
 
-            if (directors == null)
+            if (directors.Count == 0)
             {
                 return NotFound("No directors found");
             }
@@ -56,38 +46,27 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        public ActionResult UpdateDirector(Guid directorUid, string fullName)
+        public async Task<IActionResult> UpdateDirector(Guid directorUid, string fullName)
         {
-            if (fullName == null)
+            if (!_directorService.IsValidDirectorName(fullName))
             {
-                return BadRequest();
+                return BadRequest("Invalid director name format");
             }
 
-            if (!_directorService.CheckRegex(fullName))
+            if (!await _directorService.UpdateDirectorAsync(directorUid, fullName))
             {
-                ModelState.AddModelError("", "Invalid director name format");
-
-                return BadRequest(ModelState);
-            }
-
-            if (!_directorService.UpdateDirector(directorUid, fullName))
-            {
-                ModelState.AddModelError("", "Failed to update director");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to update director");
             }
 
             return Ok("Director updated");
         }
 
         [HttpDelete]
-        public ActionResult DeleteDirector(Guid directorUid)
+        public async Task<IActionResult> DeleteDirector(Guid directorUid)
         {
-            if (!_directorService.DeleteDirector(directorUid))
+            if (!await _directorService.DeleteDirectorAsync(directorUid))
             {
-                ModelState.AddModelError("", "Failed to delete director");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to delete director");
             }
 
             return Ok("Director deleted");
