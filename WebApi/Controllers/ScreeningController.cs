@@ -24,7 +24,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         //[Authorize(Roles = "Admin")]
-        public ActionResult CreateScreening(ScreeningInfo screeningInfo)
+        public async Task<IActionResult> CreateScreening(ScreeningInfo screeningInfo)
         {
             if (screeningInfo.MovieTitle == null || screeningInfo.HallName == null ||
                 screeningInfo.ScreeningStart == null || screeningInfo.Price <= 0)
@@ -42,7 +42,7 @@ namespace WebApi.Controllers
                 return NotFound("Hall not found");
             }
 
-            if (!_screeningPriceService.CheckScreeningPrice(screeningInfo.Price))
+            if (!await _screeningPriceService.ScreeningPriceExistsAsync(screeningInfo.Price))
             {
                 return NotFound("Price not found");
             }
@@ -118,7 +118,7 @@ namespace WebApi.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "Admin")]
-        public ActionResult UpdateScreening(Guid screeningUid, ScreeningInfo screeningInfo)
+        public async Task<IActionResult> UpdateScreening(Guid screeningUid, ScreeningInfo screeningInfo)
         {
             if (screeningInfo.MovieTitle == null || screeningInfo.HallName == null ||
                 screeningInfo.ScreeningStart == null || screeningInfo.Price <= 0)
@@ -141,7 +141,7 @@ namespace WebApi.Controllers
                 return NotFound("Hall not found");
             }
 
-            if (!_screeningPriceService.CheckScreeningPrice(screeningInfo.Price))
+            if (!await _screeningPriceService.ScreeningPriceExistsAsync(screeningInfo.Price))
             {
                 return NotFound("Price not found");
             }

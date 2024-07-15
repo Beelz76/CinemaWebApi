@@ -1,5 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using WebApi.Interface;
 
 namespace WebApi.Services
@@ -13,7 +14,7 @@ namespace WebApi.Services
             _cinemaDbContext = cinemaDbContext;
         }
 
-        public bool CreateScreeningPrice(int price)
+        public async Task<bool> CreateScreeningPriceAsync(int price)
         {
             var screeningPrice = new ScreeningPrice
             {
@@ -21,16 +22,15 @@ namespace WebApi.Services
                 Price = price,
             };
 
-            _cinemaDbContext.Add(screeningPrice);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            await _cinemaDbContext.AddAsync(screeningPrice);
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public List<Contracts.ScreeningPrice>? GetScreeningPrices()
+        public async Task<List<Contracts.ScreeningPrice>> GetScreeningPricesAsync()
         {
-            var screeningPrices = _cinemaDbContext.Set<ScreeningPrice>().OrderBy(x => x.Price).ToList();
+            var screeningPrices = await _cinemaDbContext.Set<ScreeningPrice>().OrderBy(x => x.Price).ToListAsync();
 
-            if (screeningPrices.Count == 0 ) { return null; }
+            if (screeningPrices.Count == 0 ) { return new List<Contracts.ScreeningPrice>(); }
 
             return screeningPrices.Select(screeningPrice => new Contracts.ScreeningPrice
             {
@@ -39,44 +39,30 @@ namespace WebApi.Services
             }).ToList();
         }
 
-        public bool UpdateScreeningPrice(Guid screeningPriceUid, int price)
+        public async Task<bool> UpdateScreeningPriceAsync(Guid screeningPriceUid, int price)
         {
-            var screeningPrice = _cinemaDbContext.Set<ScreeningPrice>().SingleOrDefault(x => x.ScreeningPriceUid == screeningPriceUid);
+            var screeningPrice = await _cinemaDbContext.Set<ScreeningPrice>().FirstOrDefaultAsync(x => x.ScreeningPriceUid == screeningPriceUid);
 
             if (screeningPrice == null) { return false; }
 
             screeningPrice.Price = price;
 
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool DeleteScreeningPrice(Guid screeningPriceUid)
+        public async Task<bool> DeleteScreeningPriceAsync(Guid screeningPriceUid)
         {
-            var screeningPrice = _cinemaDbContext.Set<ScreeningPrice>().SingleOrDefault(x => x.ScreeningPriceUid == screeningPriceUid);
+            var screeningPrice = await _cinemaDbContext.Set<ScreeningPrice>().FirstOrDefaultAsync(x => x.ScreeningPriceUid == screeningPriceUid);
 
             if (screeningPrice == null) { return false; }
 
             _cinemaDbContext.Remove(screeningPrice);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool CheckScreeningPrice(int price)
+        public async Task<bool> ScreeningPriceExistsAsync(int price)
         {
-            var screeningPrice = _cinemaDbContext.Set<ScreeningPrice>().SingleOrDefault(x => x.Price == price);
-
-            if (screeningPrice == null) { return false; }
-
-            return true;
-        }
-
-        public bool IsScreeningPriceExists(Guid screeningPriceUid)
-        {
-            var screeningPrice = _cinemaDbContext.Set<ScreeningPrice>().SingleOrDefault(x => x.ScreeningPriceUid == screeningPriceUid);
-
-            if (screeningPrice == null) { return false; }
-
-            return true;
+            return await _cinemaDbContext.Set<ScreeningPrice>().AnyAsync(x => x.Price == price);;
         }
     }
 }

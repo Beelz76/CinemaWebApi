@@ -1,5 +1,4 @@
-﻿using WebApi.Contracts;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Interface;
 
@@ -18,36 +17,32 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateScreeningPrice(int price)
+        public async Task<IActionResult> CreateScreeningPrice(int price)
         {
             if (price <= 0)
             {
-                return BadRequest();
+                return BadRequest("Invalid format");
             }
 
-            if (_screeningPriceService.CheckScreeningPrice(price))
+            if (await _screeningPriceService.ScreeningPriceExistsAsync(price))
             {
-                ModelState.AddModelError("", "Screening price already exists");
-
-                return BadRequest(ModelState);
+                return Conflict("Screening price already exists");
             }
 
-            if (!_screeningPriceService.CreateScreeningPrice(price))
+            if (!await _screeningPriceService.CreateScreeningPriceAsync(price))
             {
-                ModelState.AddModelError("", "Failed to create screening price");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create screening price");
             }
 
             return Ok("Screening price created");
         }
 
         [HttpGet]
-        public ActionResult<List<ScreeningPrice>> GetScreeningPrices()
+        public async Task<IActionResult> GetScreeningPrices()
         {
-            var screeningPrices = _screeningPriceService.GetScreeningPrices();
+            var screeningPrices = await _screeningPriceService.GetScreeningPricesAsync();
 
-            if (screeningPrices == null)
+            if (screeningPrices.Count == 0)
             {
                 return NotFound("No screening prices found");
             }
@@ -56,38 +51,32 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        public ActionResult UpdateScreeningPrice(Guid screeningPriceUid, int price)
+        public async Task<IActionResult> UpdateScreeningPrice(Guid screeningPriceUid, int price)
         {
             if (price <= 0)
             {
-                return BadRequest();
+                return BadRequest("Invalid format");
             }
 
-            if (_screeningPriceService.CheckScreeningPrice(price))
+            if (await _screeningPriceService.ScreeningPriceExistsAsync(price))
             {
-                ModelState.AddModelError("", "Screening price already exists");
-
-                return BadRequest(ModelState);
+                return Conflict("Screening price already exists");
             }
 
-            if (!_screeningPriceService.UpdateScreeningPrice(screeningPriceUid, price))
+            if (!await _screeningPriceService.UpdateScreeningPriceAsync(screeningPriceUid, price))
             {
-                ModelState.AddModelError("", "Failed to update screening price");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to update screening price");
             }
 
             return Ok("Screening price updated");
         }
 
         [HttpDelete]
-        public ActionResult DeleteScreeningPrice(Guid screeningPriceUid)
+        public async Task<IActionResult> DeleteScreeningPrice(Guid screeningPriceUid)
         {
-            if (!_screeningPriceService.DeleteScreeningPrice(screeningPriceUid))
+            if (!await _screeningPriceService.DeleteScreeningPriceAsync(screeningPriceUid))
             {
-                ModelState.AddModelError("", "Failed to delete screening price");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to delete screening price");
             }
 
             return Ok("Screening price deleted");

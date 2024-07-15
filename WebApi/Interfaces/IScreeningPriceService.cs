@@ -2,11 +2,10 @@
 {
     public interface IScreeningPriceService
     {
-        bool CreateScreeningPrice(int price);
-        List<Contracts.ScreeningPrice>? GetScreeningPrices();
-        bool UpdateScreeningPrice(Guid screeningPriceUid, int price);
-        bool DeleteScreeningPrice(Guid screeningPriceUid);
-        bool CheckScreeningPrice(int price);
-        bool IsScreeningPriceExists(Guid screeningPriceUid);
+        Task<bool> CreateScreeningPriceAsync(int price);
+        Task<List<Contracts.ScreeningPrice>> GetScreeningPricesAsync();
+        Task<bool> UpdateScreeningPriceAsync(Guid screeningPriceUid, int price);
+        Task<bool> DeleteScreeningPriceAsync(Guid screeningPriceUid);
+        Task<bool> ScreeningPriceExistsAsync(int price);
     }
 }
