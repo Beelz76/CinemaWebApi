@@ -22,41 +22,31 @@ namespace WebApi.Controllers
 
         [HttpPost]
         //[Authorize(Roles = "Admin, User")]
-        public ActionResult CreateTicket(Guid userUid, Guid screeningUid, Guid seatUid)
+        public async Task<IActionResult> CreateTicket(Guid userUid, Guid screeningUid, Guid seatUid)
         {
-            if (!_userService.IsUserExists(userUid))
+            if (!await _userService.UserExistsAsync(userUid))
             {
-                ModelState.AddModelError("", "User not found");
-
-                return BadRequest(ModelState);
+                return NotFound("User not found");
             }
 
-            if (!_screeningService.IsScreeningExists(screeningUid))
+            if (!await _screeningService.ScreeningExistsAsync(screeningUid))
             {
-                ModelState.AddModelError("", "Screening not found");
-
-                return BadRequest(ModelState);
+                return NotFound("Screening not found");
             }
 
-            if (!_ticketService.CheckScreeningSeatExists(screeningUid, seatUid))
+            if (!await _ticketService.ScreeningSeatExistsAsync(screeningUid, seatUid))
             {
-                ModelState.AddModelError("", "Seat not found");
-
-                return BadRequest(ModelState);
+                return NotFound("Seat not found");
             }
 
-            if (!_ticketService.IsSeatTaken(screeningUid, seatUid))
+            if (!await _ticketService.IsSeatTakenAsync(screeningUid, seatUid))
             {
-                ModelState.AddModelError("", "Seat already taken");
-
-                return BadRequest(ModelState);
+                return BadRequest("Seat already taken");
             }          
 
-            if (!_ticketService.CreateTicket(userUid, screeningUid, seatUid))
+            if (!await _ticketService.CreateTicketAsync(userUid, screeningUid, seatUid))
             {
-                ModelState.AddModelError("", "Failed to create ticket");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create ticket");
             }
 
             return Ok("Ticket created");
@@ -64,11 +54,11 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<List<Ticket>> GetAllTickets()
+        public async Task<IActionResult> GetAllTickets()
         {
-            var tickets = _ticketService.GetAllTickets();
+            var tickets = await _ticketService.GetAllTicketsAsync();
 
-            if (tickets == null)
+            if (tickets.Count == 0)
             {
                 return NotFound("No tickets found");
             }
@@ -78,16 +68,16 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin, User")]
-        public ActionResult<List<UserTicket>> GetUserTickets(Guid userUid)
+        public async Task<IActionResult> GetUserTickets(Guid userUid)
         {
-            if (!_userService.IsUserExists(userUid))
+            if (!await _userService.UserExistsAsync(userUid))
             {
                 return NotFound("User not found");
             }
 
-            var tickets = _ticketService.GetUserTickets(userUid);
+            var tickets = await _ticketService.GetUserTicketsAsync(userUid);
 
-            if (tickets == null)
+            if (tickets.Count == 0)
             {
                 return NotFound("No tickets found");
             }
@@ -97,16 +87,16 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<List<Ticket>> GetScreeningTickets(Guid screeningUid)
+        public async Task<IActionResult> GetScreeningTickets(Guid screeningUid)
         {
-            if (!_screeningService.IsScreeningExists(screeningUid))
+            if (!await _screeningService.ScreeningExistsAsync(screeningUid))
             {
                 return NotFound("Screning not found");
             }
 
-            var tickets = _ticketService.GetScreeningTickets(screeningUid);
+            var tickets = await _ticketService.GetScreeningTicketsAsync(screeningUid);
 
-            if (tickets == null)
+            if (tickets.Count == 0)
             {
                 return NotFound("No tickets found");
             }
@@ -116,13 +106,11 @@ namespace WebApi.Controllers
 
         [HttpDelete]
         //[Authorize(Roles = "Admin, User")]
-        public ActionResult DeleteTicket(Guid ticketUid)
+        public async Task<IActionResult> DeleteTicket(Guid ticketUid)
         {
-            if (!_ticketService.DeleteTicket(ticketUid))
+            if (!await _ticketService.DeleteTicketAsync(ticketUid))
             {
-                ModelState.AddModelError("", "Failed to delete ticket");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to delete ticket");
             }
 
             return Ok("Ticket deleted");
