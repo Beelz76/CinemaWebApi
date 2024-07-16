@@ -1,5 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using WebApi.Interface;
 
@@ -14,7 +15,7 @@ namespace WebApi.Services
             _cinemaDbContext = cinemaDbContext;
         }
 
-        public bool CreateHall(string name)
+        public async Task<bool> CreateHallAsync(string name)
         {
             var hall = new Hall
             {
@@ -23,16 +24,15 @@ namespace WebApi.Services
                 Capacity = 0,
             };
 
-            _cinemaDbContext.Add(hall);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            await _cinemaDbContext.AddAsync(hall);
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public List<Contracts.Hall>? GetHalls()
+        public async Task<List<Contracts.Hall>> GetHallsAsync()
         {
-            var halls = _cinemaDbContext.Set<Hall>().ToList();
+            var halls = await _cinemaDbContext.Set<Hall>().ToListAsync();
 
-            if (halls.Count == 0) { return null; }
+            if (halls.Count == 0) { return new List<Contracts.Hall>(); }
 
             return halls.Select(hall => new Contracts.Hall
             {
@@ -42,56 +42,35 @@ namespace WebApi.Services
             }).ToList();
         }
 
-        public bool UpdateHall(Guid hallUid, string name)
+        public async Task<bool> UpdateHallAsync(Guid hallUid, string name)
         {
-            var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.HallUid == hallUid);
+            var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.HallUid == hallUid);
 
             if (hall == null) { return false; }
 
             hall.Name = name;
 
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool DeleteHall(Guid hallUid)
+        public async Task<bool> DeleteHallAsync(Guid hallUid)
         {
-            var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.HallUid == hallUid);
+            var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.HallUid == hallUid);
 
             if (hall == null) { return false; }
 
             _cinemaDbContext.Remove(hall);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool CheckHallName(string name)
+        public async Task<bool> HallExistsAsync(string name)
         {
-            var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.Name == name);
-
-            if (hall == null) { return false; }
-
-            return true;
+            return await _cinemaDbContext.Set<Hall>().AnyAsync(x => x.Name == name);
         }
 
-        public bool IsHallExists(Guid hallUid)
+        public bool IsValidHallName(string name)
         {
-            var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.HallUid == hallUid);
-
-            if (hall == null) { return false; }
-
-            return true;
-        }
-
-        public bool CheckRegex(string name)
-        {
-            var regex = new Regex(@"^[a-zA-Zа-яА-Я0-9][a-zA-Zа-яА-Я -]{1,}$");
-
-            if (!regex.IsMatch(name))
-            {
-                return false;
-            }
-
-            return true;
+            return new Regex(@"^[a-zA-Zа-яА-Я0-9][a-zA-Zа-яА-Я -]{1,}$").IsMatch(name);
         }
     }
 }

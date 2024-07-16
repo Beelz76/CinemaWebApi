@@ -18,43 +18,32 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateHall(string name)
+        public async Task<IActionResult> CreateHall(string name)
         {
-            if (name == null)
+            if (!_hallService.IsValidHallName(name))
             {
-                return BadRequest();
+                return BadRequest("Invalid hall name format");
             }
 
-            if (!_hallService.CheckRegex(name))
+            if (await _hallService.HallExistsAsync(name))
             {
-                ModelState.AddModelError("", "Invalid hall name format");
-
-                return BadRequest(ModelState);
+                return Conflict("Hall already exists");
             }
 
-            if (_hallService.CheckHallName(name))
+            if (!await _hallService.CreateHallAsync(name))
             {
-                ModelState.AddModelError("", "Hall already exists");
-
-                return BadRequest(ModelState);
-            }
-
-            if (!_hallService.CreateHall(name))
-            {
-                ModelState.AddModelError("", "Failed to create hall");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create hall");
             }
 
             return Ok("Hall created");
         }
 
         [HttpGet]
-        public ActionResult<List<Hall>> GetHalls()
+        public async Task<IActionResult> GetHalls()
         {
-            var halls = _hallService.GetHalls();
+            var halls = await _hallService.GetHallsAsync();
 
-            if (halls == null)
+            if (halls.Count == 0)
             {
                 return NotFound("No halls found");
             }
@@ -63,45 +52,32 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        public ActionResult UpdateHall(Guid hallUid, string name)
+        public async Task<IActionResult> UpdateHall(Guid hallUid, string name)
         {
-            if (name == null)
+            if (!_hallService.IsValidHallName(name))
             {
-                return BadRequest();
+                return BadRequest("Invalid hall name format");
             }
 
-            if (!_hallService.CheckRegex(name))
+            if (await _hallService.HallExistsAsync(name))
             {
-                ModelState.AddModelError("", "Invalid hall name format");
-
-                return BadRequest(ModelState);
+                return Conflict("Hall already exists");
             }
 
-            if (_hallService.CheckHallName(name))
+            if (!await _hallService.UpdateHallAsync(hallUid, name))
             {
-                ModelState.AddModelError("", "Hall already exists");
-
-                return BadRequest(ModelState);
-            }
-
-            if (!_hallService.UpdateHall(hallUid, name))
-            {
-                ModelState.AddModelError("", "Failed to update hall");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to update hall");
             }
 
             return Ok("Hall updated");
         }
 
         [HttpDelete]
-        public ActionResult DeleteHall(Guid hallUid)
+        public async Task<IActionResult> DeleteHall(Guid hallUid)
         {
-            if (!_hallService.DeleteHall(hallUid))
+            if (!await _hallService.DeleteHallAsync(hallUid))
             {
-                ModelState.AddModelError("", "Failed to delete hall");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to delete hall");
             }
 
             return Ok("Hall deleted");

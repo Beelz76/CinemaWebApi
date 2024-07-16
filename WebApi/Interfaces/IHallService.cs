@@ -2,12 +2,11 @@
 {
     public interface IHallService
     {
-        bool CreateHall(string name);
-        List<Contracts.Hall>? GetHalls();
-        bool UpdateHall(Guid hallUid, string name);
-        bool DeleteHall(Guid hallUid);
-        bool CheckHallName(string name);
-        bool IsHallExists(Guid hallUid);
-        bool CheckRegex(string name);
+        Task<bool> CreateHallAsync(string name);
+        Task<List<Contracts.Hall>> GetHallsAsync();
+        Task<bool> UpdateHallAsync(Guid hallUid, string name);
+        Task<bool> DeleteHallAsync(Guid hallUid);
+        Task<bool> HallExistsAsync(string name);
+        bool IsValidHallName(string name);
     }
 }
