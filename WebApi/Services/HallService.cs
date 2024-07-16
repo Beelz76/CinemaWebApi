@@ -30,7 +30,7 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.Hall>> GetHallsAsync()
         {
-            var halls = await _cinemaDbContext.Set<Hall>()
+            return await _cinemaDbContext.Set<Hall>()
                 .Select(hall => new Contracts.Hall
                 {
                     HallUid = hall.HallUid,
@@ -38,10 +38,6 @@ namespace WebApi.Services
                     Capacity = hall.Capacity
                 })
                 .ToListAsync();
-
-            if (halls.Count == 0) { return new List<Contracts.Hall>(); }
-
-            return halls;
         }
 
         public async Task<bool> UpdateHallAsync(Guid hallUid, string name)

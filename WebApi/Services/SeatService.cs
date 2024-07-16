@@ -36,7 +36,7 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.Seat>> GetAllSeatsAsync()
         {
-            var seats = await _cinemaDbContext.Set<Seat>()
+            return await _cinemaDbContext.Set<Seat>()
                 .Include(x => x.Hall)
                 .OrderBy(x => x.Hall.Name)
                 .ThenBy(x => x.Row)
@@ -49,15 +49,11 @@ namespace WebApi.Services
                     Number = seat.Number
                 })
                 .ToListAsync();
-
-            if (seats.Count == 0) { return new List<Contracts.Seat>(); }
-
-            return seats;
         }
 
         public async Task<List<Contracts.HallSeat>> GetHallSeatsAsync(string hallName)
         {
-            var seats = await _cinemaDbContext.Set<Seat>()
+            return await _cinemaDbContext.Set<Seat>()
                 .Where(x => x.Hall.Name.ToLower() == hallName.ToLower())
                 .OrderBy(x => x.Hall.HallUid)
                 .ThenBy(x => x.Row)
@@ -69,10 +65,6 @@ namespace WebApi.Services
                      Number = seat.Number
                  })
                 .ToListAsync();
-
-            if (seats.Count == 0) { return new List<Contracts.HallSeat>(); }
-
-            return seats;
         }
 
         public async Task<List<Contracts.ScreeningSeat>> GetScreeningSeatsAsync(Guid screeningUid)
@@ -81,7 +73,7 @@ namespace WebApi.Services
                 .Include(x => x.Hall)
                 .FirstOrDefaultAsync(x => x.ScreeningUid == screeningUid);
 
-            var seats = await _cinemaDbContext.Set<Seat>()
+            return await _cinemaDbContext.Set<Seat>()
                 .Where(x => x.Hall.HallUid == screening.Hall.HallUid)
                 .OrderBy(x => x.Row)
                 .ThenBy(x => x.Number)
@@ -93,10 +85,6 @@ namespace WebApi.Services
                     Status = x.Tickets.Any(x => x.Screening.ScreeningUid == screeningUid) ? "Занято" : "Свободно"
                 })
                 .ToListAsync();
-
-            if (seats.Count == 0) { return new List<Contracts.ScreeningSeat>(); }
-
-            return seats;
         }
 
         public async Task<bool> UpdateSeatAsync(Guid seatUid, int row, int number)

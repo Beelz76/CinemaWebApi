@@ -28,7 +28,7 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.ScreeningPrice>> GetScreeningPricesAsync()
         {
-            var screeningPrices = await _cinemaDbContext.Set<ScreeningPrice>()
+            return await _cinemaDbContext.Set<ScreeningPrice>()
                 .OrderBy(x => x.Price)
                 .Select(screeningPrice => new Contracts.ScreeningPrice
                 {
@@ -36,10 +36,6 @@ namespace WebApi.Services
                     Price = screeningPrice.Price
                 })
                 .ToListAsync();
-
-            if (screeningPrices.Count == 0 ) { return new List<Contracts.ScreeningPrice>(); }
-
-            return screeningPrices;
         }
 
         public async Task<bool> UpdateScreeningPriceAsync(Guid screeningPriceUid, int price)

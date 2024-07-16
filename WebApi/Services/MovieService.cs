@@ -35,7 +35,7 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.Movie>> GetAllMoviesAsync()
         {
-            var movies = await _cinemaDbContext.Set<Movie>()
+            return await _cinemaDbContext.Set<Movie>()
                 .Include(x => x.Directors)
                 .Include(x => x.Genres)
                 .Include(x => x.Countries)
@@ -50,10 +50,6 @@ namespace WebApi.Services
                     Genres = movie.Genres.Select(x => x.Name).ToList()
                 })
                 .ToListAsync();
-
-            if (movies.Count == 0) { return new List<Contracts.Movie>(); }
-
-            return movies;
         }
 
         public async Task<Contracts.Movie> GetSingleMovieAsync(Guid movieUid)
@@ -79,7 +75,7 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.MovieInfo>> GetMoviesInfoAsync()
         {
-            var movies = await _cinemaDbContext.Set<Movie>()
+            return await _cinemaDbContext.Set<Movie>()
                 .Include(x => x.Directors)
                 .Include(x => x.Genres)
                 .Include(x => x.Countries)
@@ -94,10 +90,6 @@ namespace WebApi.Services
                     Genres = movie.Genres.Select(x => x.Name).ToList()
                 })
                 .ToListAsync();
-
-            if (movies.Count == 0) { return new List<Contracts.MovieInfo>(); }
-
-            return movies;
         }
 
         public async Task<bool> UpdateMovieAsync(Guid movieUid, Contracts.MovieInfo movieInfo)

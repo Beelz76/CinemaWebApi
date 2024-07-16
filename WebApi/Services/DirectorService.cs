@@ -29,17 +29,13 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.Director>> GetDirectorsAsync()
         {
-            var directors = await _cinemaDbContext.Set<Director>()
+            return await _cinemaDbContext.Set<Director>()
                 .Select(director => new Contracts.Director
                 {
                     DirectorUid = director.DirectorUid,
                     FullName = director.FullName
                 })
                 .ToListAsync();
-
-            if (directors.Count == 0) { return new List<Contracts.Director>(); }
-
-            return directors;
         }
 
         public async Task<bool> UpdateDirectorAsync(Guid directorUid, string fullName)

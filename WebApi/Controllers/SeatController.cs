@@ -84,7 +84,7 @@ namespace WebApi.Controllers
         //[Authorize(Roles = "Admin, User")]
         public async Task<IActionResult> GetScreeningSeats(Guid screeningUid)
         {
-            if (!_screeningService.IsScreeningExists(screeningUid))
+            if (!await _screeningService.ScreeningExistsAsync(screeningUid))
             {
                 return NotFound("Screening not found");
             }

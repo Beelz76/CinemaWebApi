@@ -29,17 +29,13 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.Genre>> GetGenresAsync()
         {
-            var genres = await _cinemaDbContext.Set<Genre>()
+            return await _cinemaDbContext.Set<Genre>()
                 .Select(genre => new Contracts.Genre
                 {
                     GenreUid = genre.GenreUid,
                     Name = genre.Name
                 })
                 .ToListAsync();
-
-            if (genres.Count == 0) { return new List<Contracts.Genre>(); }
-
-            return genres;
         }
 
         public async Task<bool> UpdateGenreAsync(Guid genreUid, string name)

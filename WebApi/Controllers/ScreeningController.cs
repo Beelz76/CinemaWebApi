@@ -26,18 +26,18 @@ namespace WebApi.Controllers
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateScreening(ScreeningInfo screeningInfo)
         {
-            if (screeningInfo.MovieTitle == null || screeningInfo.HallName == null ||
-                screeningInfo.ScreeningStart == null || screeningInfo.Price <= 0)
+            if (string.IsNullOrWhiteSpace(screeningInfo.MovieTitle) || string.IsNullOrWhiteSpace(screeningInfo.HallName) ||
+                string.IsNullOrWhiteSpace(screeningInfo.ScreeningStart) || screeningInfo.Price <= 0)
             {
-                return BadRequest();
+                return BadRequest("Wrong data");
             }
 
-            if (!_movieService.CheckMovieTitle(screeningInfo.MovieTitle))
+            if (!await _movieService.MovieExistsByTitleAsync(screeningInfo.MovieTitle))
             {
                 return NotFound("Movie not found");
             }
 
-            if (!_hallService.CheckHallName(screeningInfo.HallName))
+            if (!await _hallService.HallExistsAsync(screeningInfo.HallName))
             {
                 return NotFound("Hall not found");
             }
@@ -47,18 +47,14 @@ namespace WebApi.Controllers
                 return NotFound("Price not found");
             }
 
-            if (!_screeningService.CheckScreeningInfo(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart))
+            if (!await _screeningService.IsValidScreningTimeAsync(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart))
             {
-                ModelState.AddModelError("", "Failed to create screening at this time");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create screening at this time");
             }
 
-            if (!_screeningService.CreateScreening(screeningInfo))
+            if (!await _screeningService.CreateScreeningAsync(screeningInfo))
             {
-                ModelState.AddModelError("", "Failed to create screening");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create screening");
             }
 
             return Ok("Screening created");
@@ -66,11 +62,11 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<List<Screening>> GetAllScreenings()
+        public async Task<IActionResult> GetAllScreenings()
         {
-            var screenings = _screeningService.GetAllScreenings();
+            var screenings = await _screeningService.GetAllScreeningsAsync();
 
-            if (screenings == null)
+            if (screenings.Count == 0)
             {
                 return NotFound("No screenings found");
             }
@@ -80,16 +76,16 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin, User")]
-        public ActionResult<List<MovieScreening>> GetMovieScreenings(Guid movieUid)
+        public async Task<IActionResult> GetMovieScreenings(Guid movieUid)
         {
-            if (!_movieService.IsMovieExists(movieUid))
+            if (!await _movieService.MovieExistsAsync(movieUid))
             {
                 return NotFound("Movie not found");
             }
 
-            var screenings = _screeningService.GetMovieScreenings(movieUid);
+            var screenings = await _screeningService.GetMovieScreeningsAsync(movieUid);
 
-            if (screenings == null)
+            if (screenings.Count == 0)
             {
                 return NotFound("No screenings found");
             }
@@ -99,16 +95,16 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<List<Screening>> GetHallScreenings(string hallName)
+        public async Task<IActionResult> GetHallScreenings(string hallName)
         {
-            if (!_hallService.CheckHallName(hallName))
+            if (!await _hallService.HallExistsAsync(hallName))
             {
                 return NotFound("Hall not found");
             }
 
-            var screenings = _screeningService.GetHallScreenings(hallName);
+            var screenings = await _screeningService.GetHallScreeningsAsync(hallName);
 
-            if (screenings == null)
+            if (screenings.Count == 0)
             {
                 return NotFound("No screenings found");
             }
@@ -120,23 +116,18 @@ namespace WebApi.Controllers
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateScreening(Guid screeningUid, ScreeningInfo screeningInfo)
         {
-            if (screeningInfo.MovieTitle == null || screeningInfo.HallName == null ||
-                screeningInfo.ScreeningStart == null || screeningInfo.Price <= 0)
+            if (string.IsNullOrWhiteSpace(screeningInfo.MovieTitle) || string.IsNullOrWhiteSpace(screeningInfo.HallName) ||
+                string.IsNullOrWhiteSpace(screeningInfo.ScreeningStart) || screeningInfo.Price <= 0)
             {
-                return BadRequest();
+                return BadRequest("Wrong data");
             }
 
-            if (!_screeningService.IsScreeningExists(screeningUid))
-            {
-                return NotFound("Screening not found");
-            }
-
-            if (!_movieService.CheckMovieTitle(screeningInfo.MovieTitle))
+            if (!await _movieService.MovieExistsByTitleAsync(screeningInfo.MovieTitle))
             {
                 return NotFound("Movie not found");
             }
 
-            if (!_hallService.CheckHallName(screeningInfo.HallName))
+            if (!await _hallService.HallExistsAsync(screeningInfo.HallName))
             {
                 return NotFound("Hall not found");
             }
@@ -146,17 +137,14 @@ namespace WebApi.Controllers
                 return NotFound("Price not found");
             }
 
-            if (!_screeningService.CheckScreeningInfo(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart, screeningUid))
+            if (!await _screeningService.IsValidScreningTimeAsync(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart))
             {
-                ModelState.AddModelError("", "Failed to create screening at this time");
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create screening at this time");
             }
 
-            if (!_screeningService.UpdateScreening(screeningUid, screeningInfo))
+            if (!await _screeningService.UpdateScreeningAsync(screeningUid, screeningInfo))
             {
-                ModelState.AddModelError("", "Failed to update screening");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to update screening");
             }
 
             return Ok("Screening updated");
@@ -164,13 +152,11 @@ namespace WebApi.Controllers
 
         [HttpDelete]
         //[Authorize(Roles = "Admin")]
-        public ActionResult DeleteScreening(Guid screeningUid)
+        public async Task<IActionResult> DeleteScreening(Guid screeningUid)
         {
-            if (!_screeningService.DeleteScreening(screeningUid))
+            if (!await _screeningService.DeleteScreeningAsync(screeningUid))
             {
-                ModelState.AddModelError("", "Failed to delete screening");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to delete screening");
             }
 
             return Ok("Screening deleted");

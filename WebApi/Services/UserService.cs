@@ -47,7 +47,7 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.User>> GetAllUsersAsync()
         {
-            var users = await _cinemaDbContext.Set<User>()
+            return await _cinemaDbContext.Set<User>()
                 .Select(user => new Contracts.User
                 {
                     UserUid = user.UserUid,
@@ -58,10 +58,6 @@ namespace WebApi.Services
                     IsAdmin = user.IsAdmin,
                 })
                 .ToListAsync();
-
-            if (users.Count == 0) { return new List<Contracts.User>(); }
-
-            return users;
         }
 
         public async Task<Contracts.User> GetSingleUserAsync(Guid userUid)
