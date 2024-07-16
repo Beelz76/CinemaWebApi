@@ -28,15 +28,18 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.ScreeningPrice>> GetScreeningPricesAsync()
         {
-            var screeningPrices = await _cinemaDbContext.Set<ScreeningPrice>().OrderBy(x => x.Price).ToListAsync();
+            var screeningPrices = await _cinemaDbContext.Set<ScreeningPrice>()
+                .OrderBy(x => x.Price)
+                .Select(screeningPrice => new Contracts.ScreeningPrice
+                {
+                    ScreeningPriceUid = screeningPrice.ScreeningPriceUid,
+                    Price = screeningPrice.Price
+                })
+                .ToListAsync();
 
             if (screeningPrices.Count == 0 ) { return new List<Contracts.ScreeningPrice>(); }
 
-            return screeningPrices.Select(screeningPrice => new Contracts.ScreeningPrice
-            {
-                ScreeningPriceUid = screeningPrice.ScreeningPriceUid,
-                Price = screeningPrice.Price
-            }).ToList();
+            return screeningPrices;
         }
 
         public async Task<bool> UpdateScreeningPriceAsync(Guid screeningPriceUid, int price)

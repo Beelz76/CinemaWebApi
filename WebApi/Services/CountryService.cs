@@ -29,15 +29,17 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.Country>> GetCountriesAsync()
         {
-            var countries = await _cinemaDbContext.Set<Country>().ToListAsync();
+            var countries = await _cinemaDbContext.Set<Country>()
+                .Select(country => new Contracts.Country
+                {
+                    CountryUid = country.CountryUid,
+                    Name = country.Name
+                })
+                .ToListAsync();
 
             if (countries.Count == 0) { return new List<Contracts.Country>(); }
 
-            return countries.Select(country => new Contracts.Country
-            {
-                CountryUid = country.CountryUid,
-                Name = country.Name
-            }).ToList();
+            return countries;
         }
 
         public async Task<bool> UpdateCountryAsync(Guid countryUid, string name)

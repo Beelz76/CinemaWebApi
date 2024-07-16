@@ -47,19 +47,21 @@ namespace WebApi.Services
 
         public async Task<List<Contracts.User>> GetAllUsersAsync()
         {
-            var users = await _cinemaDbContext.Set<User>().ToListAsync();
+            var users = await _cinemaDbContext.Set<User>()
+                .Select(user => new Contracts.User
+                {
+                    UserUid = user.UserUid,
+                    FullName = user.FullName,
+                    Login = user.Login,
+                    Password = GetHash(user.Password),
+                    Email = user.Email,
+                    IsAdmin = user.IsAdmin,
+                })
+                .ToListAsync();
 
             if (users.Count == 0) { return new List<Contracts.User>(); }
 
-            return users.Select(user => new Contracts.User
-            {
-                UserUid = user.UserUid,
-                FullName = user.FullName,
-                Login = user.Login,
-                Password = GetHash(user.Password),
-                Email = user.Email,
-                IsAdmin = user.IsAdmin,
-            }).ToList();
+            return users;
         }
 
         public async Task<Contracts.User> GetSingleUserAsync(Guid userUid)

@@ -1,6 +1,7 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 using WebApi.Interface;
 
 namespace WebApi.Services
@@ -81,8 +82,6 @@ namespace WebApi.Services
                 .Include(x => x.Hall)
                 .FirstOrDefaultAsync(x => x.ScreeningUid == screeningUid);
 
-            if (screening == null) { return new List<Contracts.ScreeningSeat>(); }
-
             var seats = await _cinemaDbContext.Set<Seat>()
                 .Where(x => x.Hall.HallUid == screening.Hall.HallUid)
                 .OrderBy(x => x.Row)
@@ -95,6 +94,8 @@ namespace WebApi.Services
                     Status = x.Tickets.Any(x => x.Screening.ScreeningUid == screeningUid) ? "Занято" : "Свободно"
                 })
                 .ToListAsync();
+
+            if (seats.Count == 0) { return new List<Contracts.ScreeningSeat>(); }
 
             return seats;
         }
