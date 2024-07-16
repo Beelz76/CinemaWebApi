@@ -20,56 +20,50 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult<JwtToken> Register(UserRegisterCredentials credentials)
+        public async Task<IActionResult> Register(UserRegisterCredentials credentials)
         {
-            if (!_userService.CheckLoginRegex(credentials.Login))
+            if (!_userService.IsValidLogin(credentials.Login))
             {
-                ModelState.AddModelError("", "Invalid name format");
-
-                return BadRequest(ModelState);
+                return BadRequest("Invalid name format");
             }
 
-            if (_userService.CheckLogin(credentials.Login))
+            if (await _userService.LoginExistsAsync(credentials.Login))
             {
-                ModelState.AddModelError("", "Login already exists");
-
-                return BadRequest(ModelState);
+                return Conflict("Login already exists");
             }
 
-            var userUid = _userService.Register(credentials);
+            var userUid = await _userService.RegisterAsync(credentials);
 
-            return new JwtToken
+            return Ok(new JwtToken
             {
                 Token = _jwtService.GenerateToken(userUid, credentials.Login, false)
-            };
+            });
         }
 
         [HttpPost]
         [AllowAnonymous]
-        public ActionResult<JwtToken> Login(UserLoginCredentials credentials)
+        public async Task<IActionResult> Login(UserLoginCredentials credentials)
         {
-            var userUid = _userService.Login(credentials);
-
-            if (userUid == null)
+            var userUid = await _userService.LoginAsync(credentials);
+            
+            if (userUid == Guid.Empty)
             {
-                ModelState.AddModelError("user", "Invalid login or password");
-
-                return BadRequest(ModelState);
+                return BadRequest("Invalid login or password");
             }
 
-            return new JwtToken
+            return Ok(new JwtToken
             {
-                Token = _jwtService.GenerateToken(userUid.Value, credentials.Login, _userService.IsAdmin(userUid.Value))
-            };
+                Token = _jwtService.GenerateToken(userUid, credentials.Login, await _userService.IsAdminAsync(userUid))
+            });
         }
 
         [HttpGet]
         //[Authorize (Roles = "Admin")]
-        public ActionResult<List<User>> GetAllUsers()
+        public async Task<IActionResult> GetAllUsers()
         {
-            var users = _userService.GetAllUsers();
+            var users = await _userService.GetAllUsersAsync();
 
-            if (users == null)
+            if (users.Count == 0)
             {
                 return NotFound("No users found");
             }
@@ -79,9 +73,9 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<User> GetSingleUser(Guid userUid)
+        public async Task<IActionResult> GetSingleUser(Guid userUid)
         {
-            var user = _userService.GetSingleUser(userUid);
+            var user = await _userService.GetSingleUserAsync(userUid);
 
             if (user == null)
             {
@@ -93,9 +87,9 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin, User")]
-        public ActionResult<UserInfo> GetUserInfo(Guid userUid)
+        public async Task<IActionResult> GetUserInfo(Guid userUid)
         {
-            var user = _userService.GetUserInfo(userUid);
+            var user = await _userService.GetUserInfoAsync(userUid);
 
             if (user == null)
             {
@@ -107,50 +101,40 @@ namespace WebApi.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "Admin, User")]
-        public ActionResult UpdateUser(Guid userUid, UserUpdate userUpdate)
+        public async Task<IActionResult> UpdateUser(Guid userUid, UserUpdate userUpdate)
         {
-            if (userUpdate.Login == null || userUpdate.Password == null || 
-                userUpdate.FullName == null || userUpdate.ConfirmedPassword == null)
+            if (string.IsNullOrWhiteSpace(userUpdate.Login) || string.IsNullOrWhiteSpace(userUpdate.Password) ||
+                string.IsNullOrWhiteSpace(userUpdate.FullName) || string.IsNullOrWhiteSpace(userUpdate.ConfirmedPassword))
             {
-                return BadRequest();
+                return BadRequest("Wrong data");
             }
 
-            if (_userService.GetLogin(userUid) != userUpdate.Login)
+            if (await _userService.GetUserLoginAsync(userUid) != userUpdate.Login)
             {
-                if (!_userService.CheckLoginRegex(userUpdate.Login))
+                if (!_userService.IsValidLogin(userUpdate.Login))
                 {
-                    ModelState.AddModelError("", "Invalid name format");
-
-                    return BadRequest(ModelState);
+                    return BadRequest("Invalid name format");
                 }
 
-                if (_userService.CheckLogin(userUpdate.Login))
+                if (await _userService.LoginExistsAsync(userUpdate.Login))
                 {
-                    ModelState.AddModelError("", "Login already exists");
-
-                    return BadRequest(ModelState);
+                    return Conflict("Login already exists");
                 }
             }
 
-            if (!_userService.CheckEmailRegex(userUpdate.Email))
+            if (!_userService.IsValidEmail(userUpdate.Email))
             {
-                ModelState.AddModelError("", "Invalid email format");
-
-                return BadRequest(ModelState);
+                return BadRequest("Invalid email format");
             }
 
             if (userUpdate.Password != userUpdate.ConfirmedPassword)
             {
-                ModelState.AddModelError("", "Failed to confirm password");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to confirm password");
             }
 
-            if (!_userService.UpdateUser(userUid, userUpdate))
+            if (!await _userService.UpdateUserAsync(userUid, userUpdate))
             {
-                ModelState.AddModelError("", "Failed to update user");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to update user");
             }
 
             return Ok("User updated");
@@ -158,13 +142,11 @@ namespace WebApi.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "Admin")]
-        public ActionResult UpdateUserAdminStatus(Guid userUid)
+        public async Task<IActionResult> UpdateUserAdminStatus(Guid userUid)
         {
-            if (!_userService.UpdateUserAdminStatus(userUid))
+            if (!await _userService.UpdateUserAdminStatusAsync(userUid))
             {
-                ModelState.AddModelError("", "Failed to update user status");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to update user status");
             }
 
             return Ok("User status updated");
@@ -172,13 +154,11 @@ namespace WebApi.Controllers
 
         [HttpDelete]
         //[Authorize(Roles = "Admin")]
-        public ActionResult DeleteUser(Guid userUid)
+        public async Task<IActionResult> DeleteUser(Guid userUid)
         {
-            if (!_userService.DeleteUser(userUid))
+            if (!await _userService.DeleteUserAsync(userUid))
             {
-                ModelState.AddModelError("", "Failed to delete user");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to delete user");
             }
 
             return Ok("User deleted");

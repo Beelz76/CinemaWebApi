@@ -8,7 +8,7 @@ using WebApi.Interface;
 
 namespace WebApi.Services
 {
-    public class JwtService : IJwtService
+    public sealed class JwtService : IJwtService
     {
         private readonly IOptions<JwtAuthenticationOptions> _options;
 
@@ -23,10 +23,10 @@ namespace WebApi.Services
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                new Claim(ClaimTypes.NameIdentifier, userUid.ToString()),
-                new Claim(ClaimTypes.Name, login),
-                new Claim(ClaimTypes.Role, IsAdmin? "Admin" : "User")
-            }),
+                    new Claim(ClaimTypes.NameIdentifier, userUid.ToString()),
+                    new Claim(ClaimTypes.Name, login),
+                    new Claim(ClaimTypes.Role, IsAdmin ? "Admin" : "User")
+                }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 Issuer = _options.Value.Issuer,
                 Audience = _options.Value.Audience,

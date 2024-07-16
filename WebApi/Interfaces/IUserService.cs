@@ -2,19 +2,19 @@
 {
     public interface IUserService
     {
-        Guid Register(Contracts.UserRegisterCredentials credentials);
-        Guid? Login(Contracts.UserLoginCredentials credentials);
-        List<Contracts.User>? GetAllUsers();
-        Contracts.User? GetSingleUser(Guid userUid);
-        Contracts.UserInfo? GetUserInfo(Guid userUid);
-        bool UpdateUser(Guid userUid, Contracts.UserUpdate userUpdate);
-        bool UpdateUserAdminStatus(Guid userUid);
-        bool DeleteUser(Guid userUid);
-        bool CheckLogin(string login);
-        string? GetLogin(Guid userUid);
-        bool IsAdmin(Guid userUid);
-        bool IsUserExists(Guid? userUid);
-        bool CheckLoginRegex(string login);
-        bool CheckEmailRegex(string email);
+        Task<Guid> RegisterAsync(Contracts.UserRegisterCredentials credentials);
+        Task<Guid> LoginAsync(Contracts.UserLoginCredentials credentials);
+        Task<List<Contracts.User>> GetAllUsersAsync();
+        Task<Contracts.User> GetSingleUserAsync(Guid userUid);
+        Task<Contracts.UserInfo> GetUserInfoAsync(Guid userUid);
+        Task<bool> UpdateUserAsync(Guid userUid, Contracts.UserUpdate userUpdate);
+        Task<bool> UpdateUserAdminStatusAsync(Guid userUid);
+        Task<bool> DeleteUserAsync(Guid userUid);
+        Task<bool> LoginExistsAsync(string login);
+        Task<string> GetUserLoginAsync(Guid userUid);
+        Task<bool> IsAdminAsync(Guid userUid);
+        Task<bool> UserExistsAsync(Guid userUid);
+        bool IsValidLogin(string login);
+        bool IsValidEmail(string email);
     }
 }

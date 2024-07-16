@@ -1,5 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -16,7 +17,7 @@ namespace WebApi.Services
             _cinemaDbContext = cinemaDbContext;
         }
 
-        public Guid Register(Contracts.UserRegisterCredentials credentials)
+        public async Task<Guid> RegisterAsync(Contracts.UserRegisterCredentials credentials)
         {
             var user = new User
             {
@@ -27,26 +28,28 @@ namespace WebApi.Services
                 IsAdmin = false,
             };
 
-            _cinemaDbContext.Add(user);
-            _cinemaDbContext.SaveChanges();
+            await _cinemaDbContext.AddAsync(user);
+            await _cinemaDbContext.SaveChangesAsync();
 
             return user.UserUid;
         }
 
-        public Guid? Login(Contracts.UserLoginCredentials credentials)
+        public async Task<Guid> LoginAsync(Contracts.UserLoginCredentials credentials)
         {
             var hashedPassword = GetHash(credentials.Password);
 
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.Login == credentials.Login && x.Password == hashedPassword);
+            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.Login == credentials.Login && x.Password == hashedPassword);
+            
+            if (user == null) { return Guid.Empty; }
 
-            return user?.UserUid;
+            return user.UserUid;
         }
 
-        public List<Contracts.User>? GetAllUsers()
+        public async Task<List<Contracts.User>> GetAllUsersAsync()
         {
-            var users = _cinemaDbContext.Set<User>().ToList();
+            var users = await _cinemaDbContext.Set<User>().ToListAsync();
 
-            if (users.Count == 0) { return null; }
+            if (users.Count == 0) { return new List<Contracts.User>(); }
 
             return users.Select(user => new Contracts.User
             {
@@ -59,9 +62,9 @@ namespace WebApi.Services
             }).ToList();
         }
 
-        public Contracts.User? GetSingleUser(Guid userUid)
+        public async Task<Contracts.User> GetSingleUserAsync(Guid userUid)
         {
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
+            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
 
             if (user == null) { return null; }
 
@@ -76,9 +79,9 @@ namespace WebApi.Services
             };
         }
 
-        public Contracts.UserInfo? GetUserInfo(Guid userUid)
+        public async Task<Contracts.UserInfo> GetUserInfoAsync(Guid userUid)
         {
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
+            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
 
             if (user == null) { return null; }
 
@@ -91,9 +94,9 @@ namespace WebApi.Services
             };
         }
 
-        public bool UpdateUser(Guid userUid, Contracts.UserUpdate userUpdate)
+        public async Task<bool> UpdateUserAsync(Guid userUid, Contracts.UserUpdate userUpdate)
         {
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
+            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
 
             if (user == null) { return false; }
 
@@ -102,60 +105,54 @@ namespace WebApi.Services
             user.Password = GetHash(userUpdate.Password);
             user.Email = userUpdate.Email;
 
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool UpdateUserAdminStatus(Guid userUid)
+        public async Task<bool> UpdateUserAdminStatusAsync(Guid userUid)
         {
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
+            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
 
             if (user == null) { return false; };
 
             user.IsAdmin = true;
 
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool DeleteUser(Guid userUid)
+        public async Task<bool> DeleteUserAsync(Guid userUid)
         {
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
+            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
 
             if (user == null) { return false; }
 
             _cinemaDbContext.Remove(user);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
         private string GetHash(string password)
         {
             using var sha = SHA512.Create();
             var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-
             return Convert.ToHexString(bytes);
         }
 
-        public bool CheckLogin(string login)
+        public async Task<bool> LoginExistsAsync(string login)
         {
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.Login == login);
-
-            if (user == null) { return false; }
-
-            return true;
+            return await _cinemaDbContext.Set<User>().AnyAsync(x => x.Login == login);
         }
 
-        public string? GetLogin(Guid userUid)
+        public async Task<string> GetUserLoginAsync(Guid userUid)
         {
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
+            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
 
-            if (user == null) { return null; }
+            if (user == null) { return string.Empty; }
 
             return user.Login;
         }
 
-        public bool IsAdmin(Guid userUid)
+        public async Task<bool> IsAdminAsync(Guid userUid)
         {
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
+            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
 
             if (user == null) { return false; }
 
@@ -167,37 +164,19 @@ namespace WebApi.Services
             return false;
         }
 
-        public bool IsUserExists(Guid? userUid)
+        public async Task<bool> UserExistsAsync(Guid userUid)
         {
-            var user = _cinemaDbContext.Set<User>().SingleOrDefault(x => x.UserUid == userUid);
-
-            if (user == null) { return false; }
-
-            return true;
+            return await _cinemaDbContext.Set<User>().AnyAsync(x => x.UserUid == userUid);
         }
 
-        public bool CheckLoginRegex(string login)
+        public bool IsValidLogin(string login)
         {
-            var regex = new Regex(@"^[a-zA-Z0-9][\w]{3,}$");
-
-            if (!regex.IsMatch(login))
-            {
-                return false;
-            }
-
-            return true;
+            return new Regex(@"^[a-zA-Z0-9][\w]{3,}$").IsMatch(login);
         }
 
-        public bool CheckEmailRegex(string email)
+        public bool IsValidEmail(string email)
         {
-            var regex = new Regex(@"^[\w-\.]+@([\w -]+\.)+[\w-]{2,4}$");
-
-            if (!regex.IsMatch(email))
-            {
-                return false;
-            }
-
-            return true;
+            return new Regex(@"^[\w-\.]+@([\w -]+\.)+[\w-]{2,4}$").IsMatch(email);
         }
     }
 }
