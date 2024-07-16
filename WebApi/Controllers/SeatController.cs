@@ -22,30 +22,26 @@ namespace WebApi.Controllers
 
         [HttpPost]
         //[Authorize(Roles = "Admin")]
-        public ActionResult CreateSeat(string hallName, int row, int number)
+        public async Task<IActionResult> CreateSeat(string hallName, int row, int number)
         {
-            if (hallName == null || row <= 0 || number <= 0)
+            if (string.IsNullOrWhiteSpace(hallName) || row <= 0 || number <= 0)
             {
-                return BadRequest();
+                return BadRequest("Wrong data");
             }
 
-            if (!_hallService.CheckHallName(hallName))
+            if (!await _hallService.HallExistsAsync(hallName))
             {
                 return NotFound("Hall not found");
             }
 
-            if (_seatService.CheckSeat(hallName, row, number))
+            if (await _seatService.SeatExistsAsync(hallName, row, number))
             {
-                ModelState.AddModelError("", "Seat already exists");
-
-                return BadRequest(ModelState);
+                return Conflict("Seat already exists");
             }
 
-            if (!_seatService.CreateSeat(hallName, row, number))
+            if (!await _seatService.CreateSeatAsync(hallName, row, number))
             {
-                ModelState.AddModelError("", "Failed to create seat");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create seat");
             }
 
             return Ok("Seat created");
@@ -53,11 +49,11 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<List<Seat>> GetAllSeats()
+        public async Task<IActionResult> GetAllSeats()
         {
-            var seats = _seatService.GetAllSeats();
+            var seats = await _seatService.GetAllSeatsAsync();
 
-            if (seats == null)
+            if (seats.Count == 0)
             {
                 return NotFound("No seats found");
             }
@@ -67,16 +63,16 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<List<HallSeat>> GetHallSeats(string hallName)
+        public async Task<IActionResult> GetHallSeats(string hallName)
         {
-            if (!_hallService.CheckHallName(hallName))
+            if (!await _hallService.HallExistsAsync(hallName))
             {
                 return NotFound("Hall not found");
             }
 
-            var seats = _seatService.GetHallSeats(hallName);
+            var seats = await _seatService.GetHallSeatsAsync(hallName);
 
-            if (seats == null)
+            if (seats.Count == 0)
             {
                 return NotFound("No seats found");
             }
@@ -86,16 +82,16 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin, User")]
-        public ActionResult<List<ScreeningSeat>> GetScreeningSeats(Guid screeningUid)
+        public async Task<IActionResult> GetScreeningSeats(Guid screeningUid)
         {
             if (!_screeningService.IsScreeningExists(screeningUid))
             {
                 return NotFound("Screening not found");
             }
 
-            var seats = _seatService.GetScreeningSeats(screeningUid);
+            var seats = await _seatService.GetScreeningSeatsAsync(screeningUid);
 
-            if (seats == null)
+            if (seats.Count == 0)
             {
                 return NotFound("No seats found");
             }
@@ -105,18 +101,16 @@ namespace WebApi.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "Admin")]
-        public ActionResult UpdateSeat(Guid seatUid, int row, int number)
+        public async Task<IActionResult> UpdateSeat(Guid seatUid, int row, int number)
         {
             if (row <= 0 || number <= 0)
             {
-                return BadRequest();
+                return BadRequest("Wrond data");
             }
 
-            if (!_seatService.UpdateSeat(seatUid, row, number))
+            if (!await _seatService.UpdateSeatAsync(seatUid, row, number))
             {
-                ModelState.AddModelError("", "Failed to update seat");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to update seat");
             }
 
             return Ok("Seat updated");
@@ -124,13 +118,11 @@ namespace WebApi.Controllers
 
         [HttpDelete]
         //[Authorize(Roles = "Admin")]
-        public ActionResult DeleteSeat(Guid seatUid)
+        public async Task<IActionResult> DeleteSeat(Guid seatUid)
         {
-            if (!_seatService.DeleteSeat(seatUid))
+            if (!await _seatService.DeleteSeatAsync(seatUid))
             {
-                ModelState.AddModelError("", "Failed to delete seat");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to delete seat");
             }
 
             return Ok("Seat deleted");

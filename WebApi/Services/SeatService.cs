@@ -14,9 +14,9 @@ namespace WebApi.Services
             _cinemaDbContext = cinemaDbContext;
         }
 
-        public bool CreateSeat(string hallName, int row, int number)
+        public async Task<bool> CreateSeatAsync(string hallName, int row, int number)
         {
-            var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.Name == hallName);
+            var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.Name == hallName);
 
             if (hall == null) { return false; }
 
@@ -30,58 +30,63 @@ namespace WebApi.Services
 
             hall.Capacity += 1;
 
-            _cinemaDbContext.Add(seat);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            await _cinemaDbContext.AddAsync(seat);
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public List<Contracts.Seat>? GetAllSeats()
+        public async Task<List<Contracts.Seat>> GetAllSeatsAsync()
         {
-            var seats = _cinemaDbContext.Set<Seat>()
+            var seats = await _cinemaDbContext.Set<Seat>()
                 .Include(x => x.Hall)
                 .OrderBy(x => x.Hall.Name)
                 .ThenBy(x => x.Row)
                 .ThenBy(x => x.Number)
-                .ToList();
+                .Select(seat => new Contracts.Seat
+                {
+                    SeatUid = seat.SeatUid,
+                    HallName = seat.Hall.Name,
+                    Row = seat.Row,
+                    Number = seat.Number
+                })
+                .ToListAsync();
 
-            if (seats.Count == 0) { return null; }
+            if (seats.Count == 0) { return new List<Contracts.Seat>(); }
 
-            return seats.Select(seat => new Contracts.Seat
-            {
-                SeatUid = seat.SeatUid,
-                HallName = seat.Hall.Name,
-                Row = seat.Row,
-                Number = seat.Number
-            }).ToList();
+            return seats;
         }
 
-        public List<Contracts.HallSeat>? GetHallSeats(string hallName)
+        public async Task<List<Contracts.HallSeat>> GetHallSeatsAsync(string hallName)
         {
-            var seats = _cinemaDbContext.Set<Seat>()
+            var seats = await _cinemaDbContext.Set<Seat>()
                 .Where(x => x.Hall.Name.ToLower() == hallName.ToLower())
                 .OrderBy(x => x.Hall.HallUid)
                 .ThenBy(x => x.Row)
                 .ThenBy(x => x.Number)
-                .ToList();
+                .Select(seat => new Contracts.HallSeat
+                 {
+                     SeatUid = seat.SeatUid,
+                     Row = seat.Row,
+                     Number = seat.Number
+                 })
+                .ToListAsync();
 
-            if (seats.Count == 0) { return null; }
+            if (seats.Count == 0) { return new List<Contracts.HallSeat>(); }
 
-            return seats.Select(seat => new Contracts.HallSeat
-            {
-                SeatUid = seat.SeatUid,
-                Row = seat.Row,
-                Number = seat.Number
-            }).ToList();
+            return seats;
         }
 
-        public List<Contracts.ScreeningSeat>? GetScreeningSeats(Guid screeningUid)
+        public async Task<List<Contracts.ScreeningSeat>> GetScreeningSeatsAsync(Guid screeningUid)
         {
-            var screening = _cinemaDbContext.Set<Screening>().Include(x => x.Hall).SingleOrDefault(x => x.ScreeningUid == screeningUid);
+            var screening = await _cinemaDbContext.Set<Screening>()
+                .Include(x => x.Hall)
+                .FirstOrDefaultAsync(x => x.ScreeningUid == screeningUid);
 
-            if (screening == null) { return null; }
+            if (screening == null) { return new List<Contracts.ScreeningSeat>(); }
 
-            var seats = _cinemaDbContext.Set<Seat>()
+            var seats = await _cinemaDbContext.Set<Seat>()
                 .Where(x => x.Hall.HallUid == screening.Hall.HallUid)
+                .OrderBy(x => x.Row)
+                .ThenBy(x => x.Number)
                 .Select(x => new Contracts.ScreeningSeat
                 {
                     SeatUid = x.SeatUid,
@@ -89,60 +94,39 @@ namespace WebApi.Services
                     Number = x.Number,
                     Status = x.Tickets.Any(x => x.Screening.ScreeningUid == screeningUid) ? "Занято" : "Свободно"
                 })
-                .OrderBy(x => x.Row)
-                .ThenBy(x => x.Number)
-                .ToList();
+                .ToListAsync();
 
-            if (seats.Count == 0) { return null; }
-
-            return seats.Select(seat => new Contracts.ScreeningSeat
-            {
-                SeatUid = seat.SeatUid,
-                Row = seat.Row,
-                Number = seat.Number,
-                Status = seat.Status,
-            }).ToList();
+            return seats;
         }
 
-        public bool UpdateSeat(Guid seatUid, int row, int number)
+        public async Task<bool> UpdateSeatAsync(Guid seatUid, int row, int number)
         {
-            var seat = _cinemaDbContext.Set<Seat>().SingleOrDefault(x => x.SeatUid == seatUid);
+            var seat = await _cinemaDbContext.Set<Seat>().FirstOrDefaultAsync(x => x.SeatUid == seatUid);
 
             if (seat == null) { return false; }
 
             seat.Row = row;
             seat.Number = number;
 
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool DeleteSeat(Guid seatUid)
+        public async Task<bool> DeleteSeatAsync(Guid seatUid)
         {
-            var seat = _cinemaDbContext.Set<Seat>().Include(x => x.Hall).SingleOrDefault(x => x.SeatUid == seatUid);
+            var seat = await _cinemaDbContext.Set<Seat>().Include(x => x.Hall).FirstOrDefaultAsync(x => x.SeatUid == seatUid);
 
             if (seat == null) { return false; }
 
             seat.Hall.Capacity -= 1;
 
             _cinemaDbContext.Remove(seat);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool IsSeatExists(Guid seatUid)
+        public async Task<bool> SeatExistsAsync(string hallName, int row, int number)
         {
-            var seat = _cinemaDbContext.Set<Seat>().SingleOrDefault(x => x.SeatUid == seatUid);
-
-            if (seat == null) { return false; }
-
-            return true;
-        }
-
-        public bool CheckSeat(string hallName, int row, int number)
-        {
-            var hall = _cinemaDbContext.Set<Hall>().SingleOrDefault(x => x.Name == hallName);
-
-            var seat = _cinemaDbContext.Set<Seat>().SingleOrDefault(x => x.Hall == hall & x.Row == row & x.Number == number);
+            var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.Name == hallName);
+            var seat = await _cinemaDbContext.Set<Seat>().FirstOrDefaultAsync(x => x.Hall == hall & x.Row == row & x.Number == number);
 
             if (seat == null) { return false; }
 
