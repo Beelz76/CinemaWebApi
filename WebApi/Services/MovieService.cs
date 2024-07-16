@@ -1,7 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using WebApi.Interface;
 
@@ -11,15 +10,12 @@ namespace WebApi.Services
     {
         private readonly CinemaDbContext _cinemaDbContext;
 
-        private readonly HttpClient _httpClient;
-
         public MovieService(CinemaDbContext cinemaDbContext, HttpClient httpClient)
         {
             _cinemaDbContext = cinemaDbContext;
-            _httpClient = httpClient;
         }
 
-        public bool CreateMovie(Contracts.MovieInfo movieInfo)
+        public async Task<bool> CreateMovieAsync(Contracts.MovieInfo movieInfo)
         {          
             var movie = new Movie
             {
@@ -29,86 +25,88 @@ namespace WebApi.Services
                 Duration = int.Parse(movieInfo.Duration),
             };
 
-            AddDirectors(movieInfo.Directors, movie);
-            AddCountries(movieInfo.Countries, movie);
-            AddGenres(movieInfo.Genres, movie);
+            await AddDirectorsAsync(movieInfo.Directors, movie);
+            await AddCountriesAsync(movieInfo.Countries, movie);
+            await AddGenresAsync(movieInfo.Genres, movie);
 
-            _cinemaDbContext.Add(movie);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            await _cinemaDbContext.AddAsync(movie);
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public List<Contracts.Movie>? GetAllMovies()
+        public async Task<List<Contracts.Movie>> GetAllMoviesAsync()
         {
-            var movies = _cinemaDbContext.Set<Movie>()
+            var movies = await _cinemaDbContext.Set<Movie>()
                 .Include(x => x.Directors)
                 .Include(x => x.Genres)
                 .Include(x => x.Countries)
-                .ToList();
+                .Select(movie => new Contracts.Movie
+                {
+                    MovieUid = movie.MovieUid,
+                    Title = movie.Title,
+                    ReleaseYear = movie.ReleaseYear,
+                    Duration = movie.Duration,
+                    Directors = movie.Directors.Select(x => x.FullName).ToList(),
+                    Countries = movie.Countries.Select(x => x.Name).ToList(),
+                    Genres = movie.Genres.Select(x => x.Name).ToList()
+                })
+                .ToListAsync();
 
-            if (movies.Count == 0) { return null; }
-            
-            return movies.Select(movie => new Contracts.Movie
-            {
-                MovieUid = movie.MovieUid,
-                Title = movie.Title,
-                ReleaseYear = movie.ReleaseYear,
-                Duration = movie.Duration,
-                Directors = movie.Directors.Select(x => x.FullName).ToList(),
-                Countries = movie.Countries.Select(x => x.Name).ToList(),
-                Genres = movie.Genres.Select(x => x.Name).ToList()
-            }).ToList();
+            if (movies.Count == 0) { return new List<Contracts.Movie>(); }
+
+            return movies;
         }
 
-        public Contracts.Movie? GetSingleMovie(Guid movieUid)
+        public async Task<Contracts.Movie> GetSingleMovieAsync(Guid movieUid)
         {
-            var movie = _cinemaDbContext.Set<Movie>()
+            var movie = await _cinemaDbContext.Set<Movie>()
                 .Include(x => x.Directors)
                 .Include(x => x.Genres)
                 .Include(x => x.Countries)
-                .SingleOrDefault(x => x.MovieUid == movieUid);
+                .Select(m => new Contracts.Movie
+                {
+                    MovieUid = m.MovieUid,
+                    Title = m.Title,
+                    ReleaseYear = m.ReleaseYear,
+                    Duration = m.Duration,
+                    Directors = m.Directors.Select(x => x.FullName).ToList(),
+                    Countries = m.Countries.Select(x => x.Name).ToList(),
+                    Genres = m.Genres.Select(x => x.Name).ToList()
+                })
+                .FirstOrDefaultAsync(x => x.MovieUid == movieUid);
 
-            if (movie == null) { return null; }
-
-            return new Contracts.Movie
-            {
-                MovieUid = movie.MovieUid,
-                Title = movie.Title,
-                ReleaseYear = movie.ReleaseYear,
-                Duration = movie.Duration,
-                Directors = movie.Directors.Select(x => x.FullName).ToList(),
-                Countries = movie.Countries.Select(x => x.Name).ToList(),
-                Genres = movie.Genres.Select(x => x.Name).ToList()
-            };
+            return movie;
         }
 
-        public List<Contracts.MovieInfo>? GetMoviesInfo()
+        public async Task<List<Contracts.MovieInfo>> GetMoviesInfoAsync()
         {
-            var movies = _cinemaDbContext.Set<Movie>()
+            var movies = await _cinemaDbContext.Set<Movie>()
                 .Include(x => x.Directors)
                 .Include(x => x.Genres)
                 .Include(x => x.Countries)
-                .ToList();
+                .Select(movie => new Contracts.MovieInfo
+                {
+                    movieUid = movie.MovieUid,
+                    Title = movie.Title,
+                    ReleaseYear = movie.ReleaseYear,
+                    Duration = $"{movie.Duration / 60}ч {movie.Duration % 60}мин",
+                    Directors = movie.Directors.Select(x => x.FullName).ToList(),
+                    Countries = movie.Countries.Select(x => x.Name).ToList(),
+                    Genres = movie.Genres.Select(x => x.Name).ToList()
+                })
+                .ToListAsync();
 
-            return movies.Select(movie => new Contracts.MovieInfo
-            {
-                movieUid = movie.MovieUid,
-                Title = movie.Title,
-                ReleaseYear = movie.ReleaseYear,
-                Duration = $"{movie.Duration / 60}ч {movie.Duration % 60}мин",
-                Directors = movie.Directors.Select(x => x.FullName).ToList(),
-                Countries = movie.Countries.Select(x => x.Name).ToList(),
-                Genres = movie.Genres.Select(x => x.Name).ToList()
-            }).ToList();
+            if (movies.Count == 0) { return new List<Contracts.MovieInfo>(); }
+
+            return movies;
         }
 
-        public bool UpdateMovie(Guid movieUid, Contracts.MovieInfo movieInfo)
+        public async Task<bool> UpdateMovieAsync(Guid movieUid, Contracts.MovieInfo movieInfo)
         {
-            var movie = _cinemaDbContext.Set<Movie>()
+            var movie = await _cinemaDbContext.Set<Movie>()
                 .Include(x => x.Directors)
                 .Include(x => x.Countries)
                 .Include(x => x.Genres)
-                .SingleOrDefault(x => x.MovieUid == movieUid);
+                .FirstOrDefaultAsync(x => x.MovieUid == movieUid);
 
             if (movie == null) { return false; }
 
@@ -120,29 +118,28 @@ namespace WebApi.Services
             movie.Countries.Clear();
             movie.Genres.Clear();
 
-            AddDirectors(movieInfo.Directors, movie);
-            AddCountries(movieInfo.Countries, movie);
-            AddGenres(movieInfo.Genres, movie);
+            await AddDirectorsAsync(movieInfo.Directors, movie);
+            await AddCountriesAsync(movieInfo.Countries, movie);
+            await AddGenresAsync(movieInfo.Genres, movie);
 
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public bool DeleteMovie(Guid movieUid)
+        public async Task<bool> DeleteMovieAsync(Guid movieUid)
         {
-            var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.MovieUid == movieUid);
+            var movie = await _cinemaDbContext.Set<Movie>().FirstOrDefaultAsync(x => x.MovieUid == movieUid);
 
             if (movie == null) { return false; }
 
             _cinemaDbContext.Remove(movie);
-
-            return _cinemaDbContext.SaveChanges() > 0;
+            return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        private void AddDirectors(List<string> directorNames, Movie movie)
+        private async Task AddDirectorsAsync(List<string> directorNames, Movie movie)
         {
             foreach (var directorName in directorNames)
             {
-                var director = _cinemaDbContext.Set<Director>().SingleOrDefault(x => x.FullName == directorName);
+                var director = await _cinemaDbContext.Set<Director>().FirstOrDefaultAsync(x => x.FullName == directorName);
 
                 if (director == null)
                 {
@@ -152,18 +149,18 @@ namespace WebApi.Services
                         FullName = directorName
                     };
 
-                    _cinemaDbContext.Add(director);
+                    await _cinemaDbContext.AddAsync(director);
                 }
 
                 movie.Directors.Add(director);
             }
         }
 
-        private void AddCountries(List<string> countryNames, Movie movie)
+        private async Task AddCountriesAsync(List<string> countryNames, Movie movie)
         {
             foreach (var countryName in countryNames)
             {
-                var country = _cinemaDbContext.Set<Country>().SingleOrDefault(x => x.Name == countryName);
+                var country = await _cinemaDbContext.Set<Country>().FirstOrDefaultAsync(x => x.Name == countryName);
 
                 if (country == null)
                 {
@@ -173,18 +170,18 @@ namespace WebApi.Services
                         Name = countryName
                     };
 
-                    _cinemaDbContext.Add(country);
+                    await _cinemaDbContext.AddAsync(country);
                 }
 
                 movie.Countries.Add(country);
             }
         }
 
-        private void AddGenres(List<string> genreNames, Movie movie)
+        private async Task AddGenresAsync(List<string> genreNames, Movie movie)
         {
             foreach (var genreName in genreNames)
             {
-                var genre = _cinemaDbContext.Set<Genre>().SingleOrDefault(x => x.Name == genreName);
+                var genre = await _cinemaDbContext.Set<Genre>().FirstOrDefaultAsync(x => x.Name == genreName);
 
                 if (genre == null)
                 {
@@ -194,68 +191,52 @@ namespace WebApi.Services
                         Name = genreName
                     };
 
-                    _cinemaDbContext.Add(genre);
+                    await _cinemaDbContext.AddAsync(genre);
                 }
 
                 movie.Genres.Add(genre);
             }
         }
 
-        public bool IsMovieExists(Guid movieUid)
+        public async Task<bool> MovieExistsAsync(Guid movieUid)
         {
-            var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.MovieUid == movieUid);
+            return await _cinemaDbContext.Set<Movie>().AnyAsync(x => x.MovieUid == movieUid);
+        }
+
+        public async Task<bool> MovieExistsByTitleAsync(string movieTitle)
+        {
+            var movie = await _cinemaDbContext.Set<Movie>().FirstOrDefaultAsync(x => x.Title == movieTitle);
 
             if (movie == null) { return false; }
 
             return true;
         }
 
-        public bool CheckMovieTitle(string movieTitle)
+        public async Task<bool> MovieExistsByInfoAsync(Contracts.MovieInfo movieInfo, Guid? movieUid = null)
         {
-            var movie = _cinemaDbContext.Set<Movie>().SingleOrDefault(x => x.Title == movieTitle);
+            var query = _cinemaDbContext.Set<Movie>()
+                .Where(x => x.Title == movieInfo.Title &&
+                            x.ReleaseYear == movieInfo.ReleaseYear &&
+                            x.Duration == int.Parse(movieInfo.Duration));
 
-            if (movie == null) { return false; }
-
-            return true;
-        }
-
-        public bool CheckMovieInfo(Contracts.MovieInfo movieInfo)
-        {
-            var movie = _cinemaDbContext.Set<Movie>()
-                .SingleOrDefault(x => x.Title == movieInfo.Title &&
-                                x.ReleaseYear == movieInfo.ReleaseYear &&
-                                x.Duration == int.Parse(movieInfo.Duration));
-
-            if (movie == null) { return false; };
-
-            return true;
-        }
-
-        public bool CheckMovieInfo(Guid movieUid, Contracts.MovieInfo movieInfo)
-        {
-            var movie = _cinemaDbContext.Set<Movie>()
-                .SingleOrDefault(x => x.MovieUid != movieUid && x.Title == movieInfo.Title &&
-                                x.ReleaseYear == movieInfo.ReleaseYear &&
-                                x.Duration == int.Parse(movieInfo.Duration));
-
-            if (movie == null) { return false; };
-
-            return true;
-        }
-
-        public bool CheckRegex(string name)
-        {
-            var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9. -]{1,}$");
-
-            if (!regex.IsMatch(name))
+            if (movieUid.HasValue)
             {
-                return false;
+                query = query.Where(x => x.MovieUid != movieUid.Value);
             }
 
+            var movie = await query.FirstOrDefaultAsync();
+
+            if (movie == null) { return false; };
+
             return true;
         }
 
-        public bool CheckRegexList(List<string> list)
+        public bool IsValidMovieTitle(string title)
+        {
+            return new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9. -]{1,}$").IsMatch(title);
+        }
+
+        public bool IsValidNamesInList(List<string> list)
         {
             var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$");
 
@@ -268,33 +249,6 @@ namespace WebApi.Services
             }
 
             return true;
-        }
-
-
-
-        //////////////////
-        public async Task<string?> GetMovieInfoByTitle(string title)
-        {
-            string url = $"http://www.omdbapi.com/?apikey=a6f864c1&t={Uri.EscapeDataString(title)}";
-
-            HttpResponseMessage response = await _httpClient.GetAsync(url);
-
-            if (response.IsSuccessStatusCode)
-            {
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-
-                Contracts.MovieInfoo movieInfoo = JsonConvert.DeserializeObject<Contracts.MovieInfoo>(jsonResponse);
-
-                string movieString = $"Title: {movieInfoo.Title}\n" +
-                                 $"Year: {movieInfoo.Year}\n" +
-                                 $"Genre: {movieInfoo.Genre}\n" +
-                                 $"Director: {movieInfoo.Director}\n" +
-                                 $"Plot: {movieInfoo.Plot}";
-
-                return movieString;
-            }
-
-            return null;
-        }
+        } 
     }
 }

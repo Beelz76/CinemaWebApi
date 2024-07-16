@@ -66,19 +66,19 @@ namespace WebApi.Services
 
         public async Task<Contracts.User> GetSingleUserAsync(Guid userUid)
         {
-            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
+            var user = await _cinemaDbContext.Set<User>()
+                .Select(u => new Contracts.User
+                {
+                    UserUid = u.UserUid,
+                    FullName = u.FullName,
+                    Login = u.Login,
+                    Email = u.Email,
+                    Password = GetHash(u.Password),
+                    IsAdmin = u.IsAdmin,
+                })
+                .FirstOrDefaultAsync(x => x.UserUid == userUid);
 
-            if (user == null) { return null; }
-
-            return new Contracts.User
-            {
-                UserUid = user.UserUid,
-                FullName = user.FullName,
-                Login = user.Login,
-                Email = user.Email,
-                Password = GetHash(user.Password),
-                IsAdmin = user.IsAdmin,
-            };
+            return user;
         }
 
         public async Task<Contracts.UserInfo> GetUserInfoAsync(Guid userUid)
@@ -131,7 +131,7 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        private string GetHash(string password)
+        private static string GetHash(string password)
         {
             using var sha = SHA512.Create();
             var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));

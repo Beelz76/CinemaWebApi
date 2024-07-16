@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WebApi.Interface;
-using WebApi.Services;
 
 namespace WebApi.Controllers
 {
@@ -19,53 +18,37 @@ namespace WebApi.Controllers
 
         [HttpPost]
         //[Authorize(Roles = "Admin")]
-        public ActionResult CreateMovie(MovieInfo movieInfo)
+        public async Task<IActionResult> CreateMovie(MovieInfo movieInfo)
         {
-            if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || int.Parse(movieInfo.Duration) <= 0)
+            if (string.IsNullOrWhiteSpace(movieInfo.Title) || movieInfo.ReleaseYear <= 0 || 
+                int.Parse(movieInfo.Duration) <= 0 || !_movieService.IsValidMovieTitle(movieInfo.Title))
             {
-                return BadRequest();
+                return BadRequest("Invalid movie title format or wrong data");
             }
 
-            if (!_movieService.CheckRegex(movieInfo.Title))
+            if (!_movieService.IsValidNamesInList(movieInfo.Directors))
             {
-                ModelState.AddModelError("", "Invalid movie title format");
-
-                return BadRequest(ModelState);
+                return BadRequest("Invalid director name format");
             }
 
-            if (!_movieService.CheckRegexList(movieInfo.Directors))
+            if (!_movieService.IsValidNamesInList(movieInfo.Countries))
             {
-                ModelState.AddModelError("", "Invalid director name format");
-
-                return BadRequest(ModelState);
+                return BadRequest("Invalid country name format");
             }
 
-            if (!_movieService.CheckRegexList(movieInfo.Countries))
+            if (!_movieService.IsValidNamesInList(movieInfo.Genres))
             {
-                ModelState.AddModelError("", "Invalid country name format");
-
-                return BadRequest(ModelState);
+                return BadRequest("Invalid genre name format");
             }
 
-            if (!_movieService.CheckRegexList(movieInfo.Genres))
+            if (await _movieService.MovieExistsByInfoAsync(movieInfo))
             {
-                ModelState.AddModelError("", "Invalid genre name format");
-
-                return BadRequest(ModelState);
+                return Conflict("Movie already exists");
             }
 
-            if (_movieService.CheckMovieInfo(movieInfo))
+            if (!await _movieService.CreateMovieAsync(movieInfo))
             {
-                ModelState.AddModelError("", "Movie already exists");
-
-                return BadRequest(ModelState);
-            }
-
-            if (!_movieService.CreateMovie(movieInfo))
-            {
-                ModelState.AddModelError("", "Failed to create movie");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to create movie");
             }
 
             return Ok("Movie created");
@@ -73,11 +56,11 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<List<Movie>> GetAllMovies()
+        public async Task<IActionResult> GetAllMovies()
         {
-            var movies = _movieService.GetAllMovies();
+            var movies = await _movieService.GetAllMoviesAsync();
 
-            if (movies == null)
+            if (movies.Count == 0)
             {
                 return NotFound("No movies found");
             }
@@ -87,9 +70,9 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin")]
-        public ActionResult<Movie> GetSingleMovie(Guid movieUid)
+        public async Task<IActionResult> GetSingleMovie(Guid movieUid)
         {
-            var movie = _movieService.GetSingleMovie(movieUid);
+            var movie = await _movieService.GetSingleMovieAsync(movieUid);
 
             if (movie == null)
             {
@@ -101,11 +84,11 @@ namespace WebApi.Controllers
 
         [HttpGet]
         //[Authorize(Roles = "Admin, User")]
-        public ActionResult<List<MovieInfo>> GetMoviesInfo()
+        public async Task<IActionResult> GetMoviesInfo()
         {
-            var movies = _movieService.GetMoviesInfo();
+            var movies = await _movieService.GetMoviesInfoAsync();
 
-            if (movies == null)
+            if (movies.Count == 0)
             {
                 return NotFound("No movies found");
             }
@@ -115,53 +98,37 @@ namespace WebApi.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "Admin")]
-        public ActionResult UpdateMovie(Guid movieUid, MovieInfo movieInfo)
+        public async Task<IActionResult> UpdateMovie(Guid movieUid, MovieInfo movieInfo)
         {
-            if (movieInfo.Title == null || movieInfo.ReleaseYear <= 0 || int.Parse(movieInfo.Duration) <= 0)
+            if (string.IsNullOrWhiteSpace(movieInfo.Title) || movieInfo.ReleaseYear <= 0 || 
+                int.Parse(movieInfo.Duration) <= 0 || !_movieService.IsValidMovieTitle(movieInfo.Title))
             {
-                return BadRequest();
+                return BadRequest("Invalid movie title format or wrong data");
             }
 
-            if (!_movieService.CheckRegex(movieInfo.Title))
+            if (!_movieService.IsValidNamesInList(movieInfo.Directors))
             {
-                ModelState.AddModelError("", "Invalid movie title format");
-
-                return BadRequest(ModelState);
+                return BadRequest("Invalid director name format");
             }
 
-            if (!_movieService.CheckRegexList(movieInfo.Directors))
+            if (!_movieService.IsValidNamesInList(movieInfo.Countries))
             {
-                ModelState.AddModelError("", "Invalid director name format");
-
-                return BadRequest(ModelState);
+                return BadRequest("Invalid country name format");
             }
 
-            if (!_movieService.CheckRegexList(movieInfo.Countries))
+            if (!_movieService.IsValidNamesInList(movieInfo.Genres))
             {
-                ModelState.AddModelError("", "Invalid country name format");
-
-                return BadRequest(ModelState);
+                return BadRequest("Invalid genre name format");
             }
 
-            if (!_movieService.CheckRegexList(movieInfo.Genres))
+            if (await _movieService.MovieExistsByInfoAsync(movieInfo, movieUid))
             {
-                ModelState.AddModelError("", "Invalid genre name format");
-
-                return BadRequest(ModelState);
+                return BadRequest("Movie already exists");
             }
 
-            if (_movieService.CheckMovieInfo(movieUid, movieInfo))
+            if (!await _movieService.UpdateMovieAsync(movieUid, movieInfo))
             {
-                ModelState.AddModelError("", "Movie already exists");
-
-                return BadRequest(ModelState);
-            }
-
-            if (!_movieService.UpdateMovie(movieUid, movieInfo))
-            {
-                ModelState.AddModelError("", "Failed to update movie");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to update movie");
             }
 
             return Ok("Movie updated");
@@ -169,33 +136,14 @@ namespace WebApi.Controllers
 
         [HttpDelete]
         //[Authorize(Roles = "Admin")]
-        public ActionResult DeleteMovie(Guid movieUid)
+        public async Task<IActionResult> DeleteMovie(Guid movieUid)
         {
-            if (!_movieService.DeleteMovie(movieUid))
+            if (!await _movieService.DeleteMovieAsync(movieUid))
             {
-                ModelState.AddModelError("", "Failed to delete movie");
-
-                return BadRequest(ModelState);
+                return BadRequest("Failed to delete movie");
             }
 
             return Ok("Movie deleted");
-        }
-
-
-
-
-        //////////////////
-        [HttpGet("{title}")]
-        public async Task<ActionResult<string>> GetMovieInfoByTitle(string title)
-        {
-            var movieString = await _movieService.GetMovieInfoByTitle(title);
-
-            if (movieString == null)
-            {
-                return NotFound("Movie not found");
-            }
-
-            return Ok(movieString);
         }
     }
 }

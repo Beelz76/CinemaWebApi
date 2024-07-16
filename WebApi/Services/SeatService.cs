@@ -1,7 +1,6 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.CodeAnalysis;
 using WebApi.Interface;
 
 namespace WebApi.Services
