@@ -27,7 +27,7 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<Contracts.Director>> GetDirectorsAsync()
+        public async Task<IReadOnlyList<Contracts.Director>> GetDirectorsAsync()
         {
             return await _cinemaDbContext.Set<Director>()
                 .Select(director => new Contracts.Director

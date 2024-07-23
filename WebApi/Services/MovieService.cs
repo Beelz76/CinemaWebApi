@@ -16,7 +16,7 @@ namespace WebApi.Services
         }
 
         public async Task<bool> CreateMovieAsync(Contracts.MovieInfo movieInfo)
-        {          
+        {
             var movie = new Movie
             {
                 MovieUid = Guid.NewGuid(),
@@ -33,7 +33,7 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<Contracts.Movie>> GetAllMoviesAsync()
+        public async Task<IReadOnlyList<Contracts.Movie>> GetAllMoviesAsync()
         {
             return await _cinemaDbContext.Set<Movie>()
                 .Include(x => x.Directors)
@@ -73,7 +73,7 @@ namespace WebApi.Services
             return movie;
         }
 
-        public async Task<List<Contracts.MovieInfo>> GetMoviesInfoAsync()
+        public async Task<IReadOnlyList<Contracts.MovieInfo>> GetMoviesInfoAsync()
         {
             return await _cinemaDbContext.Set<Movie>()
                 .Include(x => x.Directors)
@@ -241,6 +241,6 @@ namespace WebApi.Services
             }
 
             return true;
-        } 
+        }
     }
 }

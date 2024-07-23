@@ -3,9 +3,9 @@
     public interface IMovieService
     {
         Task<bool> CreateMovieAsync(Contracts.MovieInfo movieInfo);
-        Task<List<Contracts.Movie>> GetAllMoviesAsync();
+        Task<IReadOnlyList<Contracts.Movie>> GetAllMoviesAsync();
         Task<Contracts.Movie> GetSingleMovieAsync(Guid movieUid);
-        Task<List<Contracts.MovieInfo>> GetMoviesInfoAsync();
+        Task<IReadOnlyList<Contracts.MovieInfo>> GetMoviesInfoAsync();
         Task<bool> UpdateMovieAsync(Guid movieUid, Contracts.MovieInfo movieInfo);
         Task<bool> DeleteMovieAsync(Guid movieUid);
         Task<bool> MovieExistsAsync(Guid movieUid);

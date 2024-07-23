@@ -45,7 +45,7 @@ namespace WebApi.Services
             return user.UserUid;
         }
 
-        public async Task<List<Contracts.User>> GetAllUsersAsync()
+        public async Task<IReadOnlyList<Contracts.User>> GetAllUsersAsync()
         {
             return await _cinemaDbContext.Set<User>()
                 .Select(user => new Contracts.User

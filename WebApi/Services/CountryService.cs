@@ -27,7 +27,7 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<Contracts.Country>> GetCountriesAsync()
+        public async Task<IReadOnlyList<Contracts.Country>> GetCountriesAsync()
         {
             return await _cinemaDbContext.Set<Country>()
                 .Select(country => new Contracts.Country

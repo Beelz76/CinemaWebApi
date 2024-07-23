@@ -26,7 +26,7 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<Contracts.ScreeningPrice>> GetScreeningPricesAsync()
+        public async Task<IReadOnlyList<Contracts.ScreeningPrice>> GetScreeningPricesAsync()
         {
             return await _cinemaDbContext.Set<ScreeningPrice>()
                 .OrderBy(x => x.Price)

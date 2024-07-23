@@ -34,7 +34,7 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<Contracts.Ticket>> GetAllTicketsAsync()
+        public async Task<IReadOnlyList<Contracts.Ticket>> GetAllTicketsAsync()
         {
             return await _cinemaDbContext.Set<Ticket>()
                 .Include(x => x.Screening.Hall)
@@ -58,7 +58,7 @@ namespace WebApi.Services
                 .ToListAsync();
         }
 
-        public async Task<List<Contracts.UserTicket>> GetUserTicketsAsync(Guid userUid)
+        public async Task<IReadOnlyList<Contracts.UserTicket>> GetUserTicketsAsync(Guid userUid)
         {
             return await _cinemaDbContext.Set<Ticket>()
                 .Include(x => x.Screening.Hall)
@@ -82,7 +82,7 @@ namespace WebApi.Services
                 .ToListAsync();
         }
 
-        public async Task<List<Contracts.Ticket>> GetScreeningTicketsAsync(Guid screeningUid)
+        public async Task<IReadOnlyList<Contracts.Ticket>> GetScreeningTicketsAsync(Guid screeningUid)
         {
             return await _cinemaDbContext.Set<Ticket>()
                 .Include(x => x.Screening.Hall)

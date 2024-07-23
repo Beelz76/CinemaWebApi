@@ -28,7 +28,7 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<Contracts.Hall>> GetHallsAsync()
+        public async Task<IReadOnlyList<Contracts.Hall>> GetHallsAsync()
         {
             return await _cinemaDbContext.Set<Hall>()
                 .Select(hall => new Contracts.Hall

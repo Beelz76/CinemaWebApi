@@ -4,7 +4,7 @@
     {
         Task<Guid> RegisterAsync(Contracts.UserRegisterCredentials credentials);
         Task<Guid> LoginAsync(Contracts.UserLoginCredentials credentials);
-        Task<List<Contracts.User>> GetAllUsersAsync();
+        Task<IReadOnlyList<Contracts.User>> GetAllUsersAsync();
         Task<Contracts.User> GetSingleUserAsync(Guid userUid);
         Task<Contracts.UserInfo> GetUserInfoAsync(Guid userUid);
         Task<bool> UpdateUserAsync(Guid userUid, Contracts.UserUpdate userUpdate);
