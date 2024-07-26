@@ -2,7 +2,7 @@
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
-using WebApi.Interface;
+using WebApi.Interfaces;
 
 namespace WebApi.Services
 {

@@ -1,4 +1,4 @@
-﻿namespace WebApi.Interface
+﻿namespace WebApi.Interfaces
 {
     public interface ITicketService
     {

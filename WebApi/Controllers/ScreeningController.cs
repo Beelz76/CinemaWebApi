@@ -1,7 +1,7 @@
 ﻿using WebApi.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using WebApi.Interface;
+using WebApi.Interfaces;
 
 namespace WebApi.Controllers
 {
@@ -47,7 +47,7 @@ namespace WebApi.Controllers
                 return NotFound("Price not found");
             }
 
-            if (!await _screeningService.IsValidScreningTimeAsync(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart))
+            if (!await _screeningService.IsValidScreeningTimeAsync(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart))
             {
                 return BadRequest("Failed to create screening at this time");
             }
@@ -137,7 +137,7 @@ namespace WebApi.Controllers
                 return NotFound("Price not found");
             }
 
-            if (!await _screeningService.IsValidScreningTimeAsync(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart))
+            if (!await _screeningService.IsValidScreeningTimeAsync(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart))
             {
                 return BadRequest("Failed to create screening at this time");
             }

@@ -2,7 +2,7 @@
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
-using WebApi.Interface;
+using WebApi.Interfaces;
 
 namespace WebApi.Services
 {
@@ -139,12 +139,12 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> IsValidScreningTimeAsync(string movieTitle, string hallName, string screeningStart)
+        public async Task<bool> IsValidScreeningTimeAsync(string movieTitle, string hallName, string screeningStart)
         {
             var movie = await _cinemaDbContext.Set<Movie>().FirstOrDefaultAsync(x => x.Title == movieTitle);
             var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.Name == hallName);
 
-            if (movie == null || hall == null) { return false; };
+            if (movie == null || hall == null) { return false; }
 
             if (!DateTime.TryParseExact(screeningStart, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime screeningStartTime))
             {
@@ -158,7 +158,7 @@ namespace WebApi.Services
                             ((x.ScreeningStart <= screeningStartTime && screeningStartTime <= x.ScreeningEnd) ||
                             (x.ScreeningStart <= screeningEndTime && screeningEndTime <= x.ScreeningEnd))).ToListAsync();
 
-            if (conflictingScreenings.Any())
+            if (conflictingScreenings.Count != 0)
             {
                 return false;
             }

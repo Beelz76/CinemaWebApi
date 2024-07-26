@@ -1,4 +1,4 @@
-﻿namespace WebApi.Interface
+﻿namespace WebApi.Interfaces
 {
     public interface IScreeningService
     {
@@ -8,7 +8,7 @@
         Task<IReadOnlyList<Contracts.Screening>> GetHallScreeningsAsync(string hallName);
         Task<bool> UpdateScreeningAsync(Guid screeningUid, Contracts.ScreeningInfo screeningInfo);
         Task<bool> DeleteScreeningAsync(Guid screeningUid);
-        Task<bool> IsValidScreningTimeAsync(string movieTitle, string hallName, string screeningStart);     
+        Task<bool> IsValidScreeningTimeAsync(string movieTitle, string hallName, string screeningStart);     
         Task<bool> ScreeningExistsAsync(Guid screeningUid);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using WebApi.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using WebApi.Interface;
+using WebApi.Interfaces;
 
 namespace WebApi.Controllers
 {

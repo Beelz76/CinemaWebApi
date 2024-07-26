@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using WebApi.Interface;
+using WebApi.Interfaces;
 
 namespace WebApi.Services
 {
