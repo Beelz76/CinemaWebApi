@@ -9,12 +9,12 @@
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const tickets = await response.json();
 
             const ticketTable = document.getElementById('ticketTable');
             ticketTable.innerHTML = '';
-
-            data.forEach(ticket => {
+            
+            for (const ticket of tickets) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${ticket.ticketUid}</td>
@@ -29,10 +29,10 @@
                 <td>${ticket.number}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${ticket.ticketUid}"></td>`;
                 ticketTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
-            location.reload(true);
+            location.reload();
             throw new Error('Что-то пошло не так');
         }
     } catch (error) {
@@ -41,7 +41,7 @@
 }
 
 async function getUserTickets() {
-    var decodedToken = JSON.parse(atob(localStorage.getItem('userToken').split('.')[1]));
+    const decodedToken = JSON.parse(atob(localStorage.getItem('userToken').split('.')[1]));
     const uid = decodedToken.nameid;
 
     try {
@@ -54,12 +54,12 @@ async function getUserTickets() {
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const tickets = await response.json();
 
             const ticketTable = document.getElementById('ticketTable');
             ticketTable.innerHTML = '';
 
-            data.forEach(ticket => {
+            for (const ticket of tickets) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${ticket.movieTitle}</td>
@@ -72,7 +72,7 @@ async function getUserTickets() {
                 <td>${ticket.number}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${ticket.ticketUid}"></td>`;
                 ticketTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
             throw new Error('Что-то пошло не так');
@@ -95,12 +95,12 @@ async function getScreeningTickets() {
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const tickets = await response.json();
 
             const ticketTable = document.getElementById('ticketTable');
             ticketTable.innerHTML = '';
 
-            data.forEach(ticket => {
+            for (const ticket of tickets) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${ticket.ticketUid}</td>
@@ -115,7 +115,7 @@ async function getScreeningTickets() {
                 <td>${ticket.number}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${ticket.ticketUid}"></td>`;
                 ticketTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
             throw new Error('Что-то пошло не так');
@@ -133,7 +133,7 @@ async function createTicket() {
         return;
     }
 
-    var decodedToken = JSON.parse(atob(localStorage.getItem('userToken').split('.')[1]));
+    const decodedToken = JSON.parse(atob(localStorage.getItem('userToken').split('.')[1]));
     const userUid = decodedToken.nameid;
     const screeningUid = localStorage.getItem('selectedScreening');
 
@@ -144,7 +144,7 @@ async function createTicket() {
         }
     }
 
-    uids.forEach(async (uid) => {
+    for (const uid of uids) {
         try {
             const response = await fetch(`https://localhost:7172/api/Ticket/CreateTicket?userUid=${userUid}&seatUid=${uid}&screeningUid=${screeningUid}`, {
                 method: 'POST',
@@ -158,7 +158,7 @@ async function createTicket() {
 
             if (response.ok) {
                 console.log(data);
-                location.reload(true);
+                location.reload();
             } else {
                 console.log(data)
                 throw new Error('Что-то пошло не так');
@@ -166,9 +166,9 @@ async function createTicket() {
         } catch (error) {
             console.error(error);
             alert('Место занято');
-            location.reload(true);
+            location.reload();
         }
-    });
+    }
 }
 
 async function deleteTicket() {
@@ -186,7 +186,7 @@ async function deleteTicket() {
         }
     }
 
-    uids.forEach(async (uid) => {
+    for (const uid of uids) {
         try {
             const response = await fetch(`https://localhost:7172/api/Ticket/DeleteTicket?ticketUid=${uid}`, {
                 method: 'DELETE',
@@ -201,10 +201,10 @@ async function deleteTicket() {
             if (response.ok) {
                 if (window.location.href === 'https://localhost:7172/html/user/userTicket.html') {
                     console.log(data);
-                    location.reload(true);
+                    location.reload();
                 } else if (window.location.href === 'https://localhost:7172/html/admin/ticket.html') {
                     console.log(data);
-                    getAllTickets();
+                    await getAllTickets();
                 }              
             } else {
                 console.log(data)
@@ -214,5 +214,5 @@ async function deleteTicket() {
             console.error(error);
       
         }
-    });
+    }
 }

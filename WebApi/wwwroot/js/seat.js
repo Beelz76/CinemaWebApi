@@ -9,12 +9,12 @@
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const seats = await response.json();
 
             const seatTable = document.getElementById('seatTable');
             seatTable.innerHTML = '';
 
-            data.forEach(seat => {
+            for (const seat of seats) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${seat.seatUid}</td>
@@ -23,10 +23,10 @@
                 <td>${seat.number}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${seat.seatUid}"></td>`;
                 seatTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
-            location.reload(true);
+            location.reload();
             throw new Error('Что-то пошло не так');
         }
     } catch (error) {
@@ -52,12 +52,12 @@ async function getHallSeats() {
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const seats = await response.json();
 
             const seatTable = document.getElementById('seatTable');
             seatTable.innerHTML = '';
 
-            data.forEach(seat => {
+            for (const seat of seats) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${seat.seatUid}</td>
@@ -67,7 +67,7 @@ async function getHallSeats() {
                 <td style="text-align: center;"><input type="checkbox" value="${seat.seatUid}"></td>`;
                 seatTable.appendChild(row);
                 document.getElementById('hallName').value = '';
-            });
+            }
         } else {
             console.log(await response.text())
             throw new Error('Что-то пошло не так');
@@ -96,12 +96,12 @@ async function getScreeningSeats() {
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const seats = await response.json();
 
             const seatTable = document.getElementById('seatTable');
             seatTable.innerHTML = '';
 
-            data.forEach(seat => {
+            for (const seat of seats) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${seat.row}</td>
@@ -109,7 +109,7 @@ async function getScreeningSeats() {
                 <td>${seat.status}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${seat.seatUid}"></td>`;
                 seatTable.appendChild(row);
-            });
+            }
         } else {
             throw new Error('Что-то пошло не так');
         }
@@ -141,7 +141,7 @@ async function createSeat() {
 
         if (response.ok) {
             console.log(data);
-            getAllSeats();
+            await getAllSeats();
         } else {
             console.log(data);
             throw new Error('Что-то пошло не так');
@@ -182,7 +182,7 @@ async function updateSeat() {
 
         if (response.ok) {
             console.log(data);
-            getAllSeats();
+            await getAllSeats();
         } else {
             console.log(data);
             throw new Error('Не удалось изменить место');
@@ -208,7 +208,7 @@ async function deleteSeat() {
         }
     }
 
-    uids.forEach(async (uid) => {
+    for (const uid of uids) {
         try {
             const response = await fetch(`https://localhost:7172/api/Seat/DeleteSeat?seatUid=${uid}`, {
                 method: 'DELETE',
@@ -222,7 +222,7 @@ async function deleteSeat() {
 
             if (response.ok) {
                 console.log(data);
-                getAllSeats();
+                await getAllSeats();
             } else {
                 console.log(data);
                 throw new Error('Что-то пошло не так');
@@ -231,5 +231,5 @@ async function deleteSeat() {
             console.error(error);
             alert('Ошибка');
         }
-    });
+    }
 }

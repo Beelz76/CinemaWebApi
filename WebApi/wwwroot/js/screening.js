@@ -9,12 +9,12 @@
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const screenings = await response.json();
 
             const screeningTable = document.getElementById('screeningTable');
             screeningTable.innerHTML = '';
 
-            data.forEach(screening => {
+            for (const screening of screenings) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${screening.screeningUid}</td>
@@ -26,10 +26,10 @@
                 <td>${screening.price}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${screening.screeningUid}"></td>`;
                 screeningTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
-            location.reload(true);
+            location.reload();
             throw new Error('Что-то пошло не так');
         }
     } catch (error) {
@@ -55,12 +55,12 @@ async function getHallScreenings() {
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const screenings = await response.json();
 
             const screeningTable = document.getElementById('screeningTable');
             screeningTable.innerHTML = '';
 
-            data.forEach(screening => {
+            for (const screening of screenings) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${screening.screeningUid}</td>
@@ -72,7 +72,7 @@ async function getHallScreenings() {
                 <td>${screening.price}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${screening.screeningUid}"></td>`;
                 screeningTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
             throw new Error('Что-то пошло не так');
@@ -102,12 +102,12 @@ async function getMovieScreenings() {
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const screenings = await response.json();
 
             const screeningTable = document.getElementById('screeningTable');
             screeningTable.innerHTML = '';
 
-            data.forEach(screening => {
+            for (const screening of screenings) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${screening.screeningStart}</td>
@@ -116,7 +116,7 @@ async function getMovieScreenings() {
                 <td>${screening.price}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${screening.screeningUid}"></td>`;
                 screeningTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
             throw new Error('Что-то пошло не так');
@@ -158,8 +158,8 @@ async function createScreening() {
         const data = await response.text();
 
         if (response.ok) {
-            console.log(data);;
-            getAllScreenings();
+            console.log(data);
+            await getAllScreenings();
         } else {
             console.log(data);
             throw new Error('Что-то пошло не так');
@@ -209,8 +209,8 @@ async function updateScreening() {
         const data = await response.text();
 
         if (response.ok) {
-            console.log(data);;
-            getAllScreenings();
+            console.log(data);
+            await getAllScreenings();
         } else {
             console.log(data);
             throw new Error('Не удалось изменить сеанс');
@@ -236,7 +236,7 @@ async function deleteScreening() {
         }
     }
 
-    uids.forEach(async (uid) => {
+    for (const uid of uids) {
         try {
             const response = await fetch(`https://localhost:7172/api/Screening/DeleteScreening?screeningUid=${uid}`, {
                 method: 'DELETE',
@@ -250,7 +250,7 @@ async function deleteScreening() {
 
             if (response.ok) {
                 console.log(data);
-                getAllScreenings();
+                await getAllScreenings();
             } else {
                 console.log(data);
                 throw new Error('Что-то пошло не так');
@@ -259,5 +259,5 @@ async function deleteScreening() {
             console.error(error);
             alert('Ошибка');
         }
-    });
+    }
 }

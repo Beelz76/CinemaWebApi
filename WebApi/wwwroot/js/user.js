@@ -20,7 +20,7 @@
             const data = await response.json();
             localStorage.setItem('userToken', data.token);
 
-            var decodedToken = JSON.parse(atob(data.token.split('.')[1]));
+            const decodedToken = JSON.parse(atob(data.token.split('.')[1]));
             const userRole = decodedToken.role;
 
             if (userRole === 'Admin') {
@@ -102,7 +102,7 @@ async function updateUser() {
         confirmedPassword: confirmedPassword
     };
 
-    var decodedToken = JSON.parse(atob(localStorage.getItem('userToken').split('.')[1]));
+    const decodedToken = JSON.parse(atob(localStorage.getItem('userToken').split('.')[1]));
     const uid = decodedToken.nameid;
 
     try {
@@ -120,7 +120,7 @@ async function updateUser() {
         if (response.ok) {          
             console.log(data);
             alert('Данные обновлены');
-            location.reload(true);
+            location.reload();
         } else {
             console.log(data);
             throw new Error('Не удалось обновить данные');
@@ -135,7 +135,7 @@ async function getUserInfo() {
     document.getElementById('password').value = '';
     document.getElementById('confirmedPassword').value = '';
 
-    var decodedToken = JSON.parse(atob(localStorage.getItem('userToken').split('.')[1]));
+    const decodedToken = JSON.parse(atob(localStorage.getItem('userToken').split('.')[1]));
     const uid = decodedToken.nameid;
 
     try {
@@ -174,12 +174,12 @@ async function getAllUsers() {
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const users = await response.json();
 
             const userTable = document.getElementById('userTable');
             userTable.innerHTML = '';
-
-            data.forEach(user => {
+            
+            for (const user of users) {
                 let email;
 
                 if (!user.email) {
@@ -197,7 +197,7 @@ async function getAllUsers() {
                 <td>${user.isAdmin}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${user.userUid}"></td>`;
                 userTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text());
             throw new Error('Что-то пошло не так');
@@ -272,7 +272,7 @@ async function deleteUser() {
         }
     }
 
-    uids.forEach(async (uid) => {
+    for (const uid of uids) {
         try {
             const response = await fetch(`https://localhost:7172/api/User/DeleteUser?userUid=${uid}`, {
                 method: 'DELETE',
@@ -286,7 +286,7 @@ async function deleteUser() {
 
             if (response.ok) {
                 console.log(data);
-                getAllUsers();             
+                await getAllUsers();             
             } else {
                 console.log(data);
                 throw new Error('Что-то пошло не так');
@@ -295,7 +295,7 @@ async function deleteUser() {
             console.error(error);
             alert('Ошибка');
         }
-    });
+    }
 }
 
 async function updateUserAdminStatus() {
@@ -306,7 +306,7 @@ async function updateUserAdminStatus() {
         return;
     }
 
-    var choice = confirm('Вы хотите назначить пользователя администратором?');
+    const choice = confirm('Вы хотите назначить пользователя администратором?');
 
     if (!choice) {
         return;
@@ -328,7 +328,7 @@ async function updateUserAdminStatus() {
         if (response.ok) {
             console.log(data);
             alert('Данный пользователь назначен администратором');
-            getAllUsers();
+            await getAllUsers();
         } else {
             console.log(data);
             throw new Error('Не удалось обновить роль');

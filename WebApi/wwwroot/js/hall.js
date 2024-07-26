@@ -14,12 +14,12 @@
 		);
 
 		if (response.ok) {
-			const data = await response.json();
+			const halls = await response.json();
 
 			const hallTable = document.getElementById("hallTable");
 			hallTable.innerHTML = "";
 
-			data.forEach((hall) => {
+			for (const hall of halls) {
 				const row = document.createElement("tr");
 				row.innerHTML = `
 				<td>${hall.hallUid}</td>
@@ -27,10 +27,10 @@
 				<td>${hall.capacity}</td>
 				<td style="text-align: center;"><input type="checkbox" value="${hall.hallUid}"></td>`;
 				hallTable.appendChild(row);
-			});
+			}
 		} else {
 			console.log(await response.text());
-			location.reload(true);
+			location.reload();
 			throw new Error("Что-то пошло не так");
 		}
 	} catch (error) {
@@ -64,7 +64,7 @@ async function createHall() {
 
 		if (response.ok) {
 			console.log(data);
-			getHalls();
+			await getHalls();
 		} else {
 			console.log(data);
 			throw new Error("Что-то пошло не так");
@@ -111,7 +111,7 @@ async function updateHall() {
 
 		if (response.ok) {
 			console.log(data);
-			getHalls();
+			await getHalls();
 		} else {
 			console.log(data);
 			throw new Error("Не удалось изменить зал");
@@ -139,7 +139,7 @@ async function deleteHall() {
 		}
 	}
 
-	uids.forEach(async (uid) => {
+	for (const uid of uids) {
 		try {
 			const response = await fetch(
 				`https://localhost:7172/api/Hall/DeleteHall?hallUid=${uid}`,
@@ -158,7 +158,7 @@ async function deleteHall() {
 
 			if (response.ok) {
 				console.log(data);
-				getHalls();
+				await getHalls();
 			} else {
 				console.log(data);
 				throw new Error("Что-то пошло не так");
@@ -167,5 +167,5 @@ async function deleteHall() {
 			console.error(error);
 			alert("Ошибка");
 		}
-	});
+	}
 }

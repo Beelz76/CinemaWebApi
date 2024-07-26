@@ -9,12 +9,12 @@
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const movies = await response.json();
 
             const movieTable = document.getElementById('movieTable');
             movieTable.innerHTML = '';
 
-            data.forEach(movie => {
+            for (const movie of movies) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${movie.movieUid}</td>
@@ -26,10 +26,10 @@
                 <td>${movie.genres}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${movie.movieUid}"></td>`;
                 movieTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
-            location.reload(true);
+            location.reload();
             throw new Error('Что-то пошло не так');
         }
     } catch (error) {
@@ -92,12 +92,12 @@ async function getMoviesInfo() {
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const movies = await response.json();
 
             const movieTable = document.getElementById('movieTable');
             movieTable.innerHTML = '';
 
-            data.forEach(movie => {
+            for (const movie of movies) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${movie.title}</td>
@@ -108,7 +108,7 @@ async function getMoviesInfo() {
                 <td>${movie.genres}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${movie.movieUid}"></td>`;
                 movieTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
             throw new Error('Что-то пошло не так');
@@ -153,8 +153,8 @@ async function createMovie() {
         const data = await response.text();
 
         if (response.ok) {
-            console.log(data);;
-            getAllMovies();
+            console.log(data);
+            await getAllMovies();
         } else {
             console.log(data);
             throw new Error('Что-то пошло не так');
@@ -209,7 +209,7 @@ async function updateMovie() {
 
         if (response.ok) {
             console.log(data);
-            getAllMovies();
+            await getAllMovies();
         } else {
             console.log(data);
             throw new Error('Не удалось изменить фильм');
@@ -235,7 +235,7 @@ async function deleteMovie() {
         }
     }
 
-    uids.forEach(async (uid) => {
+    for (const uid of uids) {
         try {
             const response = await fetch(`https://localhost:7172/api/Movie/DeleteMovie?movieUid=${uid}`, {
                 method: 'DELETE',
@@ -249,7 +249,7 @@ async function deleteMovie() {
 
             if (response.ok) {
                 console.log(data);
-                getAllMovies();
+                await getAllMovies();
                
             } else {
                 console.log(data);
@@ -259,5 +259,5 @@ async function deleteMovie() {
             console.error(error);
             alert('Ошибка');
         }
-    });
+    }
 }

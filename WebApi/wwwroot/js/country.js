@@ -11,12 +11,12 @@
         );
 
         if (response.ok) {
-            const data = await response.json();
+            const countries = await response.json();
 
             const countryTable = document.getElementById("countryTable");
             countryTable.innerHTML = "";
 
-            data.forEach((country) => {
+            for (const country of countries) {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                 <td>${country.countryUid}</td>
@@ -24,10 +24,10 @@
                 <td style="text-align: center;"><input type="checkbox" value="${country.countryUid}"></td>
             `;
                 countryTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text());
-            location.reload(true);
+            location.reload();
             throw new Error("Что-то пошло не так");
         }
     } catch (error) {
@@ -58,7 +58,7 @@ async function createCountry() {
 
         if (response.ok) {
             console.log(data);
-            getCountries();
+            await getCountries();
         } else {
             console.log(data);
             throw new Error("Что-то пошло не так");
@@ -102,7 +102,7 @@ async function updateCountry() {
 
         if (response.ok) {
             console.log(data);
-            getCountries();
+            await getCountries();
         } else {
             console.log(data);
             throw new Error("Не удалось изменить страну");
@@ -130,7 +130,7 @@ async function deleteCountry() {
         }
     }
 
-    uids.forEach(async (uid) => {
+    for (const uid of uids) {
         try {
             const response = await fetch(
                 `https://localhost:7172/api/Country/DeleteCountry?countryUid=${uid}`, {
@@ -146,7 +146,7 @@ async function deleteCountry() {
 
             if (response.ok) {
                 console.log(data);
-                getCountries();
+                await getCountries();
             } else {
                 console.log(data);
                 throw new Error("Что-то пошло не так");
@@ -155,5 +155,5 @@ async function deleteCountry() {
             console.error(error);
             alert("Ошибка");
         }
-    });
+    }
 }

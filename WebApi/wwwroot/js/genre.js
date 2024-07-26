@@ -9,22 +9,22 @@
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const genres = await response.json();
 
             const genreTable = document.getElementById('genreTable');
             genreTable.innerHTML = '';
 
-            data.forEach(genre => {
+            for (const genre of genres) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${genre.genreUid}</td>
                 <td>${genre.name}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${genre.genreUid}"></td>`;
                 genreTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
-            location.reload(true);
+            location.reload();
             throw new Error('Что-то пошло не так');
         }
     } catch (error) {
@@ -52,8 +52,8 @@ async function createGenre() {
         const data = await response.text();
 
         if (response.ok) {
-            console.log(data);;
-            getGenres();
+            console.log(data);
+            await getGenres();
         } else {
             console.log(data);
             throw new Error('Что-то пошло не так');
@@ -93,7 +93,7 @@ async function updateGenre() {
 
         if (response.ok) {
             console.log(data);
-            getGenres();
+            await getGenres();
         } else {
             console.log(data);
             throw new Error('Не удалось изменить жанр');
@@ -119,7 +119,7 @@ async function deleteGenre() {
         }
     }
 
-    uids.forEach(async (uid) => {
+    for (const uid of uids) {
         try {
             const response = await fetch(`https://localhost:7172/api/Genre/DeleteGenre?genreUid=${uid}`, {
                 method: 'DELETE',
@@ -133,7 +133,7 @@ async function deleteGenre() {
 
             if (response.ok) {
                 console.log(data);
-                getGenres();
+                await getGenres();
                 
             } else {
                 console.log(data);
@@ -143,5 +143,5 @@ async function deleteGenre() {
             console.error(error);
             alert('Ошибка');
         }
-    });
+    }
 }

@@ -9,22 +9,22 @@
         });
 
         if (response.ok) {
-            const data = await response.json();
+            const screeningPrices = await response.json();
 
             const screeningPriceTable = document.getElementById('screeningPriceTable');
             screeningPriceTable.innerHTML = '';
 
-            data.forEach(screeningPrice => {
+            for (const screeningPrice of screeningPrices) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${screeningPrice.screeningPriceUid}</td>
                 <td>${screeningPrice.price}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${screeningPrice.screeningPriceUid}"></td>`;
                 screeningPriceTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text())
-            location.reload(true);
+            location.reload();
             throw new Error('Что-то пошло не так');
         }
     } catch (error) {
@@ -52,8 +52,8 @@ async function createScreeningPrice() {
         const data = await response.text();
 
         if (response.ok) {
-            console.log(data);;
-            getScreeningPrices();
+            console.log(data);
+            await getScreeningPrices();
         } else {
             console.log(data);
             throw new Error('Что-то пошло не так');
@@ -93,7 +93,7 @@ async function updateScreeningPrice() {
 
         if (response.ok) {
             console.log(data);
-            getScreeningPrices();
+            await getScreeningPrices();
         } else {
             console.log(data);
             throw new Error('Не удалось изменить цену');
@@ -119,7 +119,7 @@ async function deleteScreeningPrice() {
         }
     }
 
-    uids.forEach(async (uid) => {
+    for (const uid of uids) {
         try {
             const response = await fetch(`https://localhost:7172/api/ScreeningPrice/DeleteScreeningPrice?screeningPriceUid=${uid}`, {
                 method: 'DELETE',
@@ -133,7 +133,7 @@ async function deleteScreeningPrice() {
 
             if (response.ok) {
                 console.log(data)
-                getScreeningPrices();
+                await getScreeningPrices();
                  
             } else {
                 console.log(data)
@@ -143,5 +143,5 @@ async function deleteScreeningPrice() {
             console.error(error);
             alert('Ошибка');
         }
-    });
+    }
 }

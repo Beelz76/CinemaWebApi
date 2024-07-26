@@ -14,22 +14,22 @@
         );
 
         if (response.ok) {
-            const data = await response.json();
+            const directors = await response.json();
 
             const directorTable = document.getElementById("directorTable");
             directorTable.innerHTML = "";
 
-            data.forEach((director) => {
+            for (const director of directors) {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                 <td>${director.directorUid}</td>
                 <td>${director.fullName}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${director.directorUid}"></td>`;
                 directorTable.appendChild(row);
-            });
+            }
         } else {
             console.log(await response.text());
-            location.reload(true);
+            location.reload();
             throw new Error("Что-то пошло не так");
         }
     } catch (error) {
@@ -63,7 +63,7 @@ async function createDirector() {
 
         if (response.ok) {
             console.log(data);
-            getDirectors();
+            await getDirectors();
         } else {
             console.log(data);
             throw new Error("Что-то пошло не так");
@@ -110,7 +110,7 @@ async function updateDirector() {
 
         if (response.ok) {
             console.log(data);
-            getDirectors();
+            await getDirectors();
         } else {
             console.log(data);
             throw new Error("Не удалось изменить режиссера");
@@ -138,7 +138,7 @@ async function deleteDirector() {
         }
     }
 
-    uids.forEach(async (uid) => {
+    for (const uid of uids) {
         try {
             const response = await fetch(
                 `https://localhost:7172/api/Director/DeleteDirector?directorUid=${uid}`,
@@ -157,7 +157,7 @@ async function deleteDirector() {
 
             if (response.ok) {
                 console.log(data);
-                getDirectors();
+                await getDirectors();
             } else {
                 console.log(data);
                 throw new Error("Что-то пошло не так");
@@ -166,5 +166,5 @@ async function deleteDirector() {
             console.error(error);
             alert("Ошибка");
         }
-    });
+    }
 }
