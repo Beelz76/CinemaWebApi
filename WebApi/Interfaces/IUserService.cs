@@ -1,6 +1,4 @@
-﻿using WebApi.Contracts;
-
-namespace WebApi.Interfaces
+﻿namespace WebApi.Interfaces
 {
     public interface IUserService
     {
@@ -8,7 +6,7 @@ namespace WebApi.Interfaces
         Task<Guid> LoginAsync(Contracts.UserLoginCredentials credentials);
         Task<IReadOnlyList<Contracts.User>> GetAllUsersAsync();
         Task<Contracts.User> GetSingleUserAsync(Guid userUid);
-        Task<UserInfo?> GetUserInfoAsync(Guid userUid);
+        Task<Contracts.UserInfo> GetUserInfoAsync(Guid userUid);
         Task<bool> UpdateUserAsync(Guid userUid, Contracts.UserUpdate userUpdate);
         Task<bool> UpdateUserAdminStatusAsync(Guid userUid);
         Task<bool> DeleteUserAsync(Guid userUid);
