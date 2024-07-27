@@ -110,7 +110,7 @@ namespace WebApi.Services
         {
             var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
 
-            if (user == null) { return false; };
+            if (user == null) { return false; }
 
             user.IsAdmin = true;
 
@@ -154,7 +154,7 @@ namespace WebApi.Services
 
             if (user == null) { return false; }
 
-            if (user.IsAdmin == true)
+            if (user.IsAdmin)
             {
                 return true;
             }

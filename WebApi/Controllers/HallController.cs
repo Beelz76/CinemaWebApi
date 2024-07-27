@@ -7,7 +7,7 @@ namespace WebApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class HallController : ControllerBase
     {
         private readonly IHallService _hallService;

@@ -218,7 +218,7 @@ namespace WebApi.Services
 
             var movie = await query.FirstOrDefaultAsync();
 
-            if (movie == null) { return false; };
+            if (movie == null) { return false; }
 
             return true;
         }

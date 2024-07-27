@@ -61,7 +61,7 @@ namespace WebApi.Services
 
         public async Task<bool> ScreeningPriceExistsAsync(int price)
         {
-            return await _cinemaDbContext.Set<ScreeningPrice>().AnyAsync(x => x.Price == price);;
+            return await _cinemaDbContext.Set<ScreeningPrice>().AnyAsync(x => x.Price == price);
         }
     }
 }

@@ -82,7 +82,7 @@ namespace WebApi.Services
                     SeatUid = x.SeatUid,
                     Row = x.Row,
                     Number = x.Number,
-                    Status = x.Tickets.Any(x => x.Screening.ScreeningUid == screeningUid) ? "Занято" : "Свободно"
+                    Status = x.Tickets.Any(t => t.Screening.ScreeningUid == screeningUid) ? "Занято" : "Свободно"
                 })
                 .ToListAsync();
         }
