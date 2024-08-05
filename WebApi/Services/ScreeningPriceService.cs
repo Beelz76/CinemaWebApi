@@ -40,23 +40,21 @@ namespace WebApi.Services
 
         public async Task<bool> UpdateScreeningPriceAsync(Guid screeningPriceUid, int price)
         {
-            var screeningPrice = await _cinemaDbContext.Set<ScreeningPrice>().FirstOrDefaultAsync(x => x.ScreeningPriceUid == screeningPriceUid);
+            var totalRows = await _cinemaDbContext.Set<ScreeningPrice>()
+                .Where(x => x.ScreeningPriceUid == screeningPriceUid)
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(p => p.Price, p => price));
 
-            if (screeningPrice == null) { return false; }
-
-            screeningPrice.Price = price;
-
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            return totalRows > 0;
         }
 
         public async Task<bool> DeleteScreeningPriceAsync(Guid screeningPriceUid)
         {
-            var screeningPrice = await _cinemaDbContext.Set<ScreeningPrice>().FirstOrDefaultAsync(x => x.ScreeningPriceUid == screeningPriceUid);
-
-            if (screeningPrice == null) { return false; }
-
-            _cinemaDbContext.Remove(screeningPrice);
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            var totalRows = await _cinemaDbContext.Set<ScreeningPrice>()
+                .Where(x => x.ScreeningPriceUid == screeningPriceUid)
+                .ExecuteDeleteAsync();
+            
+            return totalRows > 0;
         }
 
         public async Task<bool> ScreeningPriceExistsAsync(int price)

@@ -42,23 +42,21 @@ namespace WebApi.Services
 
         public async Task<bool> UpdateHallAsync(Guid hallUid, string name)
         {
-            var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.HallUid == hallUid);
-
-            if (hall == null) { return false; }
-
-            hall.Name = name;
-
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            var totalRows = await _cinemaDbContext.Set<Hall>()
+                .Where(x => x.HallUid == hallUid)   
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(p => p.Name, p => name));
+            
+            return totalRows > 0;
         }
 
         public async Task<bool> DeleteHallAsync(Guid hallUid)
         {
-            var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.HallUid == hallUid);
+            var totalRows = await _cinemaDbContext.Set<Hall>()
+                .Where(x => x.HallUid == hallUid)
+                .ExecuteDeleteAsync();
 
-            if (hall == null) { return false; }
-
-            _cinemaDbContext.Remove(hall);
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            return totalRows > 0;
         }
 
         public async Task<bool> HallExistsAsync(string name)

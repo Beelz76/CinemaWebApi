@@ -30,33 +30,31 @@ namespace WebApi.Services
         public async Task<IReadOnlyList<Contracts.Country>> GetCountriesAsync()
         {
             return await _cinemaDbContext.Set<Country>()
-                .Select(country => new Contracts.Country
+                .Select(c => new Contracts.Country
                 {
-                    CountryUid = country.CountryUid,
-                    Name = country.Name
+                    CountryUid = c.CountryUid,
+                    Name = c.Name
                 })
                 .ToListAsync();
         }
 
         public async Task<bool> UpdateCountryAsync(Guid countryUid, string name)
-        {
-            var country = await _cinemaDbContext.Set<Country>().FirstOrDefaultAsync(x => x.CountryUid == countryUid);
-
-            if (country == null) { return false; }
-
-            country.Name = name;
-
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+        { 
+            var totalRows = await _cinemaDbContext.Set<Country>()
+                .Where(x => x.CountryUid == countryUid)
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(p => p.Name, p => name));
+            
+            return totalRows > 0;
         }
 
         public async Task<bool> DeleteCountryAsync(Guid countryUid)
         {
-            var country = await _cinemaDbContext.Set<Country>().FirstOrDefaultAsync(x => x.CountryUid == countryUid);
-
-            if (country == null) { return false; }
-
-            _cinemaDbContext.Remove(country);
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            var totalRows = await _cinemaDbContext.Set<Country>()
+                .Where(x => x.CountryUid == countryUid)
+                .ExecuteDeleteAsync();
+            
+            return totalRows > 0;
         }
 
         public async Task<bool> CountryExistsAsync(string name)

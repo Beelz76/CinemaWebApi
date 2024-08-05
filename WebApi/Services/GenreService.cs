@@ -40,23 +40,21 @@ namespace WebApi.Services
 
         public async Task<bool> UpdateGenreAsync(Guid genreUid, string name)
         {
-            var genre = await _cinemaDbContext.Set<Genre>().FirstOrDefaultAsync(x => x.GenreUid == genreUid);
-
-            if (genre == null) { return false; }
-
-            genre.Name = name;
-
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            var totalRows = await _cinemaDbContext.Set<Genre>()
+                .Where(x => x.GenreUid == genreUid)
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(p => p.Name, p => name));
+            
+            return totalRows > 0;
         }
 
         public async Task<bool> DeleteGenreAsync(Guid genreUid)
         {
-            var genre = await _cinemaDbContext.Set<Genre>().FirstOrDefaultAsync(x => x.GenreUid == genreUid);
-
-            if (genre == null) { return false; }
-
-            _cinemaDbContext.Remove(genre);
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            var totalRows = await _cinemaDbContext.Set<Genre>()
+                .Where(x => x.GenreUid == genreUid)
+                .ExecuteDeleteAsync();
+            
+            return totalRows > 0;
         }
 
         public async Task<bool> GenreExistsAsync(string name)

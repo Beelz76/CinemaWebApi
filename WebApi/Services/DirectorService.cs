@@ -40,23 +40,21 @@ namespace WebApi.Services
 
         public async Task<bool> UpdateDirectorAsync(Guid directorUid, string fullName)
         {
-            var director = await _cinemaDbContext.Set<Director>().FirstOrDefaultAsync(x => x.DirectorUid == directorUid);
+            var totalRows = await _cinemaDbContext.Set<Director>()
+                .Where(x => x.DirectorUid == directorUid)
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(p => p.FullName, p => fullName));
 
-            if (director == null) { return false; }
-
-            director.FullName = fullName;
-
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            return totalRows > 0;
         }
 
         public async Task<bool> DeleteDirectorAsync(Guid directorUid)
         {
-            var director = await _cinemaDbContext.Set<Director>().FirstOrDefaultAsync(x => x.DirectorUid == directorUid);
+            var totalRows = await _cinemaDbContext.Set<Director>()
+                .Where(x => x.DirectorUid == directorUid)
+                .ExecuteDeleteAsync();
 
-            if (director == null) { return false; }
-
-            _cinemaDbContext.Remove(director);
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            return totalRows > 0;
         }
 
         public async Task<bool> DirectorExistsAsync(string fullName)

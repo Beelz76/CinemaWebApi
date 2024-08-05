@@ -61,7 +61,7 @@ async function getHallSeats() {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                 <td>${seat.seatUid}</td>
-                <td>${hallName}</td>
+                <td>${seat.hallName}</td>
                 <td>${seat.row}</td>
                 <td>${seat.number}</td>
                 <td style="text-align: center;"><input type="checkbox" value="${seat.seatUid}"></td>`;

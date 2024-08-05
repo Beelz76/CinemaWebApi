@@ -54,13 +54,14 @@ namespace WebApi.Services
         public async Task<IReadOnlyList<Contracts.HallSeat>> GetHallSeatsAsync(string hallName)
         {
             return await _cinemaDbContext.Set<Seat>()
-                .Where(x => x.Hall.Name.ToLower() == hallName.ToLower())
+                .Where(x => x.Hall.Name == hallName)
                 .OrderBy(x => x.Hall.HallUid)
                 .ThenBy(x => x.Row)
                 .ThenBy(x => x.Number)
                 .Select(seat => new Contracts.HallSeat
                  {
                      SeatUid = seat.SeatUid,
+                     HallName = seat.Hall.Name,
                      Row = seat.Row,
                      Number = seat.Number
                  })
@@ -89,36 +90,52 @@ namespace WebApi.Services
 
         public async Task<bool> UpdateSeatAsync(Guid seatUid, int row, int number)
         {
-            var seat = await _cinemaDbContext.Set<Seat>().FirstOrDefaultAsync(x => x.SeatUid == seatUid);
+            var totalRows = await _cinemaDbContext.Set<Seat>()
+                .Where(x => x.SeatUid == seatUid)
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(p => p.Row, row)
+                    .SetProperty(p => p.Number, number));
 
-            if (seat == null) { return false; }
-
-            seat.Row = row;
-            seat.Number = number;
-
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            return totalRows > 0;
         }
 
         public async Task<bool> DeleteSeatAsync(Guid seatUid)
         {
-            var seat = await _cinemaDbContext.Set<Seat>().Include(x => x.Hall).FirstOrDefaultAsync(x => x.SeatUid == seatUid);
-
-            if (seat == null) { return false; }
-
-            seat.Hall.Capacity -= 1;
-
-            _cinemaDbContext.Remove(seat);
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            var totalRows = await _cinemaDbContext.Set<Seat>()
+                .Where(x => x.SeatUid == seatUid)
+                .ExecuteDeleteAsync();
+            
+            return totalRows > 0;
         }
 
         public async Task<bool> SeatExistsAsync(string hallName, int row, int number)
         {
             var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.Name == hallName);
-            var seat = await _cinemaDbContext.Set<Seat>().FirstOrDefaultAsync(x => x.Hall == hall & x.Row == row & x.Number == number);
+            return await _cinemaDbContext.Set<Seat>().AnyAsync(x => x.Hall == hall && x.Row == row && x.Number == number);
+        }
+        
+        public async Task<bool> ScreeningSeatExistsAsync(Guid screeningUid, Guid seatUid)
+        {
+            var screening = await _cinemaDbContext.Set<Screening>()
+                .Include(x => x.Hall.Seats)
+                .FirstOrDefaultAsync(x => x.ScreeningUid == screeningUid);
 
-            if (seat == null) { return false; }
+            var seat = await _cinemaDbContext.Set<Seat>().FirstOrDefaultAsync(x => x.SeatUid == seatUid);
 
-            return true;
+            foreach (var item in screening.Hall.Seats)
+            {
+                if (item == seat) 
+                { 
+                    return true; 
+                }
+            }
+
+            return false;
+        }
+        
+        public async Task<bool> IsSeatTakenAsync(Guid screeningUid, Guid seatUid)
+        {
+            return !await _cinemaDbContext.Set<Ticket>().AnyAsync(x => x.Screening.ScreeningUid == screeningUid && x.Seat.SeatUid == seatUid);
         }
     }
 }

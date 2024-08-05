@@ -10,7 +10,7 @@ namespace WebApi.Services
     {
         private readonly CinemaDbContext _cinemaDbContext;
 
-        public MovieService(CinemaDbContext cinemaDbContext, HttpClient httpClient)
+        public MovieService(CinemaDbContext cinemaDbContext, IDirectorService directorService)
         {
             _cinemaDbContext = cinemaDbContext;
         }
@@ -25,9 +25,10 @@ namespace WebApi.Services
                 Duration = int.Parse(movieInfo.Duration),
             };
 
-            await AddDirectorsAsync(movieInfo.Directors, movie);
-            await AddCountriesAsync(movieInfo.Countries, movie);
-            await AddGenresAsync(movieInfo.Genres, movie);
+            await Task.WhenAll(
+                AddDirectorsAsync(movieInfo.Directors, movie),
+                AddCountriesAsync(movieInfo.Countries, movie),
+                AddGenresAsync(movieInfo.Genres, movie));
 
             await _cinemaDbContext.AddAsync(movie);
             return await _cinemaDbContext.SaveChangesAsync() > 0;
@@ -110,21 +111,21 @@ namespace WebApi.Services
             movie.Countries.Clear();
             movie.Genres.Clear();
 
-            await AddDirectorsAsync(movieInfo.Directors, movie);
-            await AddCountriesAsync(movieInfo.Countries, movie);
-            await AddGenresAsync(movieInfo.Genres, movie);
+            await Task.WhenAll(
+                AddDirectorsAsync(movieInfo.Directors, movie),
+                AddCountriesAsync(movieInfo.Countries, movie),
+                AddGenresAsync(movieInfo.Genres, movie));
 
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
         public async Task<bool> DeleteMovieAsync(Guid movieUid)
         {
-            var movie = await _cinemaDbContext.Set<Movie>().FirstOrDefaultAsync(x => x.MovieUid == movieUid);
-
-            if (movie == null) { return false; }
-
-            _cinemaDbContext.Remove(movie);
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            var totalRows = await _cinemaDbContext.Set<Movie>()
+                .Where(x => x.MovieUid == movieUid)
+                .ExecuteDeleteAsync();
+            
+            return totalRows > 0;
         }
 
         private async Task AddDirectorsAsync(List<string> directorNames, Movie movie)
@@ -197,11 +198,7 @@ namespace WebApi.Services
 
         public async Task<bool> MovieExistsByTitleAsync(string movieTitle)
         {
-            var movie = await _cinemaDbContext.Set<Movie>().FirstOrDefaultAsync(x => x.Title == movieTitle);
-
-            if (movie == null) { return false; }
-
-            return true;
+            return await _cinemaDbContext.Set<Movie>().AnyAsync(x => x.Title == movieTitle);
         }
 
         public async Task<bool> MovieExistsByInfoAsync(Contracts.MovieInfo movieInfo, Guid? movieUid = null)
@@ -231,16 +228,7 @@ namespace WebApi.Services
         public bool IsValidNamesInList(List<string> list)
         {
             var regex = new Regex(@"^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я -]{1,}$");
-
-            foreach (var item in list)
-            {
-                if (!regex.IsMatch(item))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return list.All(item => regex.IsMatch(item));
         }
     }
 }

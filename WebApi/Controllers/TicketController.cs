@@ -12,12 +12,15 @@ namespace WebApi.Controllers
         private readonly ITicketService _ticketService;
         private readonly IScreeningService _screeningService;
         private readonly IUserService _userService;
-
-        public TicketController(ITicketService ticketService, IScreeningService screeningService, IUserService userService)
+        private readonly ISeatService _seatService;
+        
+        // Primary Constructor???
+        public TicketController(ITicketService ticketService, IScreeningService screeningService, IUserService userService, ISeatService seatService)
         {
             _ticketService = ticketService;
             _screeningService = screeningService;
             _userService = userService;
+            _seatService = seatService;
         }
 
         [HttpPost]
@@ -34,12 +37,12 @@ namespace WebApi.Controllers
                 return NotFound("Screening not found");
             }
 
-            if (!await _ticketService.ScreeningSeatExistsAsync(screeningUid, seatUid))
+            if (!await _seatService.ScreeningSeatExistsAsync(screeningUid, seatUid))
             {
                 return NotFound("Seat not found");
             }
 
-            if (!await _ticketService.IsSeatTakenAsync(screeningUid, seatUid))
+            if (!await _seatService.IsSeatTakenAsync(screeningUid, seatUid))
             {
                 return BadRequest("Seat already taken");
             }          

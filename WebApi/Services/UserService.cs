@@ -94,37 +94,34 @@ namespace WebApi.Services
 
         public async Task<bool> UpdateUserAsync(Guid userUid, Contracts.UserUpdate userUpdate)
         {
-            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
-
-            if (user == null) { return false; }
-
-            user.FullName = userUpdate.FullName;
-            user.Login = userUpdate.Login;
-            user.Password = GetHash(userUpdate.Password);
-            user.Email = userUpdate.Email;
-
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            var totalRows = await _cinemaDbContext.Set<User>()
+                .Where(x => x.UserUid == userUid)
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(p => p.FullName, userUpdate.FullName)
+                    .SetProperty(p => p.Login, userUpdate.Login)
+                    .SetProperty(p => p.Password, GetHash(userUpdate.Password))
+                    .SetProperty(p => p.Email, userUpdate.Email));
+            
+            return totalRows > 0;
         }
 
         public async Task<bool> UpdateUserAdminStatusAsync(Guid userUid)
         {
-            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
-
-            if (user == null) { return false; }
-
-            user.IsAdmin = true;
-
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            var totalRows = await _cinemaDbContext.Set<User>()
+                .Where(x => x.UserUid == userUid)
+                .ExecuteUpdateAsync(x => x
+                    .SetProperty(p => p.IsAdmin, true));
+            
+            return totalRows > 0;
         }
 
         public async Task<bool> DeleteUserAsync(Guid userUid)
         {
-            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
+            var totalRows = await _cinemaDbContext.Set<User>()
+                .Where(x => x.UserUid == userUid)
+                .ExecuteDeleteAsync();
 
-            if (user == null) { return false; }
-
-            _cinemaDbContext.Remove(user);
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            return totalRows > 0;
         }
 
         private static string GetHash(string password)
@@ -154,12 +151,7 @@ namespace WebApi.Services
 
             if (user == null) { return false; }
 
-            if (user.IsAdmin)
-            {
-                return true;
-            }
-
-            return false;
+            return user.IsAdmin;
         }
 
         public async Task<bool> UserExistsAsync(Guid userUid)

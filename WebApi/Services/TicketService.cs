@@ -109,41 +109,16 @@ namespace WebApi.Services
 
         public async Task<bool> DeleteTicketAsync(Guid ticketUid)
         {
-            var ticket = await _cinemaDbContext.Set<Ticket>().FirstOrDefaultAsync(x => x.TicketUid == ticketUid);
+            var totalRows = await _cinemaDbContext.Set<Ticket>()
+                .Where(x => x.TicketUid == ticketUid)
+                .ExecuteDeleteAsync();
 
-            if (ticket == null) { return false; }
-
-            _cinemaDbContext.Remove(ticket);
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            return totalRows > 0;
         }
 
         public async Task<bool> TicketExistsAsync(Guid ticketUid)
         {
             return await _cinemaDbContext.Set<Ticket>().AnyAsync(x => x.TicketUid == ticketUid);
-        }
-
-        public async Task<bool> IsSeatTakenAsync(Guid screeningUid, Guid seatUid)
-        {
-            return !await _cinemaDbContext.Set<Ticket>().AnyAsync(x => x.Screening.ScreeningUid == screeningUid && x.Seat.SeatUid == seatUid);
-        }
-
-        public async Task<bool> ScreeningSeatExistsAsync(Guid screeningUid, Guid seatUid)
-        {
-            var screening = await _cinemaDbContext.Set<Screening>()
-                .Include(x => x.Hall.Seats)
-                .FirstOrDefaultAsync(x => x.ScreeningUid == screeningUid);
-
-            var seat = await _cinemaDbContext.Set<Seat>().FirstOrDefaultAsync(x => x.SeatUid == seatUid);
-
-            foreach (var item in screening.Hall.Seats)
-            {
-                if (item == seat) 
-                { 
-                    return true; 
-                }
-            }
-
-            return false;
         }
     }
 }

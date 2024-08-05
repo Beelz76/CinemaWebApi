@@ -131,12 +131,11 @@ namespace WebApi.Services
 
         public async Task<bool> DeleteScreeningAsync(Guid screeningUid)
         {
-            var screening = await _cinemaDbContext.Set<Screening>().FirstOrDefaultAsync(x => x.ScreeningUid == screeningUid);
-
-            if (screening == null) { return false; }
-
-            _cinemaDbContext.Remove(screening);
-            return await _cinemaDbContext.SaveChangesAsync() > 0;
+            var totalRows = await _cinemaDbContext.Set<Screening>()
+                .Where(x => x.ScreeningUid == screeningUid)
+                .ExecuteDeleteAsync();
+            
+            return totalRows > 0;
         }
 
         public async Task<bool> IsValidScreeningTimeAsync(string movieTitle, string hallName, string screeningStart)

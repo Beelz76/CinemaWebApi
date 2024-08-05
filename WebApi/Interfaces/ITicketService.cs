@@ -8,7 +8,5 @@
         Task<IReadOnlyList<Contracts.Ticket>> GetScreeningTicketsAsync(Guid screeningUid);
         Task<bool> DeleteTicketAsync(Guid ticketUid);
         Task<bool> TicketExistsAsync(Guid ticketUid);
-        Task<bool> IsSeatTakenAsync(Guid screeningUid, Guid seatUid);
-        Task<bool> ScreeningSeatExistsAsync(Guid screeningUid, Guid seatUid);
     }
 }
