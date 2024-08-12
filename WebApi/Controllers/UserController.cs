@@ -20,7 +20,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(UserRegisterCredentials credentials)
+        public async Task<IActionResult> Register(RegisterUserDto credentials)
         {
             if (!_userService.IsValidLogin(credentials.Login))
             {
@@ -33,8 +33,8 @@ namespace WebApi.Controllers
             }
 
             var userUid = await _userService.RegisterAsync(credentials);
-
-            return Ok(new JwtToken
+            
+            return Ok(new JwtTokenDto
             {
                 Token = _jwtService.GenerateToken(userUid, credentials.Login, false)
             });
@@ -42,7 +42,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(UserLoginCredentials credentials)
+        public async Task<IActionResult> Login(LoginUserDto credentials)
         {
             var userUid = await _userService.LoginAsync(credentials);
             
@@ -51,7 +51,7 @@ namespace WebApi.Controllers
                 return BadRequest("Invalid login or password");
             }
 
-            return Ok(new JwtToken
+            return Ok(new JwtTokenDto
             {
                 Token = _jwtService.GenerateToken(userUid, credentials.Login, await _userService.IsAdminAsync(userUid))
             });
@@ -101,38 +101,38 @@ namespace WebApi.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "Admin, User")]
-        public async Task<IActionResult> UpdateUser(Guid userUid, UserUpdate userUpdate)
+        public async Task<IActionResult> UpdateUser(Guid userUid, UpdateUserDto updateUserDto)
         {
-            if (string.IsNullOrWhiteSpace(userUpdate.Login) || string.IsNullOrWhiteSpace(userUpdate.Password) ||
-                string.IsNullOrWhiteSpace(userUpdate.FullName) || string.IsNullOrWhiteSpace(userUpdate.ConfirmedPassword))
+            if (string.IsNullOrWhiteSpace(updateUserDto.Login) || string.IsNullOrWhiteSpace(updateUserDto.Password) ||
+                string.IsNullOrWhiteSpace(updateUserDto.FullName) || string.IsNullOrWhiteSpace(updateUserDto.ConfirmedPassword))
             {
                 return BadRequest("Wrong data");
             }
 
-            if (await _userService.GetUserLoginAsync(userUid) != userUpdate.Login)
+            if (await _userService.GetUserLoginAsync(userUid) != updateUserDto.Login)
             {
-                if (!_userService.IsValidLogin(userUpdate.Login))
+                if (!_userService.IsValidLogin(updateUserDto.Login))
                 {
                     return BadRequest("Invalid name format");
                 }
 
-                if (await _userService.LoginExistsAsync(userUpdate.Login))
+                if (await _userService.LoginExistsAsync(updateUserDto.Login))
                 {
                     return Conflict("Login already exists");
                 }
             }
 
-            if (!_userService.IsValidEmail(userUpdate.Email))
+            if (!_userService.IsValidEmail(updateUserDto.Email))
             {
                 return BadRequest("Invalid email format");
             }
 
-            if (userUpdate.Password != userUpdate.ConfirmedPassword)
+            if (updateUserDto.Password != updateUserDto.ConfirmedPassword)
             {
                 return BadRequest("Failed to confirm password");
             }
 
-            if (!await _userService.UpdateUserAsync(userUid, userUpdate))
+            if (!await _userService.UpdateUserAsync(userUid, updateUserDto))
             {
                 return BadRequest("Failed to update user");
             }

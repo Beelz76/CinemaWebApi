@@ -2,6 +2,7 @@
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using WebApi.Contracts;
 using WebApi.Interfaces;
 
 namespace WebApi.Services
@@ -15,15 +16,15 @@ namespace WebApi.Services
             _cinemaDbContext = cinemaDbContext;
         }
 
-        public async Task<bool> CreateScreeningAsync(Contracts.ScreeningInfo screeningInfo)
+        public async Task<bool> CreateScreeningAsync(ScreeningInfoDto screeningInfoDto)
         {
-            var movie = await _cinemaDbContext.Set<Movie>().FirstOrDefaultAsync(x => x.Title == screeningInfo.MovieTitle);
-            var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.Name == screeningInfo.HallName);
-            var screeningPrice = await _cinemaDbContext.Set<ScreeningPrice>().FirstOrDefaultAsync(x => x.Price == screeningInfo.Price);
+            var movie = await _cinemaDbContext.Set<Movie>().FirstOrDefaultAsync(x => x.Title == screeningInfoDto.MovieTitle);
+            var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.Name == screeningInfoDto.HallName);
+            var screeningPrice = await _cinemaDbContext.Set<ScreeningPrice>().FirstOrDefaultAsync(x => x.Price == screeningInfoDto.Price);
 
             if (hall == null || movie == null || screeningPrice == null) { return false; }
 
-            if (!DateTime.TryParseExact(screeningInfo.ScreeningStart, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime screeningStartTime))
+            if (!DateTime.TryParseExact(screeningInfoDto.ScreeningStart, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime screeningStartTime))
             {
                 return false;
             }
@@ -42,14 +43,14 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyList<Contracts.Screening>> GetAllScreeningsAsync()
+        public async Task<IReadOnlyList<ScreeningDto>> GetAllScreeningsAsync()
         {
             return await _cinemaDbContext.Set<Screening>()
                 .Include(x => x.Hall)
                 .Include(x => x.ScreeningPrice)
                 .Include(x => x.Movie)               
                 .OrderBy(x => x.ScreeningStart)
-                .Select(screening => new Contracts.Screening
+                .Select(screening => new ScreeningDto
                 {
                     ScreeningUid = screening.ScreeningUid,
                     MovieTitle = screening.Movie.Title,
@@ -62,7 +63,7 @@ namespace WebApi.Services
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyList<Contracts.MovieScreening>> GetMovieScreeningsAsync(Guid movieUid)
+        public async Task<IReadOnlyList<MovieScreeningDto>> GetMovieScreeningsAsync(Guid movieUid)
         {
             return await _cinemaDbContext.Set<Screening>()
                 .Include(x => x.Hall)
@@ -71,7 +72,7 @@ namespace WebApi.Services
                 .Where(x => x.Movie.MovieUid == movieUid)
                 .OrderBy(x => x.ScreeningStart)
                     .ThenBy(x => x.Hall.Name)
-                .Select(screening => new Contracts.MovieScreening
+                .Select(screening => new MovieScreeningDto
                 {
                     ScreeningUid = screening.ScreeningUid,
                     ScreeningStart = screening.ScreeningStart.ToString("dd.MM.yyyy HH:mm"),
@@ -82,7 +83,7 @@ namespace WebApi.Services
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyList<Contracts.Screening>> GetHallScreeningsAsync(string hallName)
+        public async Task<IReadOnlyList<ScreeningDto>> GetHallScreeningsAsync(string hallName)
         {
             return await _cinemaDbContext.Set<Screening>()
                 .Include(x => x.Hall)
@@ -90,7 +91,7 @@ namespace WebApi.Services
                 .Include(x => x.Movie)
                 .Where(x => x.Hall.Name == hallName)
                 .OrderBy(x => x.ScreeningStart)
-                .Select(screening => new Contracts.Screening
+                .Select(screening => new ScreeningDto
                 {
                     ScreeningUid = screening.ScreeningUid,
                     MovieTitle = screening.Movie.Title,
@@ -103,19 +104,19 @@ namespace WebApi.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> UpdateScreeningAsync(Guid screeningUid, Contracts.ScreeningInfo screeningInfo)
+        public async Task<bool> UpdateScreeningAsync(Guid screeningUid, ScreeningInfoDto screeningInfoDto)
         {
             var screening = await _cinemaDbContext.Set<Screening>().FirstOrDefaultAsync(x => x.ScreeningUid == screeningUid);
 
             if (screening == null) {  return false; }
 
-            var movie = await _cinemaDbContext.Set<Movie>().FirstOrDefaultAsync(x => x.Title == screeningInfo.MovieTitle);
-            var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.Name == screeningInfo.HallName);
-            var screeningPrice = await _cinemaDbContext.Set<ScreeningPrice>().FirstOrDefaultAsync(x => x.Price == screeningInfo.Price);
+            var movie = await _cinemaDbContext.Set<Movie>().FirstOrDefaultAsync(x => x.Title == screeningInfoDto.MovieTitle);
+            var hall = await _cinemaDbContext.Set<Hall>().FirstOrDefaultAsync(x => x.Name == screeningInfoDto.HallName);
+            var screeningPrice = await _cinemaDbContext.Set<ScreeningPrice>().FirstOrDefaultAsync(x => x.Price == screeningInfoDto.Price);
 
             if (movie == null || hall == null || screeningPrice == null) { return false;}
 
-            if (!DateTime.TryParseExact(screeningInfo.ScreeningStart, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime screeningStartTime))
+            if (!DateTime.TryParseExact(screeningInfoDto.ScreeningStart, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime screeningStartTime))
             {
                 return false;
             }

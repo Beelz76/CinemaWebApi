@@ -1,9 +1,11 @@
-﻿namespace WebApi.Interfaces
+﻿using WebApi.Contracts;
+
+namespace WebApi.Interfaces
 {
     public interface IHallService
     {
         Task<bool> CreateHallAsync(string name);
-        Task<IReadOnlyList<Contracts.Hall>> GetHallsAsync();
+        Task<IReadOnlyList<HallDto>> GetHallsAsync();
         Task<bool> UpdateHallAsync(Guid hallUid, string name);
         Task<bool> DeleteHallAsync(Guid hallUid);
         Task<bool> HallExistsAsync(string name);

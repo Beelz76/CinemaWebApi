@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using WebApi.Contracts;
 using WebApi.Interfaces;
 
 namespace WebApi.Services
@@ -17,7 +18,7 @@ namespace WebApi.Services
             _cinemaDbContext = cinemaDbContext;
         }
 
-        public async Task<Guid> RegisterAsync(Contracts.UserRegisterCredentials credentials)
+        public async Task<Guid> RegisterAsync(RegisterUserDto credentials)
         {
             var user = new User
             {
@@ -34,21 +35,21 @@ namespace WebApi.Services
             return user.UserUid;
         }
 
-        public async Task<Guid> LoginAsync(Contracts.UserLoginCredentials credentials)
+        public async Task<Guid> LoginAsync(LoginUserDto dto)
         {
-            var hashedPassword = GetHash(credentials.Password);
+            var hashedPassword = GetHash(dto.Password);
 
-            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.Login == credentials.Login && x.Password == hashedPassword);
+            var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.Login == dto.Login && x.Password == hashedPassword);
             
             if (user == null) { return Guid.Empty; }
 
             return user.UserUid;
         }
 
-        public async Task<IReadOnlyList<Contracts.User>> GetAllUsersAsync()
+        public async Task<IReadOnlyList<UserDto>> GetAllUsersAsync()
         {
             return await _cinemaDbContext.Set<User>()
-                .Select(user => new Contracts.User
+                .Select(user => new UserDto
                 {
                     UserUid = user.UserUid,
                     FullName = user.FullName,
@@ -60,10 +61,10 @@ namespace WebApi.Services
                 .ToListAsync();
         }
 
-        public async Task<Contracts.User> GetSingleUserAsync(Guid userUid)
+        public async Task<UserDto> GetSingleUserAsync(Guid userUid)
         {
             var user = await _cinemaDbContext.Set<User>()
-                .Select(u => new Contracts.User
+                .Select(u => new UserDto
                 {
                     UserUid = u.UserUid,
                     FullName = u.FullName,
@@ -77,13 +78,13 @@ namespace WebApi.Services
             return user;
         }
 
-        public async Task<Contracts.UserInfo> GetUserInfoAsync(Guid userUid)
+        public async Task<UserProfileDto> GetUserInfoAsync(Guid userUid)
         {
             var user = await _cinemaDbContext.Set<User>().FirstOrDefaultAsync(x => x.UserUid == userUid);
 
             if (user == null) { return null; }
 
-            return new Contracts.UserInfo
+            return new UserProfileDto
             {
                 FullName = user.FullName,
                 Login = user.Login,
@@ -92,15 +93,15 @@ namespace WebApi.Services
             };
         }
 
-        public async Task<bool> UpdateUserAsync(Guid userUid, Contracts.UserUpdate userUpdate)
+        public async Task<bool> UpdateUserAsync(Guid userUid, UpdateUserDto updateUserDto)
         {
             var totalRows = await _cinemaDbContext.Set<User>()
                 .Where(x => x.UserUid == userUid)
                 .ExecuteUpdateAsync(x => x
-                    .SetProperty(p => p.FullName, userUpdate.FullName)
-                    .SetProperty(p => p.Login, userUpdate.Login)
-                    .SetProperty(p => p.Password, GetHash(userUpdate.Password))
-                    .SetProperty(p => p.Email, userUpdate.Email));
+                    .SetProperty(p => p.FullName, updateUserDto.FullName)
+                    .SetProperty(p => p.Login, updateUserDto.Login)
+                    .SetProperty(p => p.Password, GetHash(updateUserDto.Password))
+                    .SetProperty(p => p.Email, updateUserDto.Email));
             
             return totalRows > 0;
         }

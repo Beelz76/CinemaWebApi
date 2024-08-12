@@ -2,6 +2,7 @@
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using WebApi.Contracts;
 using WebApi.Interfaces;
 
 namespace WebApi.Services
@@ -27,10 +28,10 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyList<Contracts.Genre>> GetGenresAsync()
+        public async Task<IReadOnlyList<GenreDto>> GetGenresAsync()
         {
             return await _cinemaDbContext.Set<Genre>()
-                .Select(genre => new Contracts.Genre
+                .Select(genre => new GenreDto
                 {
                     GenreUid = genre.GenreUid,
                     Name = genre.Name

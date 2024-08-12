@@ -18,35 +18,35 @@ namespace WebApi.Controllers
 
         [HttpPost]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateMovie(MovieInfo movieInfo)
+        public async Task<IActionResult> CreateMovie(MovieDto movieDto)
         {
-            if (string.IsNullOrWhiteSpace(movieInfo.Title) || movieInfo.ReleaseYear <= 0 || 
-                int.Parse(movieInfo.Duration) <= 0 || !_movieService.IsValidMovieTitle(movieInfo.Title))
+            if (string.IsNullOrWhiteSpace(movieDto.Title) || movieDto.ReleaseYear <= 0 || 
+                movieDto.Duration <= 0 || !_movieService.IsValidMovieTitle(movieDto.Title))
             {
                 return BadRequest("Invalid movie title format or wrong data");
             }
 
-            if (!_movieService.IsValidNamesInList(movieInfo.Directors))
+            if (!_movieService.IsValidNamesInList(movieDto.Directors))
             {
                 return BadRequest("Invalid director name format");
             }
 
-            if (!_movieService.IsValidNamesInList(movieInfo.Countries))
+            if (!_movieService.IsValidNamesInList(movieDto.Countries))
             {
                 return BadRequest("Invalid country name format");
             }
 
-            if (!_movieService.IsValidNamesInList(movieInfo.Genres))
+            if (!_movieService.IsValidNamesInList(movieDto.Genres))
             {
                 return BadRequest("Invalid genre name format");
             }
 
-            if (await _movieService.MovieExistsByInfoAsync(movieInfo))
+            if (await _movieService.MovieExistsByInfoAsync(movieDto))
             {
                 return Conflict("Movie already exists");
             }
 
-            if (!await _movieService.CreateMovieAsync(movieInfo))
+            if (!await _movieService.CreateMovieAsync(movieDto))
             {
                 return BadRequest("Failed to create movie");
             }
@@ -98,35 +98,35 @@ namespace WebApi.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateMovie(Guid movieUid, MovieInfo movieInfo)
+        public async Task<IActionResult> UpdateMovie(Guid movieUid, MovieDto movieDto)
         {
-            if (string.IsNullOrWhiteSpace(movieInfo.Title) || movieInfo.ReleaseYear <= 0 || 
-                int.Parse(movieInfo.Duration) <= 0 || !_movieService.IsValidMovieTitle(movieInfo.Title))
+            if (string.IsNullOrWhiteSpace(movieDto.Title) || movieDto.ReleaseYear <= 0 || 
+                movieDto.Duration <= 0 || !_movieService.IsValidMovieTitle(movieDto.Title))
             {
                 return BadRequest("Invalid movie title format or wrong data");
             }
 
-            if (!_movieService.IsValidNamesInList(movieInfo.Directors))
+            if (!_movieService.IsValidNamesInList(movieDto.Directors))
             {
                 return BadRequest("Invalid director name format");
             }
 
-            if (!_movieService.IsValidNamesInList(movieInfo.Countries))
+            if (!_movieService.IsValidNamesInList(movieDto.Countries))
             {
                 return BadRequest("Invalid country name format");
             }
 
-            if (!_movieService.IsValidNamesInList(movieInfo.Genres))
+            if (!_movieService.IsValidNamesInList(movieDto.Genres))
             {
                 return BadRequest("Invalid genre name format");
             }
 
-            if (await _movieService.MovieExistsByInfoAsync(movieInfo, movieUid))
+            if (await _movieService.MovieExistsByInfoAsync(movieDto, movieUid))
             {
                 return BadRequest("Movie already exists");
             }
 
-            if (!await _movieService.UpdateMovieAsync(movieUid, movieInfo))
+            if (!await _movieService.UpdateMovieAsync(movieUid, movieDto))
             {
                 return BadRequest("Failed to update movie");
             }

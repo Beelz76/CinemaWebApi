@@ -2,6 +2,7 @@
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using WebApi.Contracts;
 using WebApi.Interfaces;
 
 namespace WebApi.Services
@@ -27,10 +28,10 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyList<Contracts.Country>> GetCountriesAsync()
+        public async Task<IReadOnlyList<CountryDto>> GetCountriesAsync()
         {
             return await _cinemaDbContext.Set<Country>()
-                .Select(c => new Contracts.Country
+                .Select(c => new CountryDto()
                 {
                     CountryUid = c.CountryUid,
                     Name = c.Name

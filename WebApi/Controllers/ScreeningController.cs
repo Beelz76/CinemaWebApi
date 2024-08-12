@@ -24,35 +24,35 @@ namespace WebApi.Controllers
 
         [HttpPost]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateScreening(ScreeningInfo screeningInfo)
+        public async Task<IActionResult> CreateScreening(ScreeningInfoDto screeningInfoDto)
         {
-            if (string.IsNullOrWhiteSpace(screeningInfo.MovieTitle) || string.IsNullOrWhiteSpace(screeningInfo.HallName) ||
-                string.IsNullOrWhiteSpace(screeningInfo.ScreeningStart) || screeningInfo.Price <= 0)
+            if (string.IsNullOrWhiteSpace(screeningInfoDto.MovieTitle) || string.IsNullOrWhiteSpace(screeningInfoDto.HallName) ||
+                string.IsNullOrWhiteSpace(screeningInfoDto.ScreeningStart) || screeningInfoDto.Price <= 0)
             {
                 return BadRequest("Wrong data");
             }
 
-            if (!await _movieService.MovieExistsByTitleAsync(screeningInfo.MovieTitle))
+            if (!await _movieService.MovieExistsByTitleAsync(screeningInfoDto.MovieTitle))
             {
                 return NotFound("Movie not found");
             }
 
-            if (!await _hallService.HallExistsAsync(screeningInfo.HallName))
+            if (!await _hallService.HallExistsAsync(screeningInfoDto.HallName))
             {
                 return NotFound("Hall not found");
             }
 
-            if (!await _screeningPriceService.ScreeningPriceExistsAsync(screeningInfo.Price))
+            if (!await _screeningPriceService.ScreeningPriceExistsAsync(screeningInfoDto.Price))
             {
                 return NotFound("Price not found");
             }
 
-            if (!await _screeningService.IsValidScreeningTimeAsync(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart))
+            if (!await _screeningService.IsValidScreeningTimeAsync(screeningInfoDto.MovieTitle, screeningInfoDto.HallName, screeningInfoDto.ScreeningStart))
             {
                 return BadRequest("Failed to create screening at this time");
             }
 
-            if (!await _screeningService.CreateScreeningAsync(screeningInfo))
+            if (!await _screeningService.CreateScreeningAsync(screeningInfoDto))
             {
                 return BadRequest("Failed to create screening");
             }
@@ -114,35 +114,35 @@ namespace WebApi.Controllers
 
         [HttpPut]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateScreening(Guid screeningUid, ScreeningInfo screeningInfo)
+        public async Task<IActionResult> UpdateScreening(Guid screeningUid, ScreeningInfoDto screeningInfoDto)
         {
-            if (string.IsNullOrWhiteSpace(screeningInfo.MovieTitle) || string.IsNullOrWhiteSpace(screeningInfo.HallName) ||
-                string.IsNullOrWhiteSpace(screeningInfo.ScreeningStart) || screeningInfo.Price <= 0)
+            if (string.IsNullOrWhiteSpace(screeningInfoDto.MovieTitle) || string.IsNullOrWhiteSpace(screeningInfoDto.HallName) ||
+                string.IsNullOrWhiteSpace(screeningInfoDto.ScreeningStart) || screeningInfoDto.Price <= 0)
             {
                 return BadRequest("Wrong data");
             }
 
-            if (!await _movieService.MovieExistsByTitleAsync(screeningInfo.MovieTitle))
+            if (!await _movieService.MovieExistsByTitleAsync(screeningInfoDto.MovieTitle))
             {
                 return NotFound("Movie not found");
             }
 
-            if (!await _hallService.HallExistsAsync(screeningInfo.HallName))
+            if (!await _hallService.HallExistsAsync(screeningInfoDto.HallName))
             {
                 return NotFound("Hall not found");
             }
 
-            if (!await _screeningPriceService.ScreeningPriceExistsAsync(screeningInfo.Price))
+            if (!await _screeningPriceService.ScreeningPriceExistsAsync(screeningInfoDto.Price))
             {
                 return NotFound("Price not found");
             }
 
-            if (!await _screeningService.IsValidScreeningTimeAsync(screeningInfo.MovieTitle, screeningInfo.HallName, screeningInfo.ScreeningStart))
+            if (!await _screeningService.IsValidScreeningTimeAsync(screeningInfoDto.MovieTitle, screeningInfoDto.HallName, screeningInfoDto.ScreeningStart))
             {
                 return BadRequest("Failed to create screening at this time");
             }
 
-            if (!await _screeningService.UpdateScreeningAsync(screeningUid, screeningInfo))
+            if (!await _screeningService.UpdateScreeningAsync(screeningUid, screeningInfoDto))
             {
                 return BadRequest("Failed to update screening");
             }

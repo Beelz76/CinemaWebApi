@@ -1,6 +1,7 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Contracts;
 using WebApi.Interfaces;
 
 namespace WebApi.Services
@@ -34,14 +35,14 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyList<Contracts.Seat>> GetAllSeatsAsync()
+        public async Task<IReadOnlyList<SeatDto>> GetAllSeatsAsync()
         {
             return await _cinemaDbContext.Set<Seat>()
                 .Include(x => x.Hall)
                 .OrderBy(x => x.Hall.Name)
                 .ThenBy(x => x.Row)
                 .ThenBy(x => x.Number)
-                .Select(seat => new Contracts.Seat
+                .Select(seat => new SeatDto
                 {
                     SeatUid = seat.SeatUid,
                     HallName = seat.Hall.Name,
@@ -51,14 +52,14 @@ namespace WebApi.Services
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyList<Contracts.HallSeat>> GetHallSeatsAsync(string hallName)
+        public async Task<IReadOnlyList<HallSeatDto>> GetHallSeatsAsync(string hallName)
         {
             return await _cinemaDbContext.Set<Seat>()
                 .Where(x => x.Hall.Name == hallName)
                 .OrderBy(x => x.Hall.HallUid)
                 .ThenBy(x => x.Row)
                 .ThenBy(x => x.Number)
-                .Select(seat => new Contracts.HallSeat
+                .Select(seat => new HallSeatDto
                  {
                      SeatUid = seat.SeatUid,
                      HallName = seat.Hall.Name,
@@ -68,7 +69,7 @@ namespace WebApi.Services
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyList<Contracts.ScreeningSeat>> GetScreeningSeatsAsync(Guid screeningUid)
+        public async Task<IReadOnlyList<ScreeningSeatDto>> GetScreeningSeatsAsync(Guid screeningUid)
         {
             var screening = await _cinemaDbContext.Set<Screening>()
                 .Include(x => x.Hall)
@@ -78,7 +79,7 @@ namespace WebApi.Services
                 .Where(x => x.Hall.HallUid == screening.Hall.HallUid)
                 .OrderBy(x => x.Row)
                 .ThenBy(x => x.Number)
-                .Select(x => new Contracts.ScreeningSeat
+                .Select(x => new ScreeningSeatDto
                 {
                     SeatUid = x.SeatUid,
                     Row = x.Row,

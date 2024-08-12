@@ -2,6 +2,7 @@
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using WebApi.Contracts;
 using WebApi.Interfaces;
 
 namespace WebApi.Services
@@ -27,10 +28,10 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyList<Contracts.Director>> GetDirectorsAsync()
+        public async Task<IReadOnlyList<DirectorDto>> GetDirectorsAsync()
         {
             return await _cinemaDbContext.Set<Director>()
-                .Select(director => new Contracts.Director
+                .Select(director => new DirectorDto
                 {
                     DirectorUid = director.DirectorUid,
                     FullName = director.FullName

@@ -1,6 +1,7 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Contracts;
 using WebApi.Interfaces;
 
 namespace WebApi.Services
@@ -34,7 +35,7 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyList<Contracts.Ticket>> GetAllTicketsAsync()
+        public async Task<IReadOnlyList<TicketDto>> GetAllTicketsAsync()
         {
             return await _cinemaDbContext.Set<Ticket>()
                 .Include(x => x.Screening.Hall)
@@ -42,7 +43,7 @@ namespace WebApi.Services
                 .Include(x => x.Screening.Movie)
                 .Include(x => x.Seat)
                 .Include(x => x.User)
-                .Select(ticket => new Contracts.Ticket
+                .Select(ticket => new TicketDto
                 {
                     TicketUid = ticket.TicketUid,
                     UserFullName = ticket.User.FullName,
@@ -58,7 +59,7 @@ namespace WebApi.Services
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyList<Contracts.UserTicket>> GetUserTicketsAsync(Guid userUid)
+        public async Task<IReadOnlyList<UserTicketDto>> GetUserTicketsAsync(Guid userUid)
         {
             return await _cinemaDbContext.Set<Ticket>()
                 .Include(x => x.Screening.Hall)
@@ -67,7 +68,7 @@ namespace WebApi.Services
                 .Include(x => x.Seat)
                 .Include(x => x.User)
                 .Where(x => x.User.UserUid == userUid)
-                .Select(ticket => new Contracts.UserTicket
+                .Select(ticket => new UserTicketDto
                 {
                     TicketUid = ticket.TicketUid,
                     MovieTitle = ticket.Screening.Movie.Title,
@@ -82,7 +83,7 @@ namespace WebApi.Services
                 .ToListAsync();
         }
 
-        public async Task<IReadOnlyList<Contracts.Ticket>> GetScreeningTicketsAsync(Guid screeningUid)
+        public async Task<IReadOnlyList<TicketDto>> GetScreeningTicketsAsync(Guid screeningUid)
         {
             return await _cinemaDbContext.Set<Ticket>()
                 .Include(x => x.Screening.Hall)
@@ -91,7 +92,7 @@ namespace WebApi.Services
                 .Include(x => x.Seat)
                 .Include(x => x.User)
                 .Where(x => x.Screening.ScreeningUid == screeningUid)
-                .Select(ticket => new Contracts.Ticket
+                .Select(ticket => new TicketDto
                 {
                     TicketUid = ticket.TicketUid,
                     UserFullName = ticket.User.FullName,

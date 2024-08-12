@@ -1,6 +1,7 @@
 ﻿using DatabaseAccessLayer;
 using DatabaseAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Contracts;
 using WebApi.Interfaces;
 
 namespace WebApi.Services
@@ -26,11 +27,11 @@ namespace WebApi.Services
             return await _cinemaDbContext.SaveChangesAsync() > 0;
         }
 
-        public async Task<IReadOnlyList<Contracts.ScreeningPrice>> GetScreeningPricesAsync()
+        public async Task<IReadOnlyList<ScreeningPriceDto>> GetScreeningPricesAsync()
         {
             return await _cinemaDbContext.Set<ScreeningPrice>()
                 .OrderBy(x => x.Price)
-                .Select(screeningPrice => new Contracts.ScreeningPrice
+                .Select(screeningPrice => new ScreeningPriceDto
                 {
                     ScreeningPriceUid = screeningPrice.ScreeningPriceUid,
                     Price = screeningPrice.Price
